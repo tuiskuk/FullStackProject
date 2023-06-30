@@ -44,3 +44,9 @@ Web app where you can:
    - change username?
    - 
 21. Moderator
+
+
+API:
+Edamam Recipe Search Api
+https://developer.edamam.com/edamam-recipe-api
+
