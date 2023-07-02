@@ -50,3 +50,4 @@ API:
 Edamam Recipe Search Api
 https://developer.edamam.com/edamam-recipe-api
 
+![image](https://github.com/tuiskuk/FullStackProject/assets/124632924/c29f57fd-b21e-4317-956b-aba4c1df94b4)
