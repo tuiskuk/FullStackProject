@@ -1,9 +1,10 @@
 import SearchBage from './components/SearchBage'
+import { Container } from '@mui/material'
 
 const App = () => (
-  <div>
+  <Container>
     <SearchBage />
-  </div>
+  </Container>
 )
 
 export default App

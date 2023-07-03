@@ -4,12 +4,13 @@ const axios = require('axios')
 
 recipesRouter.get('/', async (request, response) => {
   try {
+    const searchTerm = request.query.search
     const apiResponse = await axios.get(
       'https://api.edamam.com/api/recipes/v2',
       {
         params: {
           type: 'public',
-          q: 'pizza',
+          q: searchTerm,
           app_id: config.EDAMAM_ID,
           app_key: config.EDAMAM_APPLICATION_KEY,
         },
