@@ -44,12 +44,11 @@ const SearchBage = () => {
         Search
       </Button>
       <h2>Check recommended recipes or feel free to search recipes yourself</h2>
-      {recipes.map((recipe) => (
-        <Recipe
-          key={recipe.uri}
-          recipe={recipe}
-        />
-      ))}
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+        {recipes.map((recipe) => (
+          <Recipe key={recipe.uri} recipe={recipe} />
+        ))}
+      </div>
       {nextPageLink && (
         <Button variant="outlined" onClick={goToNextPage}>
           Load more
