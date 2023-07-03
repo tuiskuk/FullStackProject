@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 const SearchBage = () => {
   const [recipes, setRecipes] = useState([])
   const [search, setSearch] = useState('')
+  const [nextPageLink, setNextPageLink] = useState('')
 
   useEffect(() => {
     handleSearch()
@@ -14,11 +15,22 @@ const SearchBage = () => {
 
   const handleSearch = () => {
     let searchTerm = search || localStorage.getItem('search') || 'recommended'
-    recipeService.getAll(searchTerm).then((response) =>
+    recipeService.getAll(searchTerm).then((response) => {
       setRecipes(response.hits.map((hit) => hit.recipe))
-    )
+      setNextPageLink(response._links.next.href)
+    })
+
     localStorage.setItem('search', searchTerm)
     setSearch('')
+  }
+
+  const goToNextPage = () => {
+    if (nextPageLink) {
+      recipeService.getRecipesByLink(nextPageLink).then((response) => {
+        setRecipes((prevRecipes) => [...prevRecipes, ...response.hits.map((hit) => hit.recipe)])
+        setNextPageLink(response._links.next.href)
+      })
+    }
   }
 
   return (
@@ -38,6 +50,11 @@ const SearchBage = () => {
           recipe={recipe}
         />
       ))}
+      {nextPageLink && (
+        <Button variant="outlined" onClick={goToNextPage}>
+          Load more
+        </Button>
+      )}
     </div>
   )
 }

@@ -23,4 +23,16 @@ recipesRouter.get('/', async (request, response) => {
   }
 })
 
+recipesRouter.get('/link', async (request, response) => {
+  try {
+    const searchTerm = request.query.link
+    const apiResponse = await axios.get(searchTerm)
+
+    const recipes = apiResponse.data
+    response.json(recipes)
+  } catch (error) {
+    console.error(error)
+  }
+})
+
 module.exports = recipesRouter

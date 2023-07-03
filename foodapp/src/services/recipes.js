@@ -6,4 +6,9 @@ const getAll = async (searchTerm) => {
   return response.data
 }
 
-export default { getAll }
+const getRecipesByLink = async (link) => {
+  const response = await axios.get(`${baseUrl}/link`, { params: { link: link } })
+  return response.data
+}
+
+export default { getAll, getRecipesByLink }
