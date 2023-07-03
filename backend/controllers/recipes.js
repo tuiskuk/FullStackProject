@@ -14,7 +14,7 @@ recipesRouter.get('/', async (request, response) => {
           app_key: config.EDAMAM_APPLICATION_KEY,
         },
       }
-    );
+    )
     const recipes = apiResponse.data
     response.json(recipes)
   } catch (error) {
