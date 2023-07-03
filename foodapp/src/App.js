@@ -1,6 +1,8 @@
+import SearchBage from './components/SearchBage'
+
 const App = () => (
   <div>
-    <p>Hello world</p>
+    <SearchBage />
   </div>
 )
 
