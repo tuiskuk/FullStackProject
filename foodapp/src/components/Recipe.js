@@ -15,7 +15,6 @@ const Recipe = ({ recipe }) => {
           />
           <CardContent sx={{ height: 80 }}>
             <Typography variant="h6">{recipe.label}</Typography>
-            <Typography>{recipe_id}</Typography>
           </CardContent>
         </CardActionArea>
       </Card>

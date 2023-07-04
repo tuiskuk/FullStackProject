@@ -1,7 +1,9 @@
 import Recipe from './Recipe'
-import { TextField, Button, CircularProgress } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
+import healthFilterOptions from '../data'
+import { TextField, Button, FormControl, Select, MenuItem, InputLabel, Checkbox, ListItemText, CircularProgress } from '@mui/material'
+
 
 //when swiching page localStorage.clear();
 
@@ -10,7 +12,8 @@ const SearchBage = () => {
   const [search, setSearch] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [nextPageLink, setNextPageLink] = useState('')
-  const { data: allRecipesData, isLoading } = useGetAllRecipesQuery(searchTerm)
+  const [filterOptions, setFilterOptions] = useState([])
+  const { data: allRecipesData, isLoading } = useGetAllRecipesQuery({ searchTerm, filterOptions })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
 
@@ -24,9 +27,9 @@ const SearchBage = () => {
 
 
   useEffect(() => {
-    console.log(allRecipesData)
     if (allRecipesData) {
       setRecipes(allRecipesData.hits.map((hit) => hit.recipe))
+      localStorage.setItem('search', searchTerm)
       if(allRecipesData._links.next && allRecipesData._links.next.href ) setNextPageLink(allRecipesData._links.next.href)
 
     }
@@ -42,6 +45,7 @@ const SearchBage = () => {
 
   const handleClickSearch = async () => {
     setSearchTerm(search)
+
 
 
   }
@@ -66,16 +70,36 @@ const SearchBage = () => {
 
   return (
     <div>
-      <TextField
-        label="Search recipes"
-        value={search}
-        onChange={(e) => {
-          console.log(e.target.value)
-          setSearch(e.target.value)}}
-      />
-      <Button variant="contained" onClick={handleClickSearch}>
-        Search
-      </Button>
+      <FormControl variant="outlined">
+        <TextField
+          label="Search recipes"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+
+        <Button variant="contained" onClick={handleClickSearch}>
+          Search
+        </Button>
+      </FormControl>
+      <FormControl variant="outlined">
+        <InputLabel>Filter by diet</InputLabel>
+        <Select
+          multiple
+          value={filterOptions}
+          onChange={(event) => setFilterOptions(event.target.value)
+          }
+          renderValue={(selected) => selected.join(', ')}
+          style={{ minWidth: '200px' }}
+        >
+          {healthFilterOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              <Checkbox checked={filterOptions.includes(option)} />
+              <ListItemText primary={option} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
       <h2>Check recommended recipes or feel free to search recipes yourself</h2>
       {isLoading ? (
         <CircularProgress /> // Render the loading spinner when loading is true
@@ -86,12 +110,14 @@ const SearchBage = () => {
           ))}
         </div>
       )}
+
       {nextPageLink && (
         <Button variant="outlined" onClick={goToNextPage}>
           Load more
         </Button>
       )}
     </div>
+
   )
 }
 
