@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import SearchBage from './components/SearchBage'
 import HomeBage from './components/HomePage'
+import RecipeViewPage from './components/RecipeViewPage'
 import { Container, AppBar, Toolbar, Button } from '@mui/material'
 
 const App = () => (
@@ -20,6 +21,9 @@ const App = () => (
       <Routes>
         <Route path="/search" element={<SearchBage />} />
         <Route path="/" element={<HomeBage />} />
+        <Route path=':id' element={
+          <RecipeViewPage/>
+        }/>
       </Routes>
     </Container>
   </Router>
