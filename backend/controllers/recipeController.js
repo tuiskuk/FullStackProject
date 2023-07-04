@@ -5,23 +5,41 @@ import axios from 'axios';
 const getRecipes = async (request, response) => {
   try {
     const searchTerm = request.query.search;
+    // calories, time, same with every nutrien,... MIN+, MIN-MAX, MAX (string)
+    const calories = request.query.calories;
+    const time = request.query.time || '';
+
+    //['vegetarian', 'kosher']
     let healthFilters = request.query.healthFilters || [];
     
-    console.log(healthFilters)
-
+    //['bread', 'beef']
+    let excludedFilters = request.query.excludedFilters || []; 
+    
     if (typeof healthFilters === 'string') {
       healthFilters = healthFilters.split(',').map((filter) => filter.trim());
     }
 
-    console.log(healthFilters)
-    
+    console.log(healthFilters);
+
     const params = {
       type: 'public',
       q: searchTerm,
       app_id: config.EDAMAM_ID,
       app_key: config.EDAMAM_APPLICATION_KEY,
     };
-    
+
+    if (calories) {
+      params.calories = calories;
+    }
+
+    if (time) {
+      params.time = time;
+    }
+
+    if (excludedFilters) {
+      params.excluded = excludedFilters.join(' ')
+    }
+
     let filterString = '';
     if (healthFilters.length > 0) {
       const lowercaseFilters = healthFilters.map((filter) => filter.toLowerCase());
@@ -30,7 +48,7 @@ const getRecipes = async (request, response) => {
 
     const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}`;
     console.log(url);
-    const apiResponse = await axios.get(url);
+    const apiResponse = await axios.get(url);;
 
     const recipes = apiResponse.data;
     response.status(200).json(recipes);
@@ -53,4 +71,4 @@ const getLink = async (request, response) => {
 
 export default {
     getRecipes, getLink
-}
+};
