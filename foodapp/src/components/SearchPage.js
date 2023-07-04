@@ -4,22 +4,18 @@ import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice
 import healthFilterOptions from '../data'
 import { TextField, Button, FormControl, Select, MenuItem, InputLabel, Checkbox, ListItemText, CircularProgress } from '@mui/material'
 
-
 //when swiching page localStorage.clear();
 
 const SearchBage = () => {
   const [recipes, setRecipes] = useState([])
   const [search, setSearch] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
+  const [excluded, setExcluded] = useState([])
   const [nextPageLink, setNextPageLink] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [excludedTerms, setExcludedTerms] = useState([])
   const [filterOptions, setFilterOptions] = useState([])
-  const { data: allRecipesData, isLoading } = useGetAllRecipesQuery({ searchTerm, filterOptions })
+  const { data: allRecipesData, isLoading } = useGetAllRecipesQuery({ searchTerm, filterOptions, excludedTerms })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
-
-
-
-
-
 
   useEffect(() => {
     setSearchTerm(searchTerm || localStorage.getItem('search') || 'recommended')
@@ -30,24 +26,17 @@ const SearchBage = () => {
     if (allRecipesData) {
       setRecipes(allRecipesData.hits.map((hit) => hit.recipe))
       localStorage.setItem('search', searchTerm)
-      if(allRecipesData._links.next && allRecipesData._links.next.href ) setNextPageLink(allRecipesData._links.next.href)
-
+      if(allRecipesData._links.next && allRecipesData._links.next.href ) {
+        setNextPageLink(allRecipesData._links.next.href)
+      }
     }
     setSearch('')
-
-
-
+    setExcluded('')
   }, [allRecipesData])
 
-
-
-
-
   const handleClickSearch = async () => {
+    setExcludedTerms(excluded)
     setSearchTerm(search)
-
-
-
   }
 
   const fetchNextPage = async () => {
@@ -81,6 +70,15 @@ const SearchBage = () => {
           Search
         </Button>
       </FormControl>
+
+      <FormControl variant="outlined">
+        <TextField
+          label="Set excluded foods"
+          value={excluded}
+          onChange={(event) => setExcluded(event.target.value)}
+        />
+      </FormControl>
+
       <FormControl variant="outlined">
         <InputLabel>Filter by diet</InputLabel>
         <Select
@@ -117,7 +115,6 @@ const SearchBage = () => {
         </Button>
       )}
     </div>
-
   )
 }
 
