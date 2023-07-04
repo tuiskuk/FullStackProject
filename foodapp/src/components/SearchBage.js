@@ -16,6 +16,7 @@ const SearchBage = () => {
   const handleSearch = () => {
     let searchTerm = search || localStorage.getItem('search') || 'recommended'
     recipeService.getAll(searchTerm).then((response) => {
+      console.log(response)
       setRecipes(response.hits.map((hit) => hit.recipe))
       setNextPageLink(response._links.next.href)
     })
