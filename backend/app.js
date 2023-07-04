@@ -1,10 +1,10 @@
-const express = require('express')
-const cors = require('cors')
-const recipesRouter = require('./controllers/recipes')
+import express from 'express'
+import cors from 'cors'
+import recipesRouter from './routes/recipesRouter.js'
 
 const app = express()
 
 app.use(cors())
 app.use('/api/recipes', recipesRouter)
 
-module.exports = app
+export default app;
