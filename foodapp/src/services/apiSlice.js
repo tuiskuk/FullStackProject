@@ -12,11 +12,11 @@ export const apiSlice = createApi({
   ],
   endpoints: builder => ({
     getAllRecipes: builder.query({
-      query: ({ searchTerm, filterOptions }) => {
-        console.log('searchTerm:', searchTerm, filterOptions) // Add console.log here
+      query: ({ searchTerm, filterOptions, excludedTerms }) => {
+        console.log('searchTerm:', searchTerm, filterOptions, excludedTerms)
         return {
           url: '/recipes',
-          params: { search: searchTerm, healthFilters: filterOptions },
+          params: { search: searchTerm, healthFilters: filterOptions, excludedFilters: excludedTerms },
         }
       },
     }),
