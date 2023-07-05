@@ -4,11 +4,12 @@ import recipesRouter from './routes/recipesRouter.js'
 import userRouter from './routes/userRouter.js'
 import config from './utils/config.js'
 import middleware from './utils/middleware.js'
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 mongoose.set('strictQuery', false)
 
 
 const app = express()
+
 const corsOptions = {
   origin: 'http://localhost:3000',
   credentials: true,
