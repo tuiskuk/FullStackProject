@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const getRecipes = async (request, response) => {
   console.log('you are in getrecipes')
-  console.log(request.query)
+  
   try {
     const searchTerm = request.query.search;
     let healthFilters = request.query.healthFilters || [];
