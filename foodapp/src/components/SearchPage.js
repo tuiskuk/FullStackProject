@@ -4,26 +4,25 @@ import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice
 import healthFilterOptions from '../data'
 import { TextField, Button, FormControl, Select, MenuItem, InputLabel, Checkbox, ListItemText, CircularProgress } from '@mui/material'
 
-//when swiching page localStorage.clear();
-
 const SearchBage = () => {
   const [recipes, setRecipes] = useState([])
   const [search, setSearch] = useState('')
   const [excluded, setExcluded] = useState([])
   const [nextPageLink, setNextPageLink] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [time, setTime] = useState('')
+  const [timeTerm, setTimeTerm] = useState('')
+  const [calories, setCalories] = useState('')
+  const [caloriesTerm, setCaloriesTerm] = useState('')
   const [excludedTerms, setExcludedTerms] = useState([])
   const [filterOptions, setFilterOptions] = useState([])
-  const { data: allRecipesData, isLoading, isFetching } = useGetAllRecipesQuery({ searchTerm,  filterOptions, excludedTerms })
+  const [filterOptionTerms, setFilterOptionTerms] = useState([])
+  const { data: allRecipesData, isLoading, isFetching } = useGetAllRecipesQuery({ searchTerm,  filterOptionTerms, excludedTerms, timeTerm, caloriesTerm })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
   useEffect(() => {
     setSearchTerm(searchTerm || localStorage.getItem('search') || 'recommended')
   }, [])
-
-
-
-
 
   useEffect(() => {
     if (allRecipesData) {
@@ -32,24 +31,22 @@ const SearchBage = () => {
       if(allRecipesData._links.next && allRecipesData._links.next.href ) {
         setNextPageLink(allRecipesData._links.next.href)
       }
-      setSearch('')
-      setExcluded([])
     }
-
-
   }, [allRecipesData])
 
   const handleClickSearch = async () => {
-
     setExcludedTerms(excluded)
     console.log(excludedTerms)
     setSearchTerm(search)
     console.log(searchTerm)
+    setFilterOptionTerms(filterOptions)
+    console.log(filterOptionTerms)
+    setTimeTerm(time)
+    setCaloriesTerm(calories)
   }
 
   const fetchNextPage = async () => {
     if (nextPageLink) {
-
       setRecipes((prevRecipes) => [...prevRecipes, ...NextPageData.hits.map((hit) => hit.recipe)])
       if (NextPageData._links.next && NextPageData._links.next.href) {
         setNextPageLink(NextPageData._links.next.href)
@@ -105,6 +102,22 @@ const SearchBage = () => {
             </MenuItem>
           ))}
         </Select>
+      </FormControl>
+
+      <FormControl variant="outlined">
+        <TextField
+          label="Calories"
+          value={calories}
+          onChange={(event) => setCalories(event.target.value)}
+        />
+      </FormControl>
+
+      <FormControl variant="outlined">
+        <TextField
+          label="Time"
+          value={time}
+          onChange={(event) => setTime(event.target.value)}
+        />
       </FormControl>
 
       <h2>Check recommended recipes or feel free to search recipes yourself</h2>

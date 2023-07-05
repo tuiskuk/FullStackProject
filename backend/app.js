@@ -3,6 +3,7 @@ import cors from 'cors'
 import recipesRouter from './routes/recipesRouter.js'
 
 const app = express()
+
 const corsOptions = {
   origin: 'http://localhost:3000',
   credentials: true,
