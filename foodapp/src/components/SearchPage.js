@@ -6,16 +6,21 @@ import { Container, TextField, Button, FormControl, Select, MenuItem, InputLabel
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
-  const [search, setSearch] = useState('')
-  const [excluded, setExcluded] = useState([])
   const [nextPageLink, setNextPageLink] = useState('')
+
+  const [search, setSearch] = useState(localStorage.getItem('search') ||'')
   const [searchTerm, setSearchTerm] = useState('')
-  const [time, setTime] = useState('')
-  const [timeTerm, setTimeTerm] = useState('')
-  const [calories, setCalories] = useState('')
-  const [caloriesTerm, setCaloriesTerm] = useState('')
+
+  const [excluded, setExcluded] = useState(localStorage.getItem('exluded') || [])
   const [excludedTerms, setExcludedTerms] = useState([])
-  const [filterOptions, setFilterOptions] = useState([])
+
+  const [time, setTime] = useState(localStorage.getItem('time') || '')
+  const [timeTerm, setTimeTerm] = useState('')
+
+  const [calories, setCalories] = useState(localStorage.getItem('calories') || '')
+  const [caloriesTerm, setCaloriesTerm] = useState('')
+
+  const [filterOptions, setFilterOptions] = useState(localStorage.getItem('filterOptions') || [])
   const [filterOptionTerms, setFilterOptionTerms] = useState([])
 
   const { data: allRecipesData, isLoading, isFetching
@@ -33,6 +38,17 @@ const SearchPage = () => {
   }, [allRecipesData])
 
   const searchRecipes = async () => {
+    localStorage.setItem('time', time)
+    localStorage.setItem('calories', calories)
+    localStorage.setItem('excluded', excluded)
+    localStorage.setItem('filterOptions', filterOptions)
+    localStorage.setItem('search', search)
+    setExcludedTerms(excluded)
+    setSearchTerm(search)
+    setFilterOptionTerms(filterOptions)
+    setTimeTerm(time)
+    setCaloriesTerm(calories)
+
     if (allRecipesData) {
       setRecipes(allRecipesData.hits.map((hit) => hit.recipe))
       if (allRecipesData._links.next && allRecipesData._links.next.href) {
@@ -41,17 +57,13 @@ const SearchPage = () => {
     }
   }
 
-  const handleClickSearch = async () => {
-    setExcludedTerms(excluded)
-    setSearchTerm(search)
-    setFilterOptionTerms(filterOptions)
-    setTimeTerm(time)
-    setCaloriesTerm(calories)
-    localStorage.setItem('time', time)
-    localStorage.setItem('calories', calories)
-    localStorage.setItem('excluded', excluded)
-    localStorage.setItem('filterOptions', filterOptions)
-    localStorage.setItem('search', search)
+  const clearFilters = async () => {
+    setSearch('')
+    setExcluded([])
+    setFilterOptions([])
+    setTime('')
+    setCalories('')
+
     searchRecipes()
   }
 
@@ -126,20 +138,27 @@ const SearchPage = () => {
         />
       </FormControl>
 
-      <Button variant="contained" onClick={handleClickSearch}>
+      <Button variant="contained" onClick={searchRecipes}>
           Search
+      </Button>
+
+      <Button variant="contained" onClick={clearFilters}>
+          Clear
       </Button>
 
       <h2>Check recommended recipes or feel free to search recipes yourself</h2>
       {isLoading || isFetching ? (
         <CircularProgress /> // Render the loading spinner when loading is true
-      ) : (
+      ) : recipes.length !== 0 ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
           {recipes.map((recipe) => (
             <Recipe key={recipe.uri} recipe={recipe} />
           ))}
         </div>
-      )}
+      ) : (
+        <h3>No recipes found</h3>
+      )
+      }
 
       {nextPageLink && (
         <Button variant="outlined" onClick={goToNextPage}>

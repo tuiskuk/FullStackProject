@@ -1,11 +1,13 @@
+//commented filters have problems to search
+
 const healthFilterOptions = [
   'Alcohol-Cocktail',
   'Alcohol-Free',
   'Celery-Free',
-  'Crustcean-Free',
+  //'Crustcean-Free',
   'Dairy-Free',
-  'DASH',
   'Egg-Free',
+  //'DASH',
   'Fish-Free',
   'FODMAP-Free',
   'Gluten-Free',
@@ -16,7 +18,7 @@ const healthFilterOptions = [
   //'Low Potassium',
   //'Low Sugar',
   'Lupine-Free',
-  'Mediterranean',
+  //'Mediterranean',
   'Mollusk-Free	',
   'Mustard-Free',
   //'No oil added	',
