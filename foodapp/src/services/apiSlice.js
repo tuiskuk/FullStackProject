@@ -12,7 +12,7 @@ export const apiSlice = createApi({
   ],
   endpoints: builder => ({
     getAllRecipes: builder.query({
-      query: ({ searchTerm, filterOptions, excludedTerms }) => {
+      query: ({ searchTerm,  filterOptions, excludedTerms }) => {
         console.log('searchTerm:', searchTerm, filterOptions, excludedTerms)
         return {
           url: '/recipes',
@@ -25,8 +25,9 @@ export const apiSlice = createApi({
         url: '/recipes/link',
         params: { link: link }
       })
-    })
+    }),
+
   })
 })
 
-export const { useGetAllRecipesQuery, useGetNextPageQuery } = apiSlice
+export const { useGetAllRecipesQuery, useGetNextPageQuery, useGetRecipeQuery } = apiSlice

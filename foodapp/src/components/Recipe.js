@@ -2,8 +2,17 @@ import { Card, CardMedia, CardContent, Typography, CardActionArea } from '@mui/m
 import { Link } from 'react-router-dom'
 const Recipe = ({ recipe }) => {
   const recipe_id = recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1)
+
+  const handleRecipeClick = () => {
+    try {
+      // Save the recipe to sessionStorage
+      sessionStorage.setItem('recipe', JSON.stringify(recipe))
+    } catch (error) {
+      console.log('Error saving recipe:', error)
+    }
+  }
   return (
-    <Link to={`/${recipe_id}`}>
+    <Link to={`/${recipe_id}`} onClick={handleRecipeClick}>
       <Card sx={{ maxWidth: 200 }}>
         <CardActionArea>
           <CardMedia

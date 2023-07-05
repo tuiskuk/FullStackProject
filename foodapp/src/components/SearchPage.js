@@ -14,12 +14,15 @@ const SearchBage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [excludedTerms, setExcludedTerms] = useState([])
   const [filterOptions, setFilterOptions] = useState([])
-  const { data: allRecipesData, isLoading } = useGetAllRecipesQuery({ searchTerm, filterOptions, excludedTerms })
+  const { data: allRecipesData, isLoading, isFetching } = useGetAllRecipesQuery({ searchTerm,  filterOptions, excludedTerms })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
   useEffect(() => {
     setSearchTerm(searchTerm || localStorage.getItem('search') || 'recommended')
   }, [])
+
+
+
 
 
   useEffect(() => {
@@ -29,14 +32,19 @@ const SearchBage = () => {
       if(allRecipesData._links.next && allRecipesData._links.next.href ) {
         setNextPageLink(allRecipesData._links.next.href)
       }
+      setSearch('')
+      setExcluded([])
     }
-    setSearch('')
-    setExcluded('')
+
+
   }, [allRecipesData])
 
   const handleClickSearch = async () => {
+
     setExcludedTerms(excluded)
+    console.log(excludedTerms)
     setSearchTerm(search)
+    console.log(searchTerm)
   }
 
   const fetchNextPage = async () => {
@@ -85,6 +93,7 @@ const SearchBage = () => {
           multiple
           value={filterOptions}
           onChange={(event) => setFilterOptions(event.target.value)
+
           }
           renderValue={(selected) => selected.join(', ')}
           style={{ minWidth: '200px' }}
@@ -99,7 +108,7 @@ const SearchBage = () => {
       </FormControl>
 
       <h2>Check recommended recipes or feel free to search recipes yourself</h2>
-      {isLoading ? (
+      {isLoading || isFetching ? (
         <CircularProgress /> // Render the loading spinner when loading is true
       ) : (
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>

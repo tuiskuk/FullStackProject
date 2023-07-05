@@ -4,7 +4,7 @@ import axios from 'axios'
 
 const getRecipes = async (request, response) => {
   console.log('you are in getrecipes')
-  
+
   try {
     const searchTerm = request.query.search
     // calories, time, same with every nutrien,... MIN+, MIN-MAX, MAX (string)
