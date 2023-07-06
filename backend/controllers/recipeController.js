@@ -12,13 +12,17 @@ const getRecipes = async (request, response) => {
     const time = request.query.time
 
 
-    const nutrients = {}
-    for (const key in request.query.nutrients) {
-      const nutrientKey = key
-      const nutrientValue = request.query.nutrients[key]
-      nutrients[nutrientKey] = nutrientValue
+    let nutrients = []
+    console.log(JSON.parse(request.query.nutrients))
+    if(JSON.parse(request.query.nutrients)){
+      const payload = JSON.parse(request.query.nutrients)
+      nutrients = Object.entries(payload).reduce((acc, [key, value]) => {
+        acc[key] = value
+        return acc
+      }, {})
     }
-    console.log(nutrients)
+
+    console.log(nutrients['CA'])
 
     //['vegetarian', 'kosher']
     let healthFilters = request.query.healthFilters || []
@@ -52,11 +56,13 @@ const getRecipes = async (request, response) => {
     }
 
     let nutrientString = ''
-    if (Object.keys(nutrients).length > 0) {
-      nutrientString = Object.keys(nutrients)
-        .map((key) => `&${encodeURIComponent('nutrients[' + key + ']')}=${encodeURIComponent(nutrients[key])}`)
-        .join('')
-      console.log(nutrientString)
+    if (nutrients) {
+      if (Object.keys(nutrients).length > 0) {
+        nutrientString = Object.keys(nutrients)
+          .map((key) => `&${encodeURIComponent('nutrients[' + key + ']')}=${encodeURIComponent(nutrients[key])}`)
+          .join('')
+        console.log(nutrientString)
+      }
     }
 
     if (excludedFilters.length > 0) {
