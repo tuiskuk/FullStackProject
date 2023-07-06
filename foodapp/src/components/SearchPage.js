@@ -1,7 +1,7 @@
 import Recipe from './Recipe'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
-import { healthFilterOptions } from '../data'
+import { healthFilterOptions, nutrients } from '../data'
 import { Container, TextField, Button, FormControl, Select, MenuItem, InputLabel, Checkbox, ListItemText, CircularProgress } from '@mui/material'
 
 const SearchPage = () => {
@@ -23,6 +23,9 @@ const SearchPage = () => {
   const [filterOptions, setFilterOptions] = useState(localStorage.getItem('filterOptions') || [])
   const [filterOptionTerms, setFilterOptionTerms] = useState([])
 
+  const [nutrientInputs, setNutrientInputs] = useState(JSON.parse(localStorage.getItem('nutrientInputs')) || [])
+  const [nutrientInputsTerms, setNutrientInputsTerms] = useState([])
+
   localStorage.clear()
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
@@ -30,7 +33,8 @@ const SearchPage = () => {
     filterOptionTerms: filterOptionTerms || localStorage.getItem('filterOptions') || [],
     excludedTerms: excludedTerms || localStorage.getItem('exluded') || [],
     timeTerm: timeTerm || localStorage.getItem('time') || '',
-    caloriesTerm: caloriesTerm || localStorage.getItem('calories') || ''
+    caloriesTerm: caloriesTerm || localStorage.getItem('calories') || '',
+    nutrientInputsTerms: nutrientInputsTerms || localStorage.getItem('nutrientInputs') || [],
   })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
@@ -44,12 +48,13 @@ const SearchPage = () => {
     localStorage.setItem('excluded', excluded)
     localStorage.setItem('filterOptions', filterOptions)
     localStorage.setItem('search', search)
+    localStorage.setItem('nutrienInputs', nutrientInputs)
     setExcludedTerms(excluded)
     setSearchTerm(search)
     setFilterOptionTerms(filterOptions)
     setTimeTerm(time)
     setCaloriesTerm(calories)
-
+    setNutrientInputsTerms(nutrientInputs)
     if (allRecipesData) {
       setRecipes(allRecipesData.hits.map((hit) => hit.recipe))
       if (allRecipesData._links.next && allRecipesData._links.next.href) {
@@ -64,8 +69,16 @@ const SearchPage = () => {
     setFilterOptions([])
     setTime('')
     setCalories('')
+    setNutrientInputs([])
 
     searchRecipes()
+  }
+
+  const handleNutrientInputChange = (nutrientBackend, value) => {
+    setNutrientInputs((prevInputs) => ({
+      ...prevInputs,
+      [nutrientBackend]: value
+    }))
   }
 
   const fetchNextPage = async () => {
@@ -138,6 +151,18 @@ const SearchPage = () => {
           onChange={(event) => setTime(event.target.value)}
         />
       </FormControl>
+
+      {nutrients.map((nutrient) => (
+        <FormControl key={nutrient.backend} variant="outlined">
+          <TextField
+            label={nutrient.user}
+            value={nutrientInputs[nutrient.backend] || ''}
+            onChange={(event) => {
+              handleNutrientInputChange(nutrient.backend, event.target.value)
+            }}
+          />
+        </FormControl>
+      ))}
 
       <Button variant="contained" onClick={searchRecipes}>
           Search
