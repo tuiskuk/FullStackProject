@@ -11,6 +11,15 @@ const getRecipes = async (request, response) => {
     const calories = request.query.calories
     const time = request.query.time
 
+
+    const nutrients = {}
+    for (const key in request.query.nutrients) {
+      const nutrientKey = key
+      const nutrientValue = request.query.nutrients[key]
+      nutrients[nutrientKey] = nutrientValue
+    }
+    console.log(nutrients)
+
     //['vegetarian', 'kosher']
     let healthFilters = request.query.healthFilters || []
 
@@ -42,6 +51,14 @@ const getRecipes = async (request, response) => {
       params.time = time
     }
 
+    let nutrientString = ''
+    if (Object.keys(nutrients).length > 0) {
+      nutrientString = Object.keys(nutrients)
+        .map((key) => `&${encodeURIComponent('nutrients[' + key + ']')}=${encodeURIComponent(nutrients[key])}`)
+        .join('')
+      console.log(nutrientString)
+    }
+
     if (excludedFilters.length > 0) {
       params.excluded = excludedFilters.join(' ')
     }
@@ -52,7 +69,7 @@ const getRecipes = async (request, response) => {
       filterString = `&health=${lowercaseFilters.join('&health=')}`
     }
 
-    const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}`
+    const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}${nutrientString}`.trim('')
     console.log(url)
     const apiResponse = await axios.get(url)
 
