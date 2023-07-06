@@ -12,7 +12,7 @@ const Recipe = ({ recipe }) => {
     }
   }
   return (
-    <Link to={`/${recipe_id}`} onClick={handleRecipeClick}>
+    <Link to={`/recipes/${recipe_id}`} onClick={handleRecipeClick}>
       <Card sx={{ maxWidth: 200 }}>
         <CardActionArea>
           <CardMedia
