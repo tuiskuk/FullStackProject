@@ -1,7 +1,7 @@
 import Recipe from './Recipe'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
-import healthFilterOptions from '../data'
+import { healthFilterOptions } from '../data'
 import { Container, TextField, Button, FormControl, Select, MenuItem, InputLabel, Checkbox, ListItemText, CircularProgress } from '@mui/material'
 
 const SearchPage = () => {
@@ -23,6 +23,7 @@ const SearchPage = () => {
   const [filterOptions, setFilterOptions] = useState(localStorage.getItem('filterOptions') || [])
   const [filterOptionTerms, setFilterOptionTerms] = useState([])
 
+  localStorage.clear()
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
     searchTerm: searchTerm || localStorage.getItem('search') || 'recommended',
