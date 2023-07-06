@@ -112,12 +112,12 @@ const SearchPage = () => {
 
           }
           renderValue={(selected) => selected.join(', ')}
-          style={{ minWidth: '200px' }}
+          sx={{ minWidth: '200px' }}
         >
           {healthFilterOptions.map((option) => (
-            <MenuItem key={option} value={option}>
+            <MenuItem key={option} value={option} sx={{ minWidth: '200px', backgroundColor: 'white' }}>
               <Checkbox checked={filterOptions.includes(option)} />
-              <ListItemText primary={option} />
+              <ListItemText primary={option}/>
             </MenuItem>
           ))}
         </Select>
