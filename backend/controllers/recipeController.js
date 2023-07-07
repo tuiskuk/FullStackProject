@@ -14,9 +14,12 @@ const getRecipes = async (request, response) => {
 
     let nutrients = []
     const payload = JSON.parse(request.query.nutrients)
+    console.log(payload)
     if(payload){
       nutrients = Object.entries(payload).reduce((acc, [key, value]) => {
-        acc[key] = value
+        if (value !== ''){
+          acc[key] = value
+        }
         return acc
       }, {})
     }

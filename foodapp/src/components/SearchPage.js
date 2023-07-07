@@ -4,7 +4,7 @@ import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
 import { Container, Button, FormControl, Select, MenuItem,
   InputLabel, Checkbox, ListItemText, CircularProgress, InputAdornment,
-  OutlinedInput, Box, Chip } from '@mui/material'
+  OutlinedInput, Box, Chip, Typography } from '@mui/material'
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
@@ -243,13 +243,11 @@ const SearchPage = () => {
         {showNutrients && (
           nutrients.map((nutrient) => (
             <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
-              <OutlinedInput
-                placeholder={nutrient.user}
-                value={nutrientInputs[nutrient.backend] || ''}
-                endAdornment={<InputAdornment position="end">{nutrient.unit}</InputAdornment>}
-                onChange={(event) => {
-                  handleNutrientInputChange(nutrient.backend, event.target.value)
-                }}
+              <RangeInputComponent
+                nutrientBackend={nutrient.backend}
+                nutrientUser={nutrient.user}
+                nutrientUnit={nutrient.unit}
+                onChange={handleNutrientInputChange}
               />
             </FormControl>
           ))
@@ -286,6 +284,102 @@ const SearchPage = () => {
         )}
       </div>
     </Container>
+  )
+}
+
+/*
+<OutlinedInput
+  placeholder={nutrient.user}
+  value={nutrientInputs[nutrient.backend] || ''}
+  endAdornment={<InputAdornment position="end">{nutrient.unit}</InputAdornment>}
+  onChange={(event) => {
+    handleNutrientInputChange(nutrient.backend, event.target.value)
+  }}
+/>
+*/
+
+const RangeInputComponent = ({ nutrientBackend, nutrientUser, nutrientUnit, onChange }) => {
+  const [minValue, setMinValue] = useState('')
+  const [maxValue, setMaxValue] = useState('')
+
+  useEffect(() => {
+    handleParse()
+  }, [minValue, maxValue])
+
+  const handleMinValueChange = (event) => {
+    const value = event.target.value
+    if (value === '0'){
+      setMinValue('')
+    }else {
+      setMinValue(value)
+    }
+  }
+
+  const handleMaxValueChange = (event) => {
+    const value = event.target.value
+    if (value === '0'){
+      setMaxValue('')
+    }else {
+      setMaxValue(value)
+    }
+  }
+
+  const handleParse = () => {
+    let string = ''
+    if(minValue && maxValue) {
+      string = `${minValue}-${maxValue}`
+    } else if (minValue && !maxValue) {
+      string = `${minValue}+`
+    } else if (!minValue && maxValue){
+      string = `${maxValue}`
+    } else {
+      string = ''
+    }
+    onChange(nutrientBackend, string)
+  }
+
+  return (
+    <Box border={1}
+      borderColor="grey.400"
+      borderRadius="4px"
+      p={1}
+      mb={1}
+      alignItems="center"
+      bgcolor="white"
+      boxShadow="0px 2px 4px rgba(0, 0, 0, 0.1)">
+      <Box
+        display="flex"
+        alignItems="center"
+        p={1}
+        borderRadius="4px"
+        mb={1}
+        justifyContent="space-between"
+      >
+        <Typography variant="body1">{nutrientUser}</Typography>
+        <Typography variant="body1">{nutrientUnit}</Typography>
+      </Box>
+      <Box display="flex" alignItems="center">
+        <FormControl variant="outlined">
+          <OutlinedInput
+            placeholder="MIN"
+            type="number"
+            inputProps={{ min: '0' }}
+            value={minValue}
+            onChange={handleMinValueChange}
+          />
+        </FormControl>
+        <Typography variant="body1" sx={{ mx: 1 }}>-</Typography>
+        <FormControl variant="outlined">
+          <OutlinedInput
+            placeholder="MAX"
+            type="number"
+            inputProps={{ min: '0' }}
+            value={maxValue}
+            onChange={handleMaxValueChange}
+          />
+        </FormControl>
+      </Box>
+    </Box>
   )
 }
 
