@@ -37,7 +37,7 @@ const SearchPage = () => {
   const [showNutrients, setShowNutrients] = useState(false)
 
 
-  localStorage.clear()
+
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
     searchTerm: searchTerm || localStorage.getItem('search') || 'recommended',
@@ -61,7 +61,7 @@ const SearchPage = () => {
     localStorage.setItem('excluded', excluded)
     localStorage.setItem('filterOptions', filterOptions)
     localStorage.setItem('search', search)
-    localStorage.setItem('nutrienInputs', nutrientInputs)
+    localStorage.setItem('nutrientInputs', JSON.stringify(nutrientInputs))
     localStorage.setItem('ingridientsNumber', ingridientsNumber)
     localStorage.setItem('mealTypeOptions', mealTypeOptions)
     setExcludedTerms(excluded)
@@ -90,7 +90,7 @@ const SearchPage = () => {
     setIngridientsNumber('')
     setMealTypeOptions([])
 
-    searchRecipes()
+    await searchRecipes()
   }
 
   const handleNutrientInputChange = (nutrientBackend, value) => {
@@ -208,8 +208,10 @@ const SearchPage = () => {
       <div>
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
           <OutlinedInput
-            placeholder="Time"
+            placeholder="Time (MIN+, MIN-MAX, MAX)"
             value={time}
+            type="number"
+            inputProps={{ min: '0' }}
             endAdornment={<InputAdornment position="end">h</InputAdornment>}
             onChange={(event) => setTime(event.target.value)}
           />
@@ -241,16 +243,22 @@ const SearchPage = () => {
         </FormControl>
 
         {showNutrients && (
-          nutrients.map((nutrient) => (
-            <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
-              <RangeInputComponent
-                nutrientBackend={nutrient.backend}
-                nutrientUser={nutrient.user}
-                nutrientUnit={nutrient.unit}
-                onChange={handleNutrientInputChange}
-              />
-            </FormControl>
-          ))
+          <div>
+            {nutrients.map((nutrient) => {
+              console.log(nutrientInputs[nutrient.backend] || '')
+              return (
+                <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
+                  <RangeInputComponent
+                    value={nutrientInputs[nutrient.backend] || ''}
+                    nameBackend={nutrient.backend}
+                    nameUser={nutrient.user}
+                    unit={nutrient.unit}
+                    onChange={handleNutrientInputChange}
+                  />
+                </FormControl>
+              )
+            })}
+          </div>
         )}
 
         <Button variant="contained" onClick={searchRecipes} sx={{ m: 0.5, width: 250 }}>
@@ -298,9 +306,21 @@ const SearchPage = () => {
 />
 */
 
-const RangeInputComponent = ({ nutrientBackend, nutrientUser, nutrientUnit, onChange }) => {
+const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) => {
   const [minValue, setMinValue] = useState('')
   const [maxValue, setMaxValue] = useState('')
+
+  useEffect(() => {
+    console.log(value)
+    analyze(value)
+  }, [])
+
+  useEffect(() => {
+    if (!value) {
+      setMinValue('')
+      setMaxValue('')
+    }
+  }, [value])
 
   useEffect(() => {
     handleParse()
@@ -324,6 +344,22 @@ const RangeInputComponent = ({ nutrientBackend, nutrientUser, nutrientUnit, onCh
     }
   }
 
+  const analyze = () => {
+    if(value.includes('-')){
+      setMinValue(value.split('-')[0])
+      setMaxValue(value.split('-')[1])
+    } else if(value.includes('+')){
+      setMinValue(value.split('+')[0])
+      setMaxValue('')
+    } else if (value) {
+      setMinValue('')
+      setMaxValue(value)
+    } else {
+      setMinValue('')
+      setMaxValue('')
+    }
+  }
+
   const handleParse = () => {
     let string = ''
     if(minValue && maxValue) {
@@ -335,7 +371,7 @@ const RangeInputComponent = ({ nutrientBackend, nutrientUser, nutrientUnit, onCh
     } else {
       string = ''
     }
-    onChange(nutrientBackend, string)
+    onChange(nameBackend, string)
   }
 
   return (
@@ -355,8 +391,8 @@ const RangeInputComponent = ({ nutrientBackend, nutrientUser, nutrientUnit, onCh
         mb={1}
         justifyContent="space-between"
       >
-        <Typography variant="body1">{nutrientUser}</Typography>
-        <Typography variant="body1">{nutrientUnit}</Typography>
+        <Typography variant="body1">{nameUser}</Typography>
+        <Typography variant="body1">{unit}</Typography>
       </Box>
       <Box display="flex" alignItems="center">
         <FormControl variant="outlined">
