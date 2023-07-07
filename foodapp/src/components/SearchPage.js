@@ -2,7 +2,9 @@ import Recipe from './Recipe'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
-import { Container, TextField, Button, FormControl, Select, MenuItem, InputLabel, Checkbox, ListItemText, CircularProgress } from '@mui/material'
+import { Container, Button, FormControl, Select, MenuItem,
+  InputLabel, Checkbox, ListItemText, CircularProgress, InputAdornment,
+  OutlinedInput, Box, Chip } from '@mui/material'
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
@@ -31,6 +33,9 @@ const SearchPage = () => {
 
   const [mealTypeOptions, setMealTypeOptions] = useState(localStorage.getItem('mealTypeOptions') || [])
   const [mealTypeOptionTerms, setMealTypeOptionTerms] = useState([])
+
+  const [showNutrients, setShowNutrients] = useState(false)
+
 
   localStorage.clear()
   const { data: allRecipesData, isLoading, isFetching
@@ -112,107 +117,152 @@ const SearchPage = () => {
     }
   }
 
+  const toggelShow = () => {
+    setShowNutrients(!showNutrients)
+  }
+
   return (
     <Container>
-      <FormControl variant="outlined">
-        <TextField
-          label="Search recipes"
+      <FormControl fullWidth variant="outlined" sx={{ m: 0.5 }} >
+        <h2>Search page</h2>
+        <OutlinedInput
+          placeholder='Search recipes'
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
       </FormControl>
 
-      <FormControl variant="outlined">
-        <TextField
-          label="Set excluded foods"
-          value={excluded}
-          onChange={(event) => setExcluded(event.target.value)}
-        />
-      </FormControl>
+      <div>
+        <h3>Spesifications</h3>
 
-      <FormControl variant="outlined">
-        <InputLabel>Filter by diet</InputLabel>
-        <Select
-          multiple
-          value={filterOptions}
-          onChange={(event) => setFilterOptions(event.target.value)
-
-          }
-          renderValue={(selected) => selected.join(', ')}
-          sx={{ minWidth: '200px' }}
-        >
-          {healthFilterOptions.map((option) => (
-            <MenuItem key={option} value={option} sx={{ minWidth: '200px', backgroundColor: 'white' }}>
-              <Checkbox checked={filterOptions.includes(option)} />
-              <ListItemText primary={option}/>
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <FormControl variant="outlined">
-        <InputLabel>Filter by type of meal</InputLabel>
-        <Select
-          multiple
-          value={mealTypeOptions}
-          onChange={(event) => setMealTypeOptions(event.target.value)
-
-          }
-          renderValue={(selected) => selected.join(', ')}
-          sx={{ minWidth: '200px' }}
-        >
-          {mealTypes.map((option) => (
-            <MenuItem key={option} value={option} sx={{ minWidth: '200px', backgroundColor: 'white' }}>
-              <Checkbox checked={mealTypeOptions.includes(option)} />
-              <ListItemText primary={option}/>
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <FormControl variant="outlined">
-        <TextField
-          label="Calories"
-          value={calories}
-          onChange={(event) => setCalories(event.target.value)}
-        />
-      </FormControl>
-
-      <FormControl variant="outlined">
-        <TextField
-          label="Time"
-          value={time}
-          onChange={(event) => setTime(event.target.value)}
-        />
-      </FormControl>
-
-      <FormControl variant="outlined">
-        <TextField
-          label="Number of incridients"
-          value={ingridientsNumber}
-          onChange={(event) => setIngridientsNumber(event.target.value)}
-        />
-      </FormControl>
-
-      {nutrients.map((nutrient) => (
-        <FormControl key={nutrient.backend} variant="outlined">
-          <TextField
-            label={nutrient.user}
-            value={nutrientInputs[nutrient.backend] || ''}
-            onChange={(event) => {
-              handleNutrientInputChange(nutrient.backend, event.target.value)
+        <FormControl sx={{ m: 0.5, width: 250 }}>
+          <InputLabel>Meal type</InputLabel>
+          <Select
+            multiple
+            value={mealTypeOptions}
+            onChange={(event) => setMealTypeOptions(event.target.value)}
+            renderValue={(selected) => (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip key={value} label={value}/>
+                ))}
+              </Box>
+            )}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 500,
+                  width: 200
+                }
+              }
             }}
+          >
+            {mealTypes.map((option) => (
+              <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
+                <Checkbox size='small' checked={mealTypeOptions.includes(option)} />
+                <ListItemText primary={option}/>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl sx={{ m: 0.5, width: 250 }}>
+          <InputLabel>Filter allergies/diets</InputLabel>
+          <Select
+            multiple
+            value={filterOptions}
+            onChange={(event) => setFilterOptions(event.target.value)}
+            renderValue={(selected) => (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip key={value} label={value}/>
+                ))}
+              </Box>
+            )}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 500,
+                }
+              }
+            }}
+          >
+            {healthFilterOptions.map((option) => (
+              <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
+                <Checkbox size='small' checked={filterOptions.includes(option)} />
+                <ListItemText primary={option}/>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+          <OutlinedInput
+            placeholder="Set excluded foods"
+            value={excluded}
+            onChange={(event) => setExcluded(event.target.value)}
           />
         </FormControl>
-      ))}
+      </div>
 
-      <Button variant="contained" onClick={searchRecipes}>
+      <div>
+        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+          <OutlinedInput
+            placeholder="Time"
+            value={time}
+            endAdornment={<InputAdornment position="end">h</InputAdornment>}
+            onChange={(event) => setTime(event.target.value)}
+          />
+        </FormControl>
+
+        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+          <OutlinedInput
+            placeholder="Calories"
+            value={calories}
+            endAdornment={<InputAdornment position="end">kcal</InputAdornment>}
+            onChange={(event) => setCalories(event.target.value)}
+          />
+        </FormControl>
+
+        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+          <OutlinedInput
+            placeholder="Number of incridients (MIN+, MIN-MAX, MAX)"
+            value={ingridientsNumber}
+            onChange={(event) => setIngridientsNumber(event.target.value)}
+          />
+        </FormControl>
+      </div>
+
+      <div>
+        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+          <Button variant="contained" onClick={toggelShow} >
+            {showNutrients ? 'Hide Nutrient Filters' : 'Show Nutrients Filters'}
+          </Button>
+        </FormControl>
+
+        {showNutrients && (
+          nutrients.map((nutrient) => (
+            <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
+              <OutlinedInput
+                placeholder={nutrient.user}
+                value={nutrientInputs[nutrient.backend] || ''}
+                endAdornment={<InputAdornment position="end">{nutrient.unit}</InputAdornment>}
+                onChange={(event) => {
+                  handleNutrientInputChange(nutrient.backend, event.target.value)
+                }}
+              />
+            </FormControl>
+          ))
+        )}
+
+        <Button variant="contained" onClick={searchRecipes} sx={{ m: 0.5, width: 250 }}>
           Search
-      </Button>
+        </Button>
 
-      <Button variant="contained" onClick={clearFilters}>
+        <Button variant="contained" onClick={clearFilters} sx={{ m: 0.5, width: 250 }}>
           Clear
-      </Button>
+        </Button>
+      </div>
 
       <h2>Check recommended recipes or feel free to search recipes yourself</h2>
       {isLoading || isFetching ? (
@@ -225,14 +275,16 @@ const SearchPage = () => {
         </div>
       ) : (
         <h3>No recipes found</h3>
-      )
-      }
-
-      {nextPageLink && (
-        <Button variant="outlined" onClick={goToNextPage}>
-          Load more
-        </Button>
       )}
+
+      <div>
+        <br />
+        {nextPageLink && (
+          <Button variant="contained" onClick={goToNextPage} sx={{ m: 0.5, width: 250 }}>
+            Load more
+          </Button>
+        )}
+      </div>
     </Container>
   )
 }
