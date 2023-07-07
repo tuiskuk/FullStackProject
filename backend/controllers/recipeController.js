@@ -10,19 +10,16 @@ const getRecipes = async (request, response) => {
     // calories, time, same with every nutrien,... MIN+, MIN-MAX, MAX (string)
     const calories = request.query.calories
     const time = request.query.time
-
+    const ingr = request.query.ingr
 
     let nutrients = []
-    console.log(JSON.parse(request.query.nutrients))
-    if(JSON.parse(request.query.nutrients)){
-      const payload = JSON.parse(request.query.nutrients)
+    const payload = JSON.parse(request.query.nutrients)
+    if(payload){
       nutrients = Object.entries(payload).reduce((acc, [key, value]) => {
         acc[key] = value
         return acc
       }, {})
     }
-
-    console.log(nutrients['CA'])
 
     //['vegetarian', 'kosher']
     let healthFilters = request.query.healthFilters || []
@@ -55,13 +52,16 @@ const getRecipes = async (request, response) => {
       params.time = time
     }
 
+    if (ingr) {
+      params.ingr = ingr
+    }
+
     let nutrientString = ''
     if (nutrients) {
       if (Object.keys(nutrients).length > 0) {
         nutrientString = Object.keys(nutrients)
           .map((key) => `&${encodeURIComponent('nutrients[' + key + ']')}=${encodeURIComponent(nutrients[key])}`)
           .join('')
-        console.log(nutrientString)
       }
     }
 

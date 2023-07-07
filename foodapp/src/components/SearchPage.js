@@ -26,7 +26,10 @@ const SearchPage = () => {
   const [nutrientInputs, setNutrientInputs] = useState(JSON.parse(localStorage.getItem('nutrientInputs')) || [])
   const [nutrientInputsTerms, setNutrientInputsTerms] = useState([])
 
-  localStorage.clear()
+  const [ingridientsNumber, setIngridientsNumber] = useState(localStorage.getItem('ingridientsNumber') || '')
+  const [ingridientsNumberTerm, setIngridienstNumberTerm] = useState('')
+
+  //localStorage.clear()
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
     searchTerm: searchTerm || localStorage.getItem('search') || 'recommended',
@@ -35,6 +38,7 @@ const SearchPage = () => {
     timeTerm: timeTerm || localStorage.getItem('time') || '',
     caloriesTerm: caloriesTerm || localStorage.getItem('calories') || '',
     nutrientInputsTerms: nutrientInputsTerms || localStorage.getItem('nutrientInputs') || [],
+    ingridientsNumberTerm: ingridientsNumberTerm || localStorage.getItem('ingridientsNumber') || '',
   })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
@@ -49,12 +53,14 @@ const SearchPage = () => {
     localStorage.setItem('filterOptions', filterOptions)
     localStorage.setItem('search', search)
     localStorage.setItem('nutrienInputs', nutrientInputs)
+    localStorage.setItem('ingridientsNumber', ingridientsNumber)
     setExcludedTerms(excluded)
     setSearchTerm(search)
     setFilterOptionTerms(filterOptions)
     setTimeTerm(time)
     setCaloriesTerm(calories)
     setNutrientInputsTerms(nutrientInputs)
+    setIngridienstNumberTerm(ingridientsNumber)
     if (allRecipesData) {
       setRecipes(allRecipesData.hits.map((hit) => hit.recipe))
       if (allRecipesData._links.next && allRecipesData._links.next.href) {
@@ -70,6 +76,7 @@ const SearchPage = () => {
     setTime('')
     setCalories('')
     setNutrientInputs([])
+    setIngridientsNumber('')
 
     searchRecipes()
   }
@@ -149,6 +156,14 @@ const SearchPage = () => {
           label="Time"
           value={time}
           onChange={(event) => setTime(event.target.value)}
+        />
+      </FormControl>
+
+      <FormControl variant="outlined">
+        <TextField
+          label="Number of incridients"
+          value={ingridientsNumber}
+          onChange={(event) => setIngridientsNumber(event.target.value)}
         />
       </FormControl>
 
