@@ -10,35 +10,31 @@ const getRecipes = async (request, response) => {
     // calories, time, same with every nutrien,... MIN+, MIN-MAX, MAX (string)
     const calories = request.query.calories
     const time = request.query.time
-
+    const ingr = request.query.ingr
 
     let nutrients = []
-    console.log(JSON.parse(request.query.nutrients))
-    if(JSON.parse(request.query.nutrients)){
-      const payload = JSON.parse(request.query.nutrients)
+    const payload = JSON.parse(request.query.nutrients)
+    console.log(payload)
+    if(payload){
       nutrients = Object.entries(payload).reduce((acc, [key, value]) => {
-        acc[key] = value
+        if (value !== ''){
+          acc[key] = value
+        }
         return acc
       }, {})
     }
 
-    console.log(nutrients['CA'])
-
     //['vegetarian', 'kosher']
     let healthFilters = request.query.healthFilters || []
-
+    let mealTypeOptions = request.query.mealTypes || []
+    console.log(mealTypeOptions)
+    console.log(healthFilters)
     //['bread', 'beef']
     let excludedFilters = request.query.excludedFilters || []
-
-    if (typeof healthFilters === 'string') {
-      healthFilters = healthFilters.split(',').map((filter) => filter.trim())
-    }
 
     if (typeof excludedFilters === 'string') {
       excludedFilters = excludedFilters.split(',').map((filter) => filter.trim())
     }
-
-    console.log(healthFilters)
 
     const params = {
       type: 'public',
@@ -55,13 +51,16 @@ const getRecipes = async (request, response) => {
       params.time = time
     }
 
+    if (ingr) {
+      params.ingr = ingr
+    }
+
     let nutrientString = ''
     if (nutrients) {
       if (Object.keys(nutrients).length > 0) {
         nutrientString = Object.keys(nutrients)
           .map((key) => `&${encodeURIComponent('nutrients[' + key + ']')}=${encodeURIComponent(nutrients[key])}`)
           .join('')
-        console.log(nutrientString)
       }
     }
 
@@ -71,11 +70,17 @@ const getRecipes = async (request, response) => {
 
     let filterString = ''
     if (healthFilters.length > 0) {
-      const lowercaseFilters = healthFilters.map((filter) => filter.toLowerCase())
-      filterString = `&health=${lowercaseFilters.join('&health=')}`
+      const filters = healthFilters.split(',').map((filter) => filter.trim())
+      filterString = `&health=${filters.join('&health=')}`
     }
 
-    const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}${nutrientString}`.trim('')
+    let mealTypesString = ''
+    if (mealTypeOptions.length > 0) {
+      const options = mealTypeOptions.split(',').map((filter) => filter.trim())
+      mealTypesString = `&mealType=${options.join('&mealType=')}`
+    }
+
+    const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}${mealTypesString}${nutrientString}`.trim('')
     console.log(url)
     const apiResponse = await axios.get(url)
 
