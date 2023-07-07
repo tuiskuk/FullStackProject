@@ -1,7 +1,7 @@
 import Recipe from './Recipe'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
-import { healthFilterOptions, nutrients } from '../data'
+import { healthFilterOptions, nutrients, mealTypes } from '../data'
 import { Container, TextField, Button, FormControl, Select, MenuItem, InputLabel, Checkbox, ListItemText, CircularProgress } from '@mui/material'
 
 const SearchPage = () => {
@@ -29,7 +29,10 @@ const SearchPage = () => {
   const [ingridientsNumber, setIngridientsNumber] = useState(localStorage.getItem('ingridientsNumber') || '')
   const [ingridientsNumberTerm, setIngridienstNumberTerm] = useState('')
 
-  //localStorage.clear()
+  const [mealTypeOptions, setMealTypeOptions] = useState(localStorage.getItem('mealTypeOptions') || [])
+  const [mealTypeOptionTerms, setMealTypeOptionTerms] = useState([])
+
+  localStorage.clear()
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
     searchTerm: searchTerm || localStorage.getItem('search') || 'recommended',
@@ -39,6 +42,7 @@ const SearchPage = () => {
     caloriesTerm: caloriesTerm || localStorage.getItem('calories') || '',
     nutrientInputsTerms: nutrientInputsTerms || localStorage.getItem('nutrientInputs') || [],
     ingridientsNumberTerm: ingridientsNumberTerm || localStorage.getItem('ingridientsNumber') || '',
+    mealTypeOptionTerms: mealTypeOptionTerms || localStorage.getItem('mealtypeOptions') || []
   })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
@@ -54,6 +58,7 @@ const SearchPage = () => {
     localStorage.setItem('search', search)
     localStorage.setItem('nutrienInputs', nutrientInputs)
     localStorage.setItem('ingridientsNumber', ingridientsNumber)
+    localStorage.setItem('mealTypeOptions', mealTypeOptions)
     setExcludedTerms(excluded)
     setSearchTerm(search)
     setFilterOptionTerms(filterOptions)
@@ -61,6 +66,7 @@ const SearchPage = () => {
     setCaloriesTerm(calories)
     setNutrientInputsTerms(nutrientInputs)
     setIngridienstNumberTerm(ingridientsNumber)
+    setMealTypeOptionTerms(mealTypeOptions)
     if (allRecipesData) {
       setRecipes(allRecipesData.hits.map((hit) => hit.recipe))
       if (allRecipesData._links.next && allRecipesData._links.next.href) {
@@ -77,6 +83,7 @@ const SearchPage = () => {
     setCalories('')
     setNutrientInputs([])
     setIngridientsNumber('')
+    setMealTypeOptions([])
 
     searchRecipes()
   }
@@ -137,6 +144,26 @@ const SearchPage = () => {
           {healthFilterOptions.map((option) => (
             <MenuItem key={option} value={option} sx={{ minWidth: '200px', backgroundColor: 'white' }}>
               <Checkbox checked={filterOptions.includes(option)} />
+              <ListItemText primary={option}/>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl variant="outlined">
+        <InputLabel>Filter by type of meal</InputLabel>
+        <Select
+          multiple
+          value={mealTypeOptions}
+          onChange={(event) => setMealTypeOptions(event.target.value)
+
+          }
+          renderValue={(selected) => selected.join(', ')}
+          sx={{ minWidth: '200px' }}
+        >
+          {mealTypes.map((option) => (
+            <MenuItem key={option} value={option} sx={{ minWidth: '200px', backgroundColor: 'white' }}>
+              <Checkbox checked={mealTypeOptions.includes(option)} />
               <ListItemText primary={option}/>
             </MenuItem>
           ))}
