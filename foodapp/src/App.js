@@ -3,6 +3,7 @@ import SearchPage from './components/SearchPage'
 import HomePage from './components/HomePage'
 import RecipeViewPage from './components/RecipeViewPage'
 import UserViewPage from './components/UserViewPage'
+import LoginPage from './components/loginPage'
 import { Container, AppBar, Toolbar, Button } from '@mui/material'
 import RegistrationForm from './components/RegistrationPage'
 import UsersPage from './components/UsersPage'
@@ -21,6 +22,9 @@ const App = () => (
           <Button color="inherit" component={Link} to="/users">
             Discover users
           </Button>
+          <Button color="inherit" component={Link} to="/login">
+            login
+          </Button>
           <Button color="inherit" component={Link} to="/register">
             register
           </Button>
@@ -30,6 +34,7 @@ const App = () => (
       <Routes>
         <Route path="/search" element={<SearchPage />} />
         <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path='/register' element={<RegistrationForm/>}/>
         <Route path='/users' element={<UsersPage/>}/>
         <Route path='/recipes/:id' element={
