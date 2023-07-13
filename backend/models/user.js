@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema({
       message: 'Invalid email format',
     }
   },
+  isEmailConfirmed: {
+    type: Boolean, 
+    default: false 
+  },
   profileImage: {
     type: String, // Store the file name or path of the profile image
     default: null // Set a default value if the user doesn't have a profile image

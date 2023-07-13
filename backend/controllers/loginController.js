@@ -12,7 +12,11 @@ const login = async (request, response) => {
 
     if (!(user && passwordCorrect)) {
       return response.status(401).json({
-        error: "invalid username or password",
+        error: "invalid email or password",
+      });
+    } else if(!user.isEmailConfirmed){
+      return response.status(401).json({
+        error: "email is not confirmed",
       });
     }
 
@@ -22,7 +26,7 @@ const login = async (request, response) => {
     };
 
     const token = jwt.sign(userForToken, process.env.SECRET, {
-      expiresIn: 60 * 60,
+      expiresIn: 2* 60 * 60,
     });
 
     console.log({ token, user });
