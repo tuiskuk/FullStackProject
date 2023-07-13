@@ -1,5 +1,8 @@
 import { User } from '../models/user.js'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken';
+import config from '../utils/config.js'
+import nodemailer from 'nodemailer'
 
 const getUser = async (request, response) => {
   try {
@@ -46,7 +49,7 @@ const deleteUser = async (request, response) => {
 
 const createUser = async (request, response) => {
   try {
-    const { username, name, email, profileimage, profileText, password } = request.body
+    const { username, name, email, profileimage, profileText, password, isEmailConfirmed } = request.body
 
     console.log(password)
     if(!password) {
@@ -60,6 +63,7 @@ const createUser = async (request, response) => {
       username,
       name,
       email,
+      isEmailConfirmed,
       profileimage,
       profileText,
       passwordHash,
@@ -67,6 +71,42 @@ const createUser = async (request, response) => {
     })
 
     const savedUser = await user.save()
+
+    const emailToken = jwt.sign( { id: user._id,
+    } , config.EMAIL_SECRET , { expiresIn: '1d' } )
+
+    const url = `http://localhost:3001/api/register/${emailToken}`
+    console.log(url)
+    console.log(config.MY_GMAIL)
+    console.log(config.MY_GMAIL_PASSWORD)
+    console.log(email)
+
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.elasticemail.com',
+      port: 2525,
+      auth: {
+        user: `${config.MY_GMAIL}`, 
+        pass: `${config.MY_GMAIL_PASSWORD}`
+      }
+    });
+    
+
+    const mailOptions = {
+      from: `${config.MY_GMAIL}`, // Replace with your email address
+      to: `${email}`, // Replace with the recipient's email address
+      subject: 'Confirmation of your foodapp user',
+      html: `<p>Please click on the following link to confirm your FoodApp account:</p><a href="${url}">Confirm your foodapp account</a>`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
+
 
     response.status(201).json(savedUser)
   } catch (error) {
@@ -87,17 +127,17 @@ const createUser = async (request, response) => {
 const updateUser = async (request, response) => {
   try {
     const { userId } = request.params
-    const { username, password, profileText, profileImage, favourites } = request.body
+    const { password, profileText, profileImage, favourites, isEmailConfirmed } = request.body
     console.log(userId)
 
-    if (!username && !password && !profileText && !profileImage && !favourites) {
+    if (!isEmailConfirmed && !password && !profileText && !profileImage && !favourites) {
       return response.status(400).json({ error: 'something to modify must be provided' })
     }
 
     // Create an update object based on the provided fields
     const updateObject = {}
-    if (username) {
-      updateObject.username = username
+    if (isEmailConfirmed) {
+      updateObject.isEmailConfirmed = true
     }
     if (profileText) {
       updateObject.profileText = profileText
