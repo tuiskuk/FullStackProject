@@ -3,6 +3,7 @@ import cors from 'cors'
 import recipesRouter from './routes/recipesRouter.js'
 import userRouter from './routes/userRouter.js'
 import loginRouter from './routes/loginRouter.js'
+import confirmEmailRouter from './routes/confirmEmailRouter.js'
 import config from './utils/config.js'
 import middleware from './utils/middleware.js'
 import mongoose from 'mongoose'
@@ -31,9 +32,11 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(middleware.requestLogger)
 app.use(cors(corsOptions))
+app.use('/api/register',confirmEmailRouter)
 app.use('/api/recipes', recipesRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+
 
 app.use(middleware.unknownEndpoint)
 

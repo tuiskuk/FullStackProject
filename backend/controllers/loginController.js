@@ -11,8 +11,10 @@ const login = async (request, response) => {
       user === null ? false : await bcrypt.compare(password, user.passwordHash)
 
     if (!(user && passwordCorrect)) {
+      return response.status(401).json({ error: 'invalid email or password' })
+    } else if(!user.isEmailConfirmed){
       return response.status(401).json({
-        error: 'invalid username or password',
+        error: 'email is not confirmed',
       })
     }
 
@@ -22,7 +24,7 @@ const login = async (request, response) => {
     }
 
     const token = jwt.sign(userForToken, process.env.SECRET, {
-      expiresIn: 60 * 30,
+      expiresIn: 2* 60 * 60,
     })
 
     const refreshToken = jwt.sign(

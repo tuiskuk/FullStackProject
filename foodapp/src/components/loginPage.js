@@ -111,7 +111,7 @@ const LoginPage = () => {
         </form>
         {error.error && <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
           <Alert severity="error" onClose={handleCloseSnackbar}>
-              An error occurred: {error.error && error.error.data && error.error.data.error}
+            {error.error && error.error.data && error.error.data.error}
           </Alert>
         </Snackbar>}
       </Container>

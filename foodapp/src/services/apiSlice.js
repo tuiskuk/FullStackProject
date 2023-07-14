@@ -76,8 +76,13 @@ export const apiSlice = createApi({
         params: { link: link }
       })
     }),
+    confirmEmail: builder.query({
+      query: (emailToken) => ({
+        url: `register/${emailToken}`
+      })
+    })
 
   })
 })
 
-export const { useGetAllRecipesQuery, useGetNextPageQuery, useGetRecipeQuery } = apiSlice
+export const { useGetAllRecipesQuery, useGetNextPageQuery, useGetRecipeQuery, useConfirmEmailQuery } = apiSlice

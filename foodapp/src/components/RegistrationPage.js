@@ -11,6 +11,9 @@ import {
   Alert
 } from '@mui/material'
 import { useCreateUserMutation } from '../services/userSlice'
+/*import { useConfirmEmailQuery } from '../services/apiSlice'
+import { selectCurrentToken } from '../services/loginSlice'
+import { useSelector } from 'react-redux'*/
 
 const RegistrationForm = () => {
   const {
@@ -22,9 +25,7 @@ const RegistrationForm = () => {
   } = useForm()
 
   const [isSuccess, setIsSuccess] = useState(false)
-
   const [ createUser ] = useCreateUserMutation()
-
   const onSubmit = async(submitData) => {
     if (Object.keys(errors).length === 0) {
       try {
