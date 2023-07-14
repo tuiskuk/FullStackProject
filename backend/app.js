@@ -6,6 +6,7 @@ import loginRouter from './routes/loginRouter.js'
 import config from './utils/config.js'
 import middleware from './utils/middleware.js'
 import mongoose from 'mongoose'
+import cookieParser from 'cookie-parser'
 mongoose.set('strictQuery', false)
 
 
@@ -27,6 +28,7 @@ mongoose.connect(url)
   })
 
 app.use(express.json())
+app.use(cookieParser())
 app.use(middleware.requestLogger)
 app.use(cors(corsOptions))
 app.use('/api/recipes', recipesRouter)

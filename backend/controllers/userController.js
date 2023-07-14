@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 
 const getUser = async (request, response) => {
   try {
+    console.log(request.params)
     const { userId } = request.params
     const user = await User.findById(userId)
 
@@ -138,8 +139,91 @@ const updateUser = async (request, response) => {
   }
 }
 
+const addFavorite = async (req, res) => {
+  const { userId, recipeId } = req.body
+  console.log('adding favorite')
+
+  try {
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    // Check if the recipe is already in the user's favorites
+    const existingFavorite = user.favorites.find(favorite => favorite.recipeId === recipeId)
+    if (existingFavorite) {
+      return res.status(400).json({ error: 'Recipe already favorited' })
+    }
+
+    // Add the new favorite to the user's favorites array
+    user.favorites.push({ recipeId })
+
+    // Save the updated user document
+    await user.save()
+
+    res.status(201).json({ message: 'Favorite added' })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+}
+
+const removeFavorite = async (req, res) => {
+  const { userId, recipeId } = req.body
+
+  try {
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    // Find the index of the favorite in the user's favorites array
+    const favoriteIndex = user.favorites.findIndex(favorite => favorite.recipeId === recipeId)
+
+    if (favoriteIndex === -1) {
+      return res.status(404).json({ error: 'Favorite not found' })
+    }
+
+    // Remove the favorite from the user's favorites array
+    user.favorites.splice(favoriteIndex, 1)
+
+    // Save the updated user document
+    await user.save()
+
+    res.status(200).json({ message: 'Favorite removed' })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+}
+
+const getFavorite = async (req, res) => {
+  try {
+    const { userId, recipeId } = req.query
+    console.log(req.query, userId, recipeId)
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    const favorite = user.favorites.find((fav) => fav.recipeId === recipeId)
+
+    if (!favorite) {
+      return res.status(204).json({ favorite })
+    }
+
+    res.status(200).json({ favorite })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+}
+
 
 
 export default {
-  getUser, getUsers, createUser, updateUser, deleteUser
+  getUser, getUsers, createUser, updateUser, deleteUser, addFavorite, removeFavorite, getFavorite
 }

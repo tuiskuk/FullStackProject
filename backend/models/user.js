@@ -48,7 +48,9 @@ const userSchema = new mongoose.Schema({
     default: null // Set a default value if the user doesn't have a profile image
   },
   passwordHash: String,
-  favourites: Array
+  favorites: [
+    { recipeId: String }
+  ]
 })
 
 userSchema.set('toJSON', {

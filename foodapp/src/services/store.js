@@ -6,7 +6,7 @@ import loginSlice from './loginSlice'
 const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
-    login: loginSlice,
+    login: loginSlice.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(apiSlice.middleware),

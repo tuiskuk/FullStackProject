@@ -1,36 +1,50 @@
-import { useState } from 'react'
-import  { TextField, Typography, Button } from '@mui/material'
+import { useState, useEffect } from 'react'
+import  { TextField, Typography, Button, Container, Grid, Snackbar, Alert } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import { useLoginMutation, loginSuccess, logout } from '../services/loginSlice'
+import { useLoginMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import { selectCurrentUser, setUser } from '../services/loginSlice'
 
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [login] = useLoginMutation()
+  const [openSnackbar, setOpenSnackbar] = useState(false)
+  const [ login, error ] = useLoginMutation()
+  const [logout] = useSendLogoutMutation()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const isLoggedIn = useSelector(state => state.login.isLoggedIn)
-  const user = useSelector(state => state.login.user)
+  const user = useSelector(selectCurrentUser)
+  console.log(user)
+  console.log(error)
 
-  const handleLogOut = () => {
-    dispatch(logout())
-    localStorage.clear()
+  const handleLogOut = async() => {
+    await logout()
   }
+
+  // Function to handle Snackbar close event
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false)
+  }
+
+  // Trigger Snackbar when an error occurs
+  useEffect(() => {
+    if (error) {
+      setOpenSnackbar(true)
+    }
+  }, [error])
 
 
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try{
-      const response = await login({ email, password })
-      const loggedInUser = response.data.user.user
-      const token = response.data.token
+      const response = await login({ email, password }).unwrap()
+      console.log(response)
+      const loggedInUser = response.user
       console.log(loggedInUser)
-
-      dispatch(loginSuccess({ token: `Bearer ${token}` , user: loggedInUser }))
+      dispatch(setUser(loggedInUser))
       setEmail('')
       setPassword('')
       navigate('/')
@@ -41,35 +55,66 @@ const LoginPage = () => {
 
 
 
-  if(isLoggedIn){
+  if (user) {
     return (
-      <>
-        <Typography>you are logged in as a {user.username}</Typography>
-        <Button onClick={handleLogOut}>log out</Button>
-      </>
+      <Container maxWidth="sm">
+        <Typography>
+          You are logged in as {user?.username}
+        </Typography>
+        <Button onClick={handleLogOut}>Log out</Button>
+      </Container>
     )
-  }
-  else {
+  } else {
     return (
-      <form onSubmit={handleLogin}>
-        <Typography variant="h1">Log in to your account</Typography>
-        {/*<Typography variant="h2">Logging in enables you to add comments on recepies, like/dislike recepies, add reciepies you like in favouriteslist, follow users and much more  </Typography>*/}
-        <TextField
-          label="Email"
-          type="text"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <TextField
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button variant="contained" color="primary" type="submit">Log in</Button>
-        <Typography variant="h2">Dont have user? <Link to="/register">Click here</Link> to sign up.</Typography>
-      </form>
+      <Container maxWidth="sm">
+        <form onSubmit={handleLogin}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h4" align="center">
+                Log in to your account
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              {/* <Typography variant="h2">
+                Logging in enables you to add comments on recipes, like/dislike recipes, add recipes you like to the favorites list, follow users, and much more
+              </Typography> */}
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Email"
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" color="primary" type="submit">
+                Log in
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h5">
+                Dont have an account? <Link to="/register">Click here</Link> to sign up.
+              </Typography>
+            </Grid>
+          </Grid>
+        </form>
+        {error.error && <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+          <Alert severity="error" onClose={handleCloseSnackbar}>
+              An error occurred: {error.error && error.error.data && error.error.data.error}
+          </Alert>
+        </Snackbar>}
+      </Container>
     )
   }
 }
