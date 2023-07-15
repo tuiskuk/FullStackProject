@@ -39,13 +39,13 @@ const errorHandler = (error, request, response, next) => {
   }
 }
 
-/*const requireAuthentication = async (req, res, next) => {
+const requireAuthentication = async (req, res, next) => {
   /*
   Middleware used for authenticating an user.
 
   Checks that the request to the protected route contains a valid
   JsonWebToken in the Authorization-header. The token is then decoded
-  and used to authenticate the user who made the request.
+  and used to authenticate the user who made the request.*/
 
 
   console.log(req)
@@ -63,7 +63,7 @@ const errorHandler = (error, request, response, next) => {
   req.user = user
 
   next()
-}*/
+}
 
 
 const unknownEndpoint = (request, response) => {
@@ -74,5 +74,5 @@ const unknownEndpoint = (request, response) => {
 
 
 export default {
-  requestLogger, errorHandler , unknownEndpoint//, requireAuthentication
+  requestLogger, errorHandler , unknownEndpoint, requireAuthentication
 }
