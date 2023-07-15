@@ -28,16 +28,18 @@ mongoose.connect(url)
     console.log('error connecting to MongoDB:', error.message)
   })
 
-app.use(express.json())
-app.use(cookieParser())
-app.use(middleware.requestLogger)
 app.use(cors(corsOptions))
+app.use(express.json())
+//app.use(cookieParser())
+app.use(middleware.requestLogger)
 app.use('/api/register',confirmEmailRouter)
 app.use('/api/recipes', recipesRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
 
-
 app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
+
+
 
 export default app

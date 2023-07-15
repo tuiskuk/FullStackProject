@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import config from '../utils/config.js'
 import { User } from '../models/user.js'
 
-const confirmEmail = async (request, response) => {
+const confirmEmail = async (request, response, next) => {
 
   try {
     const decoded = jwt.verify(request.params.emailToken, config.EMAIL_SECRET)
@@ -10,11 +10,10 @@ const confirmEmail = async (request, response) => {
     await User.findByIdAndUpdate(userId,
       { $set: { isEmailConfirmed: true } },
       { new: true })
+      response.redirect('http://localhost:3000/login')
   } catch (error) {
-    // Handle the error
-    response.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
-  response.redirect('http://localhost:3000/login')
 }
 
 export default {
