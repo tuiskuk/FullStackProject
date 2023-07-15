@@ -1,10 +1,8 @@
 import { User } from '../models/user.js'
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import config from '../utils/config.js'
-import nodemailer from 'nodemailer'
+import { sendUserConfirmationEmail, errorCreator } from '../utils/helperFunctions.js'
 
-const getUser = async (request, response) => {
+const getUser = async (request, response, next) => {
   try {
     console.log(request.params)
     const { userId } = request.params
@@ -16,23 +14,21 @@ const getUser = async (request, response) => {
 
     response.json(user)
   } catch (error) {
-    console.log(error)
-    response.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const getUsers = async (request, response) => {
+const getUsers = async (request, response, next) => {
 
   try {
     const users = await User.find({})
     response.json(users)
   } catch (error) {
-    // Handle the error
-    response.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const deleteUser = async (request, response) => {
+const deleteUser = async (request, response, next) => {
   try {
     const { userId } = request.params
     const deletedUser = await User.findByIdAndDelete(userId)
@@ -43,19 +39,20 @@ const deleteUser = async (request, response) => {
 
     response.json({ message: 'User deleted successfully' })
   } catch (error) {
-    console.log(error)
-    response.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const createUser = async (request, response) => {
+const createUser = async (request, response, next) => {
   try {
     const { username, name, email, profileimage, profileText, password, isEmailConfirmed } = request.body
 
     console.log(password)
     if(!password) {
-      return response.status(400).json({ error: 'password is already exists' })
+      throw errorCreator('Path `password` is required.' , 'ValidationError' );
     }
+
+    console.log('are we alive')
 
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
@@ -70,68 +67,26 @@ const createUser = async (request, response) => {
       passwordHash,
       favourites: []
     })
+    console.log('user created')
 
     const savedUser = await user.save()
-
-    const emailToken = jwt.sign( { id: user._id,
-    } , config.EMAIL_SECRET , { expiresIn: '1d' } )
-
-    const url = `http://localhost:3001/api/register/${emailToken}`
-    console.log(url)
-    console.log(config.MY_GMAIL)
-    console.log(config.MY_GMAIL_PASSWORD)
-    console.log(email)
-
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.elasticemail.com',
-      port: 2525,
-      auth: {
-        user: `${config.MY_GMAIL}`,
-        pass: `${config.MY_GMAIL_PASSWORD}`
-      }
-    })
-
-
-    const mailOptions = {
-      from: `${config.MY_GMAIL}`, // Replace with your email address
-      to: `${email}`, // Replace with the recipient's email address
-      subject: 'Confirmation of your foodapp user',
-      html: `<p>Please click on the following link to confirm your FoodApp account:</p><a href="${url}">Confirm your foodapp account</a>`
-    }
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error:', error)
-      } else {
-        console.log('Email sent:', info.response)
-      }
-    })
-
-
+    console.log('user saved')
+    sendUserConfirmationEmail(email, user)
+    console.log('email send yee')
 
     response.status(201).json(savedUser)
   } catch (error) {
-    console.log(error)
-    if (error.code === 11000) {
-      // Duplicate value error (e.g., duplicate username or email)
-      const duplicateField = Object.keys(error.keyPattern)[0]
-      return response.status(400).json({ error: `${duplicateField} already exists` })
-    } else if (error.name === 'ValidationError') {
-      // Handle validation errors
-      const validationErrors = Object.values(error.errors).map((err) => err.message)
-      return response.status(400).json({ error: validationErrors })
-    }
-    response.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const updateUser = async (request, response) => {
+const updateUser = async (request, response, next) => {
   try {
     const { userId } = request.params
-    const { password, profileText, profileImage, favourites, isEmailConfirmed } = request.body
+    const { password, profileText, profileImage, favourites, isEmailConfirmed, deletefavourite } = request.body
     console.log(userId)
 
-    if (!isEmailConfirmed && !password && !profileText && !profileImage && !favourites) {
+    if (!isEmailConfirmed && !password && !profileText && !profileImage && !favourites && ! deletefavourite) {
       return response.status(400).json({ error: 'something to modify must be provided' })
     }
 
@@ -149,6 +104,9 @@ const updateUser = async (request, response) => {
     if (favourites) {
       updateObject.$push = { favourites: favourites }
     }
+    if (deletefavourite) {
+      updateObject.$pull = { favourites: deletefavourite }
+    }
     if (password) {
       const saltRounds = 10
       const passwordHash = await bcrypt.hash(password, saltRounds)
@@ -165,17 +123,7 @@ const updateUser = async (request, response) => {
 
     response.json(updatedUser)
   } catch (error) {
-    console.log(error)
-    if (error.code === 11000) {
-      // Duplicate value error (e.g., duplicate username or email)
-      const duplicateField = Object.keys(error.keyPattern)[0]
-      return response.status(400).json({ error: `${duplicateField} already exists` })
-    } else if (error.name === 'ValidationError') {
-      // Handle validation errors
-      const validationErrors = Object.values(error.errors).map((err) => err.message)
-      return response.status(400).json({ error: validationErrors })
-    }
-    response.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
