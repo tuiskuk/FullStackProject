@@ -19,6 +19,12 @@ export const userApiSlice = apiSlice.injectEndpoints({
         usersAdapter.setAll(initialState, responseData),
       providesTags: ['Users']
     }),
+    getUser: builder.query({
+      query: (userId) => ({
+        url: `/users/${userId}`,
+        params: { userId }
+      }),
+    }),
     createUser: builder.mutation({
       query: newUser => {
         return ({
@@ -54,7 +60,8 @@ export const {
   useGetUsersQuery,
   useCreateUserMutation,
   useDeleteUserMutation,
-  useUpdateUserMutation
+  useUpdateUserMutation,
+  useGetUserQuery
 } = userApiSlice
 
 export const selectUsersResult = userApiSlice.endpoints.getUsers.select('UsersList')

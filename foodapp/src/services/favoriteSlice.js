@@ -3,12 +3,12 @@ import { apiSlice } from './apiSlice'
 export const favoriteApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     addFavorite: builder.mutation({
-      query: ({ userId, recipeId }) => {
+      query: ({ userId, recipeId, label, image }) => {
         return ({
 
           url: '/users/favorites',
           method: 'POST',
-          body: { userId, recipeId }
+          body: { userId, recipeId, label, image }
 
         })
       },
@@ -26,8 +26,18 @@ export const favoriteApiSlice = apiSlice.injectEndpoints({
       query: ({ userId, recipeId }) => {
         console.log(recipeId)
         return {
-          url: '/users/favorites',
+          url: '/users/favorites/favorite',
           params: { userId, recipeId },
+        }
+
+      },
+      providesTags: ['Favorites']
+    }),
+    getAllFavorites: builder.query({
+      query: ({ userId }) => {
+        return {
+          url: '/users/favorites',
+          params: { userId },
         }
 
       },

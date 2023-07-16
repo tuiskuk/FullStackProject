@@ -40,8 +40,8 @@ const userSchema = new mongoose.Schema({
     }
   },
   isEmailConfirmed: {
-    type: Boolean, 
-    default: false 
+    type: Boolean,
+    default: false
   },
   profileImage: {
     type: String, // Store the file name or path of the profile image
@@ -52,8 +52,24 @@ const userSchema = new mongoose.Schema({
     default: null // Set a default value if the user doesn't have a profile image
   },
   passwordHash: String,
+  followers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  ],
+  following: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  ],
   favorites: [
-    { recipeId: String }
+    { recipeId: String,
+      image: String,
+      label: String }
   ]
 })
 

@@ -21,10 +21,17 @@ const login = async (request, response) => {
     const userForToken = {
       email: user.email,
       id: user._id,
+      username: user.username,
+      name: user.name,
+      profileImage: user.profileImage,
+      profileText: user.profileText,
+      followers: user.followers,
+      following: user.following,
+      favorites: user.favorites
     }
 
     const token = jwt.sign(userForToken, process.env.SECRET, {
-      expiresIn: 2* 60 * 60,
+      expiresIn:  60 * 60,
     })
 
     const refreshToken = jwt.sign(
@@ -61,6 +68,8 @@ const getRefreshToken = async (req, res) => {
 
   const refreshToken = req.cookies.token
 
+  console.log(refreshToken)
+
   // Verify the validity of the Refresh Token, if there is one
 
   jwt.verify(
@@ -84,6 +93,13 @@ const getRefreshToken = async (req, res) => {
       const userForToken = {
         email: user.email,
         id: user._id,
+        username: user.username,
+        name: user.name,
+        profileImage: user.profileImage,
+        profileText: user.profileText,
+        followers: user.followers,
+        following: user.following,
+        favorites: user.favorites
       }
       const accessToken = jwt.sign(
         userForToken,

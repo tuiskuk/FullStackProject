@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useLoginMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectCurrentUser, setUser } from '../services/loginSlice'
+import {  selectCurrentUser, setUser } from '../services/loginSlice'
 
 
 const LoginPage = () => {
