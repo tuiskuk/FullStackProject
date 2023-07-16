@@ -1,5 +1,6 @@
 import { apiSlice } from './apiSlice'
 import { setToken, logOut, setUser } from './loginSlice'
+import jwtDecode from 'jwt-decode'
 const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
 
   try {
@@ -9,8 +10,8 @@ const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
     const { token } = response.data
     dispatch(setToken({ token }))
 
-    const { user } = response.data
-    console.log(user)
+    const { username, name, email, profileImage, profileText, followers,following, favorites, id } = jwtDecode(token)
+    const user = { username, name, email, profileImage, profileText, followers,following, favorites, id }
     dispatch(setUser({ user }))
   } catch (e) {
     console.log(e)

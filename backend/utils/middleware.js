@@ -22,8 +22,9 @@ const requireAuthentication = async (req, res, next) => {
   and used to authenticate the user who made the request.
 */
 
-  console.log(req)
   const authorization = req.get('authorization') || req.get('Authorization')
+
+  console.log(authorization)
 
   // If the token is missing or invalid, deny the request with 401 Unauthorized.
   if (!(authorization && authorization.toLowerCase().startsWith('bearer ')))

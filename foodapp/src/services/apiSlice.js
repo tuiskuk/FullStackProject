@@ -29,7 +29,9 @@ const baseQueryWithRefreshToken = async(args, api, extraOptions) => {
   if (response?.error?.status === 403) {
 
     // Attempt to acquire a new accessToken using our httpOnly RefreshToken.
-    const refreshResponse = await baseQueryWithAccessToken('/auth/refresh', api, extraOptions)
+    const refreshResponse = await baseQueryWithAccessToken('/login/refresh', api, extraOptions)
+
+    console.log(refreshResponse)
 
     // If we get data back, our refresh token is valid and the data
     // should contain the new accessToken.
@@ -58,7 +60,10 @@ export const apiSlice = createApi({
   baseQuery: baseQueryWithRefreshToken,
   tagTypes: [
     'Recipes',
-    'Users'
+    'Users',
+    'Favorites',
+    'Follows',
+    'Following'
   ],
   endpoints: builder => ({
     getAllRecipes: builder.query({

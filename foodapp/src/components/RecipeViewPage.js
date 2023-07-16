@@ -18,6 +18,7 @@ const RecipeViewPage = () => {
 
   const { recipeId } = useParams()
   const user = useSelector(selectCurrentUser)
+  console.log(user)
   const userId = user?.id
   console.log(userId, recipeId)
   const [ addFavorite ] = useAddFavoriteMutation()
@@ -37,6 +38,8 @@ const RecipeViewPage = () => {
   const [recipe, setRecipe] = useState({})
   const [isLiked, setIsLiked] = useState(false)
   const [isDisliked, setIsDisliked] = useState(false)
+  const label = recipe.label
+  const image = recipe.image
 
 
   useEffect(() => {
@@ -65,7 +68,7 @@ const RecipeViewPage = () => {
     console.log(recipeId)
     if (!hasFavorited) {
       try {
-        await addFavorite({ userId, recipeId }).unwrap()
+        await addFavorite({ userId, recipeId, label, image }).unwrap()
       } catch (err) {
         console.error('Failed to add favorite: ', err)
       }

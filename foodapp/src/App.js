@@ -8,7 +8,8 @@ import { Container, AppBar, Toolbar, Button } from '@mui/material'
 import RegistrationForm from './components/RegistrationPage'
 import UsersPage from './components/UsersPage'
 import UserProfile from './components/UserProfilePage'
-import RequireLogin from './components/RequireLogin'
+//import RequireLogin from './components/RequireLogin'
+import PersistedLogin from './components/PersistedLogin'
 import { selectCurrentUser } from './services/loginSlice'
 import { useSelector } from 'react-redux'
 
@@ -51,10 +52,9 @@ const App = () => {
           <Route path='/users/:id' element={
             <UserViewPage/>
           }/>
-          <Route element={ <RequireLogin/> }>
+          <Route element={ <PersistedLogin />}>
             <Route path='/profile' element={<UserProfile/>
             }/></Route>
-
         </Routes>
       </Container>
     </Router>)
