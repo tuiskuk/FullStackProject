@@ -10,12 +10,12 @@ const requestLogger = (request, response, next) => {
 }
 
 
-const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, request, response) => {
   console.log(error.message)
   console.log('error function entered')
 
   if(request.isUnknownEndpoint){
-    return response.status(404).json({ error: 'Unknown endpoint' });
+    return response.status(404).json({ error: 'Unknown endpoint' })
   } else if (error.name === 'CastError') {
     console.log('malformatted id')
     return response.status(400).send({ error: 'malformatted id' })
@@ -66,9 +66,9 @@ const requireAuthentication = async (req, res, next) => {
 }
 
 
-const unknownEndpoint = (request, response) => {
-  request.isUnknownEndpoint = true;
-  next();
+const unknownEndpoint = (request, response, next) => {
+  request.isUnknownEndpoint = true
+  next()
 }
 
 
