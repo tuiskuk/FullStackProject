@@ -12,7 +12,7 @@ import {
   DialogActions
 } from '@mui/material'
 
-import { selectCurrentToken, selectCurrentUser } from '../services/loginSlice'
+import { selectCurrentAccessToken, selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useUpdateUserMutation } from '../services/userSlice'
 import { setUser } from '../services/loginSlice'
@@ -30,8 +30,8 @@ const UserProfile = () => {
   const followersCount = 0
   const postCount = 0
   const user = useSelector(selectCurrentUser)
-  const token = useSelector(selectCurrentToken)
-  console.log(token)
+  const accessToken = useSelector(selectCurrentAccessToken)
+  console.log(accessToken)
   const [ updateUser ] = useUpdateUserMutation()
   console.log(user?.id)
   const userId = user?.id

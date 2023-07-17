@@ -13,10 +13,10 @@ const UserViewPage = () => {
   const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(currentUserId)
   const { data: user, isLoading, refetch } = useGetUserQuery(id)
   const targetUserId = user?.id
-  const [ follow ] = useFollowMutation({ onSettled: () => {
+  const [ follow, { isLoading: isFollowMutateLoading } ] = useFollowMutation({ onSettled: () => {
     refetch() // Manually refetch the data after mutation is complete
   } })
-  const [ unfollow ] = useUnfollowMutation({ onSettled: () => {
+  const [ unfollow, { isLoading: isUnfollowMutateLoading } ] = useUnfollowMutation({ onSettled: () => {
     refetch() // Manually refetch the data after mutation is complete
   } })
   const isFollowing = Boolean(userCurrent?.following.includes(targetUserId))
@@ -31,7 +31,7 @@ const UserViewPage = () => {
 
   const handleUnfollow = async() => {
     // Check if user data is available before unfollowing
-    if (user && isFollowing) {
+    if (user && isFollowing && !isUnfollowMutateLoading) {
       await unfollow({ currentUserId, targetUserId }).unwrap()
       refetch()
       refetchCurrent()
@@ -40,7 +40,7 @@ const UserViewPage = () => {
 
   const handleFollow = async() => {
     // Check if user data is available before following
-    if (user && !isFollowing) {
+    if (user && !isFollowing && !isFollowMutateLoading) {
       await follow({ currentUserId, targetUserId }).unwrap()
       refetch()
       refetchCurrent()
@@ -71,15 +71,15 @@ const UserViewPage = () => {
               <Typography variant="h6">Username: {user?.username}</Typography>
               <Typography variant="body1">Who am I: {user?.profileText || 'No profile text available'}</Typography>
               <Typography variant="body1">Favorite recipes: {user?.favorites ? user?.favorites.join(', ') : 'No favorites'}</Typography>
-              {isFollowing ? (
-                <Button variant="contained" color="primary" onClick={handleUnfollow}>
-                  Unfollow
-                </Button>
-              ) : (
-                <Button variant="contained" color="primary" onClick={handleFollow}>
-                  Follow
-                </Button>
-              )}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={isFollowing ? handleUnfollow : handleFollow}
+                disabled={isFollowMutateLoading || isUnfollowMutateLoading}
+                startIcon={(isFollowMutateLoading || isUnfollowMutateLoading) && <CircularProgress size={20} />}
+              >
+                {isFollowing ? 'Unfollow' : !isFollowing ? 'Follow' : 'Processing...'}
+              </Button>
             </Grid>
           </Grid>
         </Paper>
