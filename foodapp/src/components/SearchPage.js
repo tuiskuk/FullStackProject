@@ -4,7 +4,7 @@ import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
 import { Container, Button, FormControl, Select, MenuItem,
   InputLabel, Checkbox, ListItemText, CircularProgress,
-  OutlinedInput, Box, Chip, Typography } from '@mui/material'
+  OutlinedInput, Box, Chip, Typography, InputAdornment } from '@mui/material'
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
@@ -13,8 +13,9 @@ const SearchPage = () => {
   const [search, setSearch] = useState(localStorage.getItem('search') ||'')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const [excluded, setExcluded] = useState(localStorage.getItem('exluded') || [])
-  const [excludedTerms, setExcludedTerms] = useState([])
+  const [excludedChip, setExcludedChip] = useState('')
+  const [excludedChipArray, setExcludedChipArray] = useState(localStorage.getItem('excludedChips') || [])
+  const [excludedChipArrayTerms, setExcludedChipArrayTerms] = useState([])
 
   const [time, setTime] = useState(localStorage.getItem('time') || '')
   const [timeTerm, setTimeTerm] = useState('')
@@ -42,12 +43,12 @@ const SearchPage = () => {
   } = useGetAllRecipesQuery({
     searchTerm: searchTerm || localStorage.getItem('search') || 'recommended',
     filterOptionTerms: filterOptionTerms || localStorage.getItem('filterOptions') || [],
-    excludedTerms: excludedTerms || localStorage.getItem('exluded') || [],
     timeTerm: timeTerm || localStorage.getItem('time') || '',
     caloriesTerm: caloriesTerm || localStorage.getItem('calories') || '',
     nutrientInputsTerms: nutrientInputsTerms || localStorage.getItem('nutrientInputs') || [],
     ingridientsNumberTerm: ingridientsNumberTerm || localStorage.getItem('ingridientsNumber') || '',
-    mealTypeOptionTerms: mealTypeOptionTerms || localStorage.getItem('mealtypeOptions') || []
+    mealTypeOptionTerms: mealTypeOptionTerms || localStorage.getItem('mealtypeOptions') || [],
+    excludedChipArrayTerms: excludedChipArrayTerms || localStorage.getItem('excludedChips') || []
   })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
@@ -58,13 +59,13 @@ const SearchPage = () => {
   const searchRecipes = async () => {
     localStorage.setItem('time', time)
     localStorage.setItem('calories', calories)
-    localStorage.setItem('excluded', excluded)
+    localStorage.setItem('excludedChips', excludedChipArray)
     localStorage.setItem('filterOptions', filterOptions)
     localStorage.setItem('search', search)
     localStorage.setItem('nutrientInputs', JSON.stringify(nutrientInputs))
     localStorage.setItem('ingridientsNumber', ingridientsNumber)
     localStorage.setItem('mealTypeOptions', mealTypeOptions)
-    setExcludedTerms(excluded)
+    setExcludedChipArrayTerms(excludedChipArray)
     setSearchTerm(search)
     setFilterOptionTerms(filterOptions)
     setTimeTerm(time)
@@ -82,7 +83,7 @@ const SearchPage = () => {
 
   const clearFilters = async () => {
     setSearch('')
-    setExcluded([])
+    setExcludedChipArray([])
     setFilterOptions([])
     setTime('')
     setCalories('')
@@ -119,6 +120,19 @@ const SearchPage = () => {
 
   const toggelShow = () => {
     setShowNutrients(!showNutrients)
+  }
+
+  const handleAddExcludedFood = () => {
+    if (excludedChip.trim()) {
+      setExcludedChipArray([...excludedChipArray, excludedChip.trim()])
+      setExcludedChip('')
+    }
+  }
+
+  const handleDeleteChip = (index) => {
+    const updatedExcludedArray = [...excludedChipArray]
+    updatedExcludedArray.splice(index, 1)
+    setExcludedChipArray(updatedExcludedArray)
   }
 
   return (
@@ -196,14 +210,6 @@ const SearchPage = () => {
             ))}
           </Select>
         </FormControl>
-
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <OutlinedInput
-            placeholder="Set excluded foods"
-            value={excluded}
-            onChange={(event) => setExcluded(event.target.value)}
-          />
-        </FormControl>
       </div>
 
       <div>
@@ -214,6 +220,30 @@ const SearchPage = () => {
             unit={'h'}
             onChange={setTime}
           />
+        </FormControl>
+
+        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+          <Box display='flex' flexWrap='wrap' gap={0.5}>
+            {excludedChipArray.map((value, index) => (
+              <Chip key={index} label={value} onDelete={() => handleDeleteChip(index)}/>
+            ))}
+            <OutlinedInput
+              placeholder="Set excluded foods"
+              value={excludedChip}
+              onChange={(event) => setExcludedChip(event.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddExcludedFood}
+                  >
+                    Add
+                  </Button>
+                </InputAdornment>
+              }
+            />
+          </Box>
         </FormControl>
 
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
