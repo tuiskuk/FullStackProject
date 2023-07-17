@@ -193,7 +193,9 @@ const removeFavorite = async (req, res) => {
 
 const getFavorite = async (req, res) => {
   try {
+    console.log('getting favorite')
     const { userId, recipeId } = req.query
+    console.log(req.query)
     const user = await User.findById(userId)
 
     if (!user) {

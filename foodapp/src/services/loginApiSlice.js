@@ -1,5 +1,5 @@
 import { apiSlice } from './apiSlice'
-import { setToken, logOut, setUser } from './loginSlice'
+import { setAccessToken, logOut, setUser } from './loginSlice'
 import jwtDecode from 'jwt-decode'
 const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
 
@@ -7,10 +7,10 @@ const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
 
     const response = await queryFulfilled
     console.log(response.data)
-    const { token } = response.data
-    dispatch(setToken({ token }))
+    const { accessToken } = response.data
+    dispatch(setAccessToken({ accessToken }))
 
-    const { username, name, email, profileImage, profileText, followers,following, favorites, id } = jwtDecode(token)
+    const { username, name, email, profileImage, profileText, followers,following, favorites, id } = jwtDecode(accessToken)
     const user = { username, name, email, profileImage, profileText, followers,following, favorites, id }
     dispatch(setUser({ user }))
   } catch (e) {
@@ -28,8 +28,8 @@ export const loginApiSlice = apiSlice.injectEndpoints({
       }),
       onQueryStarted,
       transformResponse: responseData => {
-        const { token, ...user } = responseData
-        return { token, user }
+        const { accessToken, ...user } = responseData
+        return { accessToken, user }
       },
       invalidatesTags: ['Login'],
     }),

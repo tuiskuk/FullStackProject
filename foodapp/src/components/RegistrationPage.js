@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import { useCreateUserMutation } from '../services/userSlice'
 /*import { useConfirmEmailQuery } from '../services/apiSlice'
-import { selectCurrentToken } from '../services/loginSlice'
+import { selectCurrentAccessToken } from '../services/loginSlice'
 import { useSelector } from 'react-redux'*/
 
 const RegistrationForm = () => {

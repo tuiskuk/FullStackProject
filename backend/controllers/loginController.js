@@ -1,6 +1,7 @@
 import { User } from '../models/user.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import config from '../utils/config.js'
 
 const login = async (request, response) => {
   try {
@@ -30,13 +31,13 @@ const login = async (request, response) => {
       favorites: user.favorites
     }
 
-    const token = jwt.sign(userForToken, process.env.SECRET, {
+    const accessToken = jwt.sign(userForToken, config.SECRET, {
       expiresIn:  60 * 60,
     })
 
     const refreshToken = jwt.sign(
       { id: user._id  },
-      process.env.REFRESH_TOKEN_SECRET,
+      config.REFRESH_TOKEN_SECRET,
       { expiresIn: 60 * 60 }
     )
 
@@ -47,9 +48,9 @@ const login = async (request, response) => {
       sameSite: 'None' // The cookie is cross-site
     })
 
-    console.log({ token, user })
+    console.log({ accessToken, user })
 
-    response.status(200).json({ token, user })
+    response.status(200).json({ accessToken, user })
   } catch (error) {
     // Handle any potential errors
     console.error('Login error:', error)
@@ -74,7 +75,7 @@ const getRefreshToken = async (req, res) => {
 
   jwt.verify(
     refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
+    config.REFRESH_TOKEN_SECRET,
     async(err, decoded) => {
 
       // If the Refresh Token is not valid, exit and require a new log in.
