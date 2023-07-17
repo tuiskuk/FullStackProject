@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
 import { Container, Button, FormControl, Select, MenuItem,
-  InputLabel, Checkbox, ListItemText, CircularProgress, InputAdornment,
+  InputLabel, Checkbox, ListItemText, CircularProgress,
   OutlinedInput, Box, Chip, Typography } from '@mui/material'
 
 const SearchPage = () => {
@@ -36,7 +36,7 @@ const SearchPage = () => {
 
   const [showNutrients, setShowNutrients] = useState(false)
 
-
+  localStorage.clear()
 
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
@@ -151,7 +151,7 @@ const SearchPage = () => {
             MenuProps={{
               PaperProps: {
                 style: {
-                  maxHeight: 500,
+                  maxHeight: 400,
                   width: 200
                 }
               }
@@ -182,7 +182,8 @@ const SearchPage = () => {
             MenuProps={{
               PaperProps: {
                 style: {
-                  maxHeight: 500,
+                  maxHeight: 400,
+                  width: 200
                 }
               }
             }}
@@ -207,30 +208,30 @@ const SearchPage = () => {
 
       <div>
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <OutlinedInput
-            placeholder="Time (MIN+, MIN-MAX, MAX)"
-            value={time}
-            type="number"
-            inputProps={{ min: '0' }}
-            endAdornment={<InputAdornment position="end">h</InputAdornment>}
-            onChange={(event) => setTime(event.target.value)}
+          <RangeInputComponent
+            value={time || ''}
+            nameUser={'Time'}
+            unit={'h'}
+            onChange={setTime}
           />
         </FormControl>
 
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <OutlinedInput
-            placeholder="Calories"
-            value={calories}
-            endAdornment={<InputAdornment position="end">kcal</InputAdornment>}
-            onChange={(event) => setCalories(event.target.value)}
+
+          <RangeInputComponent
+            value={calories || ''}
+            nameUser={'Calories'}
+            unit={'kcal'}
+            onChange={setCalories}
           />
         </FormControl>
 
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <OutlinedInput
-            placeholder="Number of incridients (MIN+, MIN-MAX, MAX)"
-            value={ingridientsNumber}
-            onChange={(event) => setIngridientsNumber(event.target.value)}
+          <RangeInputComponent
+            value={ingridientsNumber || ''}
+            nameUser={'Number of incridients'}
+            unit={'pcs'}
+            onChange={setIngridientsNumber}
           />
         </FormControl>
       </div>
@@ -245,7 +246,6 @@ const SearchPage = () => {
         {showNutrients && (
           <div>
             {nutrients.map((nutrient) => {
-              console.log(nutrientInputs[nutrient.backend] || '')
               return (
                 <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
                   <RangeInputComponent
@@ -295,23 +295,11 @@ const SearchPage = () => {
   )
 }
 
-/*
-<OutlinedInput
-  placeholder={nutrient.user}
-  value={nutrientInputs[nutrient.backend] || ''}
-  endAdornment={<InputAdornment position="end">{nutrient.unit}</InputAdornment>}
-  onChange={(event) => {
-    handleNutrientInputChange(nutrient.backend, event.target.value)
-  }}
-/>
-*/
-
 const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) => {
   const [minValue, setMinValue] = useState('')
   const [maxValue, setMaxValue] = useState('')
 
   useEffect(() => {
-    console.log(value)
     analyze(value)
   }, [])
 
@@ -328,19 +316,37 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
 
   const handleMinValueChange = (event) => {
     const value = event.target.value
-    if (value === '0'){
+    const newValue = parseInt(value)
+
+    if (value === '0' || isNaN(newValue)){
       setMinValue('')
-    }else {
-      setMinValue(value)
+    } else {
+      if (newValue <= maxValue || !maxValue) {
+        setMinValue(newValue)
+      } else {
+        if (newValue >= minValue) {
+          setMaxValue(newValue)
+          setMinValue(newValue)
+        }
+      }
     }
   }
 
   const handleMaxValueChange = (event) => {
     const value = event.target.value
-    if (value === '0'){
+    const newValue = parseInt(value)
+    if (value === '0' || isNaN(newValue)){
       setMaxValue('')
     }else {
-      setMaxValue(value)
+      if (newValue >= minValue || !minValue) {
+        setMaxValue(newValue)
+      } else {
+        if (newValue < maxValue) {
+          setMaxValue('')
+        } else {
+          setMaxValue(minValue)
+        }
+      }
     }
   }
 
@@ -371,7 +377,12 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
     } else {
       string = ''
     }
-    onChange(nameBackend, string)
+
+    if(nameBackend){
+      onChange(nameBackend, string)
+    }else {
+      onChange(string)
+    }
   }
 
   return (
@@ -386,22 +397,23 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
       <Box
         display="flex"
         alignItems="center"
-        p={1}
+        p={0.5}
         borderRadius="4px"
-        mb={1}
+        mb={0.5}
         justifyContent="space-between"
       >
         <Typography variant="body1">{nameUser}</Typography>
         <Typography variant="body1">{unit}</Typography>
       </Box>
       <Box display="flex" alignItems="center">
-        <FormControl variant="outlined">
+        <FormControl variant="outlined" >
           <OutlinedInput
             placeholder="MIN"
             type="number"
             inputProps={{ min: '0' }}
             value={minValue}
             onChange={handleMinValueChange}
+            size="small"
           />
         </FormControl>
         <Typography variant="body1" sx={{ mx: 1 }}>-</Typography>
@@ -412,6 +424,7 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
             inputProps={{ min: '0' }}
             value={maxValue}
             onChange={handleMaxValueChange}
+            size="small"
           />
         </FormControl>
       </Box>

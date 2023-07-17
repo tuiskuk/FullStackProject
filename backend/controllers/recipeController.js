@@ -27,8 +27,7 @@ const getRecipes = async (request, response) => {
     //['vegetarian', 'kosher']
     let healthFilters = request.query.healthFilters || []
     let mealTypeOptions = request.query.mealTypes || []
-    console.log(mealTypeOptions)
-    console.log(healthFilters)
+
     //['bread', 'beef']
     let excludedFilters = request.query.excludedFilters || []
 

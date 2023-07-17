@@ -8,6 +8,9 @@ const MONGODB_URI = process.env.MONGODB_URI
 const EMAIL_SECRET = process.env.EMAIL_SECRET
 const MY_GMAIL_PASSWORD = process.env.MY_GMAIL_PASSWORD
 const MY_GMAIL = process.env.MY_GMAIL
+const MY_GMAIL_SECRET = process.env.MY_GMAIL_SECRET
+const SECRET = process.env.SECRET
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
 
 export default {
   PORT,
@@ -16,5 +19,8 @@ export default {
   MONGODB_URI,
   EMAIL_SECRET,
   MY_GMAIL_PASSWORD,
-  MY_GMAIL
+  MY_GMAIL,
+  MY_GMAIL_SECRET,
+  SECRET,
+  REFRESH_TOKEN_SECRET
 }
