@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { setToken } from './loginSlice'
+import { setAccessToken } from './loginSlice'
 
 
 const baseQueryWithAccessToken = fetchBaseQuery({
@@ -9,7 +9,7 @@ const baseQueryWithAccessToken = fetchBaseQuery({
 
     // Attach our accessToken from state to the requests' authorization header
     // before each request is sent.
-    const jwt = getState().login?.token
+    const jwt = getState().login?.accessToken
     console.log(jwt)
 
     if (jwt)
@@ -38,7 +38,7 @@ const baseQueryWithRefreshToken = async(args, api, extraOptions) => {
     if (refreshResponse?.data) {
 
       // Store the new accessToken to state.
-      api.dispatch(setToken({ ...refreshResponse.data }))
+      api.dispatch(setAccessToken({ ...refreshResponse.data }))
 
       // Attempt to retry the original query that caused the 403
       // with the new accessToken in the header.

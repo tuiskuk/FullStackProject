@@ -41,20 +41,22 @@ const App = () => {
         </AppBar>
 
         <Routes>
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path='/register' element={<RegistrationForm/>}/>
-          <Route path='/users' element={<UsersPage/>}/>
-          <Route path='/recipes/:recipeId' element={
-            <RecipeViewPage/>
-          }/>
-          <Route path='/users/:id' element={
-            <UserViewPage/>
-          }/>
           <Route element={ <PersistedLogin />}>
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path='/register' element={<RegistrationForm/>}/>
+            <Route path='/users' element={<UsersPage/>}/>
+            <Route path='/recipes/:recipeId' element={
+              <RecipeViewPage/>
+            }/>
+            <Route path='/users/:id' element={
+              <UserViewPage/>
+            }/>
+
             <Route path='/profile' element={<UserProfile/>
-            }/></Route>
+            }/>
+          </Route>
         </Routes>
       </Container>
     </Router>)

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { User } from '../models/user.js'
+import config from './config.js'
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
@@ -50,14 +51,12 @@ const requireAuthentication = async (req, res, next) => {
 
   const authorization = req.get('authorization') || req.get('Authorization')
 
-  console.log(authorization)
-
   // If the token is missing or invalid, deny the request with 401 Unauthorized.
   if (!(authorization && authorization.toLowerCase().startsWith('bearer ')))
     return res.status(401).json({ message: 'Authorization required: missing token.' })
 
   const token = authorization.substring(7)
-  const decodedToken = jwt.verify(token, process.env.SECRET) // jwt.verify throws an JsonWebTokenError if the token is not valid.
+  const decodedToken = jwt.verify(token, config.SECRET) // jwt.verify throws an JsonWebTokenError if the token is not valid.
 
   // The authenticated user is added to the request.
   const user = await User.findById(decodedToken.userId)

@@ -1,26 +1,44 @@
 import { Outlet } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useRefreshMutation } from '../services/loginApiSlice'
-import { selectCurrentToken } from '../services/loginSlice'
+import { Box, CircularProgress } from '@mui/material'
 
-const PersistedLogin = () => {
-  const accessToken = useSelector(selectCurrentToken)
-  console.log(accessToken)
+
+import { useRefreshMutation } from '../services/loginApiSlice'
+import { selectCurrentAccessToken } from '../services/loginSlice'
+
+const PersistedUserLogin = () => {
+
+  const accessToken = useSelector(selectCurrentAccessToken)
+  const useEffectRan = useRef(false) // Flag for if the useEffect has already ran once. It runs twice in React.strictmode, which is used for development.
+
   const [refreshSuccess, setRefreshSuccess] = useState(false)
 
-  const [refresh, { isLoading, isSuccess, isError }] = useRefreshMutation()
+  const [refresh, {
+    isUninitialized,
+    isSuccess,
+    isError,
+    isLoading
+  }] = useRefreshMutation()
 
   useEffect(() => {
+    console.log('moro')
+    console.log(useEffectRan)
+
+    // useEffect runs twice in development with Strict Mode. If effectRan.current === true,
+    // it means the useEffect has already ran once, as we set it to true in the clean up function.
+    // This is necessary in development, but not in prod.
+
+    // TODO: remove this in prod or create an env for when development === true and use the var here.
+
 
     // Call the refresh mutation to get a new Access Token, if the Refresh Token
     // is still valid. Add another piece of state (refreshSuccess) to make sure
     // that the refresh request has completed and we have received the Access Token
     // before setting it.
-    console.log(accessToken)
+
     const refreshTokenIsValid = async () => {
       try {
-        console.log('getting refresh token')
         await refresh()
         setRefreshSuccess(true)
       } catch (e) {
@@ -28,36 +46,42 @@ const PersistedLogin = () => {
       }
     }
 
-    if (!accessToken) {
+    // If the user has no Access Token and they have opted to persistion, attempt to
+    // refresh the token.
+
+    if (!accessToken)
       refreshTokenIsValid()
-    }
 
-    // Set useEffectRan.current to true in the clean-up function to flag
-    // when the effect has already run once for the if statement above.
+    // Set useEffectRan.current to true in the clean up function to flag
+    // when the effect has already ran once for the if statement above.
 
-  }, [accessToken, refresh])
 
-  // Handle different states of the refresh process
-  if (isError) {
-    // Handle the error state if the refresh fails
-    return <div>Error occurred while refreshing the token</div>
-  }
+  }, [])
 
-  if (isLoading) {
-    // Show loading spinner while refreshing the token
-    return <div>Loading...</div>
-  }
 
-  if ((isSuccess && refreshSuccess) || accessToken) {
-    // If the refresh is successful and we have the new access token,
-    // render the protected routes
+  // The return values are the same, but the conditions change, resulting in different behavior.
+  // If rememberUser is false (user opted not to stay logged in), there is no point in starting to evaluate
+  // whether the RefreshToken-call was successful or not, and we should simply redirect the user back to the login page.
+
+  if (isError)
     return <Outlet />
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    )
   }
+  else if ((isSuccess && refreshSuccess) || (isUninitialized && accessToken) || (isUninitialized && !accessToken)) // rememberUser is true here.
+    return <Outlet />
 
-  // If none of the above conditions are met, the user is not authenticated
-  // or the refresh process hasn't completed yet, so you might want to show
-  // a login page or some other indication to prompt the user to log in.
-  return <div>Please log in</div>
 }
 
-export default PersistedLogin
+export default PersistedUserLogin

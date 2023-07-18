@@ -1,18 +1,46 @@
 import { apiSlice } from './apiSlice'
-import { setToken, logOut, setUser } from './loginSlice'
+import { setAccessToken, logOut, setUser } from './loginSlice'
 import jwtDecode from 'jwt-decode'
+
+const fetchUser = async (userId) => {
+  try {
+    const response = await fetch(`http://localhost:3001/api/users/${userId}`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch user data')
+    }
+    console.log(response)
+    console.log(userId)
+    const user = await response.json()
+    console.log(user)
+    return user
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
 
   try {
 
     const response = await queryFulfilled
     console.log(response.data)
-    const { token } = response.data
-    dispatch(setToken({ token }))
+    const { accessToken } = response.data
+    console.log(accessToken)
+    dispatch(setAccessToken({ accessToken }))
 
-    const { username, name, email, profileImage, profileText, followers,following, favorites, id } = jwtDecode(token)
-    const user = { username, name, email, profileImage, profileText, followers,following, favorites, id }
-    dispatch(setUser({ user }))
+    const { id } = jwtDecode(accessToken)
+    console.log(id)
+    const user = await fetchUser(id)
+    console.log(user)
+
+    if (!user) {
+      console.log('User not found in the database.')
+      // Handle the case when the user is not found in the database
+      // You can throw an error, show an error message, or handle it as needed
+    } else {
+      dispatch(setUser({ user }))
+    }
+
   } catch (e) {
     console.log(e)
   }
@@ -28,8 +56,8 @@ export const loginApiSlice = apiSlice.injectEndpoints({
       }),
       onQueryStarted,
       transformResponse: responseData => {
-        const { token, ...user } = responseData
-        return { token, user }
+        const { accessToken, ...user } = responseData
+        return { accessToken, user }
       },
       invalidatesTags: ['Login'],
     }),

@@ -30,7 +30,7 @@ mongoose.connect(url)
 
 app.use(cors(corsOptions))
 app.use(express.json())
-//app.use(cookieParser())
+app.use(cookieParser())
 app.use(middleware.requestLogger)
 app.use('/api/register',confirmEmailRouter)
 app.use('/api/recipes', recipesRouter)

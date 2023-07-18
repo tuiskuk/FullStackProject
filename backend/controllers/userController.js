@@ -12,7 +12,6 @@ const getUser = async (request, response, next) => {
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
     }
-
     response.json(user)
   } catch (error) {
     next(error)
@@ -84,10 +83,10 @@ const createUser = async (request, response, next) => {
 const updateUser = async (request, response, next) => {
   try {
     const { userId } = request.params
-    const { password, profileText, profileImage, favorites, isEmailConfirmed, followers, following } = request.body
+    const { password, profileText, profileImage, favorites, isEmailConfirmed, username } = request.body
     console.log(userId)
 
-    if (!isEmailConfirmed && !password && !profileText && !profileImage && !favorites) {
+    if (!isEmailConfirmed && !password && !profileText && !profileImage && !favorites && !username) {
       return response.status(400).json({ error: 'something to modify must be provided' })
     }
 
@@ -99,22 +98,17 @@ const updateUser = async (request, response, next) => {
     if (profileText) {
       updateObject.profileText = profileText
     }
+    if (profileText) {
+      updateObject.username = username
+    }
     if (profileImage) {
       updateObject.profileImage = profileImage
     }
-    if (favorites) {
-      updateObject.$push = { favorites: favorites }
-    }
+
     if (password) {
       const saltRounds = 10
       const passwordHash = await bcrypt.hash(password, saltRounds)
       updateObject.passwordHash = passwordHash
-    }
-    if (followers) {
-      updateObject.$push = { followers: followers }
-    }
-    if (following) {
-      updateObject.$push = { following: following }
     }
 
     // Find the user by ID and update the fields
@@ -193,7 +187,9 @@ const removeFavorite = async (req, res) => {
 
 const getFavorite = async (req, res) => {
   try {
+    console.log('getting favorite')
     const { userId, recipeId } = req.query
+    console.log(req.query)
     const user = await User.findById(userId)
 
     if (!user) {
