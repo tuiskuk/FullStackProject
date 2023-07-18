@@ -8,6 +8,7 @@ import { Container, AppBar, Toolbar, Button } from '@mui/material'
 import RegistrationForm from './components/RegistrationPage'
 import UsersPage from './components/UsersPage'
 import UserProfile from './components/UserProfilePage'
+import CreateRecipePage from './components/createRecipe'
 //import RequireLogin from './components/RequireLogin'
 import PersistedLogin from './components/PersistedLogin'
 import { selectCurrentUser } from './services/loginSlice'
@@ -34,6 +35,11 @@ const App = () => {
                   My Profile
               </Button>
             )}
+            {user && (
+              <Button color="inherit" component={Link} to="/createrecipe">
+                  Create recipe
+              </Button>
+            )}
             <Button color="inherit" component={Link} to="/login">
               login
             </Button>
@@ -46,6 +52,7 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path='/register' element={<RegistrationForm/>}/>
           <Route path='/users' element={<UsersPage/>}/>
+          <Route path='/createrecipe' element={<CreateRecipePage/>}/>
           <Route path='/recipes/:recipeId' element={
             <RecipeViewPage/>
           }/>
