@@ -91,7 +91,10 @@ const RecipeViewPage = () => {
       {recipe && recipe.image && (
         <Grid item xs={12}>
           <Card>
-            <CardMedia component="img" src={recipe.image} alt={recipe.label} height="300" />
+            <CardMedia component="img" src={recipe.image} alt={recipe.label} height="300"
+              onError={(e) => {
+                e.target.src = 'https://placehold.co/200?text=Photo+Not+Found'
+              }}/>
             <CardContent>
               <Grid container alignItems="center">
                 <Grid item xs={8}>

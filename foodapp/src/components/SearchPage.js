@@ -1,4 +1,4 @@
-import Recipe from './Recipe'
+import RecipeCard from './RecipeCard'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
@@ -14,7 +14,7 @@ const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const [excludedChip, setExcludedChip] = useState('')
-  const [excludedChipArray, setExcludedChipArray] = useState(localStorage.getItem('excludedChips') || [])
+  const [excludedChipArray, setExcludedChipArray] = useState(JSON.parse(localStorage.getItem('excludedChips')) || [])
   const [excludedChipArrayTerms, setExcludedChipArrayTerms] = useState([])
 
   const [time, setTime] = useState(localStorage.getItem('time') || '')
@@ -25,7 +25,7 @@ const SearchPage = () => {
 
   const [filterOptions, setFilterOptions] = useState(localStorage.getItem('filterOptions') || [])
   const [filterOptionTerms, setFilterOptionTerms] = useState([])
-
+  console.log(JSON.parse(localStorage.getItem('nutrientInputs')))
   const [nutrientInputs, setNutrientInputs] = useState(JSON.parse(localStorage.getItem('nutrientInputs')) || [])
   const [nutrientInputsTerms, setNutrientInputsTerms] = useState([])
 
@@ -36,8 +36,6 @@ const SearchPage = () => {
   const [mealTypeOptionTerms, setMealTypeOptionTerms] = useState([])
 
   const [showNutrients, setShowNutrients] = useState(false)
-
-  localStorage.clear()
 
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
@@ -59,7 +57,7 @@ const SearchPage = () => {
   const searchRecipes = async () => {
     localStorage.setItem('time', time)
     localStorage.setItem('calories', calories)
-    localStorage.setItem('excludedChips', excludedChipArray)
+    localStorage.setItem('excludedChips', JSON.stringify(excludedChipArray))
     localStorage.setItem('filterOptions', filterOptions)
     localStorage.setItem('search', search)
     localStorage.setItem('nutrientInputs', JSON.stringify(nutrientInputs))
@@ -306,7 +304,7 @@ const SearchPage = () => {
       ) : recipes.length !== 0 ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
           {recipes.map((recipe) => (
-            <Recipe key={recipe.uri} recipe={recipe} />
+            <RecipeCard key={recipe.uri} recipe={recipe} />
           ))}
         </div>
       ) : (
@@ -364,19 +362,10 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
 
   const handleMaxValueChange = (event) => {
     const value = event.target.value
-    const newValue = parseInt(value)
-    if (value === '0' || isNaN(newValue)){
+    if (value === '0'){
       setMaxValue('')
     }else {
-      if (newValue >= minValue || !minValue) {
-        setMaxValue(newValue)
-      } else {
-        if (newValue < maxValue) {
-          setMaxValue('')
-        } else {
-          setMaxValue(minValue)
-        }
-      }
+      setMaxValue(value)
     }
   }
 
@@ -408,7 +397,7 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
       string = ''
     }
 
-    if(nameBackend){
+    if(nameBackend) {
       onChange(nameBackend, string)
     }else {
       onChange(string)

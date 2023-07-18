@@ -19,7 +19,7 @@ import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useGetAllFollowersQuery, useGetAllFollowingQuery } from '../services/followSlice'
 
-import Recipe from './Recipe'
+import RecipeCard from './RecipeCard'
 
 const UserProfile = () => {
   const [profileDescription, setProfileDescription] = useState('')
@@ -163,7 +163,7 @@ const UserProfile = () => {
       <Grid container spacing={3} marginTop={0.2}>
         {favoritesData?.favorites?.map((favorite, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
-            <Recipe key={favorite.recipeId} recipe={favorite} />
+            <RecipeCard key={favorite.recipeId} recipe={favorite} />
           </Grid>
         ))}
       </Grid>
