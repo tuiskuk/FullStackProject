@@ -2,23 +2,20 @@ import { Typography, Grid, Avatar, Paper, Button, CircularProgress } from '@mui/
 import { useGetUserQuery } from '../services/userSlice'
 import { useParams } from 'react-router-dom'
 import { useFollowMutation, useUnfollowMutation } from '../services/followSlice'
-import { selectCurrentUser } from '../services/loginSlice'
-import { useSelector } from 'react-redux'
+import { selectCurrentUser, setUser } from '../services/loginSlice'
+import { useSelector, useDispatch } from 'react-redux'
 
 const UserViewPage = () => {
 
   const { id } = useParams()
+  const dispatch = useDispatch()
   const currentUser = useSelector(selectCurrentUser)
   const currentUserId = currentUser?.id
   const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(currentUserId)
   const { data: user, isLoading, refetch } = useGetUserQuery(id)
   const targetUserId = user?.id
-  const [ follow, { isLoading: isFollowMutateLoading } ] = useFollowMutation({ onSettled: () => {
-    refetch() // Manually refetch the data after mutation is complete
-  } })
-  const [ unfollow, { isLoading: isUnfollowMutateLoading } ] = useUnfollowMutation({ onSettled: () => {
-    refetch() // Manually refetch the data after mutation is complete
-  } })
+  const [ follow, { isLoading: isFollowMutateLoading } ] = useFollowMutation()
+  const [ unfollow, { isLoading: isUnfollowMutateLoading } ] = useUnfollowMutation()
   const isFollowing = Boolean(userCurrent?.following.includes(targetUserId))
   console.log(userCurrent)
   console.log(isFollowing)
@@ -33,8 +30,10 @@ const UserViewPage = () => {
     // Check if user data is available before unfollowing
     if (user && isFollowing && !isUnfollowMutateLoading) {
       await unfollow({ currentUserId, targetUserId }).unwrap()
-      refetch()
-      refetchCurrent()
+      refetch() // Manually refetch the data after mutation is complete
+      const updatedUser = await refetchCurrent().unwrap() // Get the updated user data
+      dispatch(setUser({ user: updatedUser }))
+      console.log(updatedUser)
     }
   }
 
@@ -42,8 +41,10 @@ const UserViewPage = () => {
     // Check if user data is available before following
     if (user && !isFollowing && !isFollowMutateLoading) {
       await follow({ currentUserId, targetUserId }).unwrap()
-      refetch()
-      refetchCurrent()
+      refetch() // Manually refetch the data after mutation is complete
+      const updatedUser = await refetchCurrent().unwrap() // Get the updated user data
+      dispatch(setUser({ user: updatedUser }))
+      console.log(updatedUser)
     }
   }
 

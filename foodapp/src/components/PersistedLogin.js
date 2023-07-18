@@ -20,11 +20,6 @@ const PersistedUserLogin = () => {
     isError,
     isLoading
   }] = useRefreshMutation()
-  console.log(isUninitialized)
-  console.log(isSuccess)
-  console.log(isError)
-  console.log(accessToken)
-  console.log(refreshSuccess)
 
   useEffect(() => {
     console.log('moro')

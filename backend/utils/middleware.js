@@ -51,10 +51,6 @@ const requireAuthentication = async (req, res, next) => {
 
   const authorization = req.get('authorization') || req.get('Authorization')
 
-  console.log(req)
-
-  console.log(authorization)
-
   // If the token is missing or invalid, deny the request with 401 Unauthorized.
   if (!(authorization && authorization.toLowerCase().startsWith('bearer ')))
     return res.status(401).json({ message: 'Authorization required: missing token.' })

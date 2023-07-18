@@ -20,15 +20,8 @@ const login = async (request, response) => {
     }
 
     const userForToken = {
-      email: user.email,
-      id: user._id,
       username: user.username,
-      name: user.name,
-      profileImage: user.profileImage,
-      profileText: user.profileText,
-      followers: user.followers,
-      following: user.following,
-      favorites: user.favorites
+      id: user._id
     }
 
     const accessToken = jwt.sign(userForToken, config.SECRET, {
@@ -92,15 +85,8 @@ const getRefreshToken = async (req, res) => {
       // Otherwise, if all is as it should be, grant the user a new short-lived
       // Access Token.
       const userForToken = {
-        email: user.email,
-        id: user._id,
         username: user.username,
-        name: user.name,
-        profileImage: user.profileImage,
-        profileText: user.profileText,
-        followers: user.followers,
-        following: user.following,
-        favorites: user.favorites
+        id: user._id
       }
       const accessToken = jwt.sign(
         userForToken,

@@ -12,12 +12,11 @@ import {
   DialogActions
 } from '@mui/material'
 
-import { selectCurrentAccessToken, selectCurrentUser } from '../services/loginSlice'
+import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useUpdateUserMutation } from '../services/userSlice'
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
-import { useGetAllFollowersQuery, useGetAllFollowingQuery } from '../services/followSlice'
 
 import Recipe from './Recipe'
 
@@ -27,28 +26,26 @@ const UserProfile = () => {
   const [newUsername, setNewUsername] = useState('')
   const [editProfileVisible, setEditProfileVisible] = useState(false)
   const selectedOption = 'favorites'
-  const followersCount = 0
   const postCount = 0
   const user = useSelector(selectCurrentUser)
-  const accessToken = useSelector(selectCurrentAccessToken)
-  console.log(accessToken)
   const [ updateUser ] = useUpdateUserMutation()
   console.log(user?.id)
   const userId = user?.id
   const { data: favoritesData } = useGetAllFavoritesQuery({ userId })
-  const { data: followers } = useGetAllFollowersQuery({ userId })
-  const { data: following } = useGetAllFollowingQuery({ userId })
+  const following = user?.following
+  const followers = user?.followers
   console.log(followers)
   console.log(following?.following)
   console.log(favoritesData)
   const dispatch = useDispatch()
-  const followingCount = following?.following.length
+  const followingCount = following?.length
+  const followersCount = followers?.length
   console.log(user)
 
   useEffect(() => {
     setProfileDescription(user?.profileText)
     setNewUsername(user?.username)
-  }, [])
+  }, [user])
 
   const handleUpdateProfile = () => {
     if(!user) return
@@ -60,6 +57,7 @@ const UserProfile = () => {
       password: newPassword,
       username: newUsername,
     }
+    console.log(updatedUser)
     updateUser({ id: user?.id, user: updatedUser }).unwrap()
     dispatch(setUser({ user: updatedUser }))
     console.log(user)
