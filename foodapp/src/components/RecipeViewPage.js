@@ -84,8 +84,8 @@ const RecipeViewPage = () => {
   }
 
   const handleMultiplierChange = (event) => {
-    const value = parseFloat(event.target.value) // Parse the input value as a number
-    setMultiplier(value || 1) // Update the multiplier state, or set it to 0 if the input is invalid
+    const value = parseFloat(event.target.value)
+    setMultiplier(value || 1)
   }
 
   const convertToFraction = (value) => {
@@ -96,6 +96,9 @@ const RecipeViewPage = () => {
   const handleMultiply = (value) => {
     return ((value/recipe.yield) * multiplier)
   }
+
+  //regex pattern
+  const pattern = /^\d+\s?\d*\/?\d*\s/
 
   return (
     <Grid container spacing={2}>
@@ -144,50 +147,80 @@ const RecipeViewPage = () => {
       <Grid item xs={12}>
         <Card>
           <CardContent>
-            <Grid container direction="row" alignItems="center">
-              <Typography variant="h6" paddingRight={'20px'}>Serving size</Typography>
-              <TextField
-                value={multiplier}
-                onChange={handleMultiplierChange}
-                InputProps={{
-                  inputProps: {
-                    min: 1,
-                    step: 1,
-                    style: { width: '25px', height: '35px', textAlign: 'center', appearance: 'textfield' } }, // Set the minimum value to 1
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <IconButton onClick={() => setMultiplier(prevMultiplier => Math.max(prevMultiplier - 1, 1))} size="small">
-                        <RemoveIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setMultiplier(prevMultiplier => prevMultiplier + 1)} size="small">
-                        <AddIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+            <Grid container direction="row" alignItems="center" justify="space-around">
+              <Grid item xs={4} container direction="row" alignItems="center" justify="center">
+                <Typography variant="h6" paddingRight={'20px'}>Serving size</Typography>
+                <TextField
+                  value={multiplier}
+                  onChange={handleMultiplierChange}
+                  InputProps={{
+                    inputProps: {
+                      min: 1,
+                      step: 1,
+                      style: { width: '25px', height: '35px', textAlign: 'center', appearance: 'textfield' } }, // Set the minimum value to 1
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <IconButton onClick={() => setMultiplier(prevMultiplier => Math.max(prevMultiplier - 1, 1))} size="small">
+                          <RemoveIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setMultiplier(prevMultiplier => prevMultiplier + 1)} size="small">
+                          <AddIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span>Time min</span>
+                  <span>{recipe.totalTime}</span>
+                </Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span>Calories kcal</span>
+                  <span>{roundValue(handleMultiply(recipe.calories))}</span>
+                </Typography>
+              </Grid>
             </Grid>
           </CardContent>
         </Card>
       </Grid>
 
-      {recipe && recipe.ingredients && (
-        <Grid item xs={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Ingredients:</Typography>
-              {recipe.ingredients.map((ingredient, index) => (
-                <Typography key={index}>{`${convertToFraction(handleMultiply(ingredient.quantity))} ${ingredient.text.split(' ').slice(1).join(' ')}`}</Typography>
-              ))}
-              <Typography variant='subtitle1'>Weight in grams: {roundValue(handleMultiply(recipe.totalWeight))} g</Typography>
-            </CardContent>
-          </Card>
+      <Grid item xs={6}>
+        <Grid container spacing={2}>
+          {recipe && recipe.ingredients && (
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">Ingredients:</Typography>
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <Typography key={index}>{`${convertToFraction(handleMultiply(ingredient.quantity))} ${ingredient.text.replace(pattern, '')}`}</Typography>
+                  ))}
+                  <Typography variant='subtitle1'>Weight in grams: {roundValue(handleMultiply(recipe.totalWeight))} g</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6">Check directions:</Typography>
+                <Typography>
+                  <a href={recipe.url} target="_blank" rel="noopener noreferrer">
+                    {recipe.label}
+                  </a>
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-      )}
+      </Grid>
 
       {recipe && recipe.totalNutrients && (
         <Grid item xs={6}>
@@ -203,6 +236,14 @@ const RecipeViewPage = () => {
           </Card>
         </Grid>
       )}
+
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6">Comments:</Typography>
+          </CardContent>
+        </Card>
+      </Grid>
 
     </Grid>
   )

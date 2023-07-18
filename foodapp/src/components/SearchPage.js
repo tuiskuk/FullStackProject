@@ -215,7 +215,7 @@ const SearchPage = () => {
           <RangeInputComponent
             value={time || ''}
             nameUser={'Time'}
-            unit={'h'}
+            unit={'min'}
             onChange={setTime}
           />
         </FormControl>
