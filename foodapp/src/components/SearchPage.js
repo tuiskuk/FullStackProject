@@ -23,30 +23,30 @@ const SearchPage = () => {
   const [calories, setCalories] = useState(localStorage.getItem('calories') || '')
   const [caloriesTerm, setCaloriesTerm] = useState('')
 
-  const [filterOptions, setFilterOptions] = useState(localStorage.getItem('filterOptions') || [])
+  const [filterOptions, setFilterOptions] = useState(JSON.parse(localStorage.getItem('filterOptions')) || [])
   const [filterOptionTerms, setFilterOptionTerms] = useState([])
-  console.log(JSON.parse(localStorage.getItem('nutrientInputs')))
+
   const [nutrientInputs, setNutrientInputs] = useState(JSON.parse(localStorage.getItem('nutrientInputs')) || [])
   const [nutrientInputsTerms, setNutrientInputsTerms] = useState([])
 
   const [ingridientsNumber, setIngridientsNumber] = useState(localStorage.getItem('ingridientsNumber') || '')
   const [ingridientsNumberTerm, setIngridienstNumberTerm] = useState('')
 
-  const [mealTypeOptions, setMealTypeOptions] = useState(localStorage.getItem('mealTypeOptions') || [])
+  const [mealTypeOptions, setMealTypeOptions] = useState(JSON.parse(localStorage.getItem('mealTypeOptions')) || [])
   const [mealTypeOptionTerms, setMealTypeOptionTerms] = useState([])
 
   const [showNutrients, setShowNutrients] = useState(false)
 
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
-    searchTerm: searchTerm || localStorage.getItem('search') || 'recommended',
-    filterOptionTerms: filterOptionTerms || localStorage.getItem('filterOptions') || [],
-    timeTerm: timeTerm || localStorage.getItem('time') || '',
-    caloriesTerm: caloriesTerm || localStorage.getItem('calories') || '',
-    nutrientInputsTerms: nutrientInputsTerms || localStorage.getItem('nutrientInputs') || [],
-    ingridientsNumberTerm: ingridientsNumberTerm || localStorage.getItem('ingridientsNumber') || '',
-    mealTypeOptionTerms: mealTypeOptionTerms || localStorage.getItem('mealtypeOptions') || [],
-    excludedChipArrayTerms: excludedChipArrayTerms || localStorage.getItem('excludedChips') || []
+    searchTerm: searchTerm || 'recommended',
+    filterOptionTerms: filterOptionTerms || [],
+    timeTerm: timeTerm || '',
+    caloriesTerm: caloriesTerm || '',
+    nutrientInputsTerms: nutrientInputsTerms || [],
+    ingridientsNumberTerm: ingridientsNumberTerm || '',
+    mealTypeOptionTerms: mealTypeOptionTerms || [],
+    excludedChipArrayTerms: excludedChipArrayTerms || []
   })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
@@ -58,11 +58,11 @@ const SearchPage = () => {
     localStorage.setItem('time', time)
     localStorage.setItem('calories', calories)
     localStorage.setItem('excludedChips', JSON.stringify(excludedChipArray))
-    localStorage.setItem('filterOptions', filterOptions)
+    localStorage.setItem('filterOptions', JSON.stringify(filterOptions))
     localStorage.setItem('search', search)
     localStorage.setItem('nutrientInputs', JSON.stringify(nutrientInputs))
     localStorage.setItem('ingridientsNumber', ingridientsNumber)
-    localStorage.setItem('mealTypeOptions', mealTypeOptions)
+    localStorage.setItem('mealTypeOptions', JSON.stringify(mealTypeOptions))
     setExcludedChipArrayTerms(excludedChipArray)
     setSearchTerm(search)
     setFilterOptionTerms(filterOptions)
@@ -328,25 +328,27 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
   const [maxValue, setMaxValue] = useState('')
 
   useEffect(() => {
-    analyze(value)
-  }, [])
+    analyze()
+  }, [value])
 
   useEffect(() => {
-    if (!value) {
+    if (!value || value === '') {
       setMinValue('')
       setMaxValue('')
     }
   }, [value])
 
   useEffect(() => {
-    handleParse()
+    if (minValue || maxValue) {
+      handleParse()
+    }
   }, [minValue, maxValue])
 
   const handleMinValueChange = (event) => {
-    const value = event.target.value
-    const newValue = parseInt(value)
+    const valueMin = event.target.value
+    const newValue = parseInt(valueMin)
 
-    if (value === '0' || isNaN(newValue)){
+    if (valueMin === '0' || isNaN(newValue)){
       setMinValue('')
     } else {
       if (newValue <= maxValue || !maxValue) {
@@ -361,19 +363,29 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
   }
 
   const handleMaxValueChange = (event) => {
-    const value = event.target.value
-    if (value === '0'){
+    const valueMax = event.target.value
+    const newValue = parseInt(valueMax)
+
+    if (valueMax === '0' || isNaN(newValue)){
       setMaxValue('')
     }else {
-      setMaxValue(value)
+      if (newValue >= minValue || !minValue) {
+        setMaxValue(newValue)
+      } else {
+        if (newValue < maxValue) {
+          setMaxValue('')
+        } else {
+          setMaxValue(minValue)
+        }
+      }
     }
   }
 
   const analyze = () => {
-    if(value.includes('-')){
+    if (value.includes('-')) {
       setMinValue(value.split('-')[0])
       setMaxValue(value.split('-')[1])
-    } else if(value.includes('+')){
+    } else if (value.includes('+')) {
       setMinValue(value.split('+')[0])
       setMaxValue('')
     } else if (value) {
@@ -387,19 +399,19 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
 
   const handleParse = () => {
     let string = ''
-    if(minValue && maxValue) {
+    if (minValue && maxValue) {
       string = `${minValue}-${maxValue}`
     } else if (minValue && !maxValue) {
       string = `${minValue}+`
-    } else if (!minValue && maxValue){
+    } else if (!minValue && maxValue) {
       string = `${maxValue}`
     } else {
       string = ''
     }
 
-    if(nameBackend) {
+    if (nameBackend) {
       onChange(nameBackend, string)
-    }else {
+    } else {
       onChange(string)
     }
   }
