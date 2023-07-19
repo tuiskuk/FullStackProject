@@ -83,7 +83,7 @@ const userRecipeSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
-});
+})
 
 
 userRecipeSchema.set('toJSON', {

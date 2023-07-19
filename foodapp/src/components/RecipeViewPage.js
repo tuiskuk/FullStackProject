@@ -1,4 +1,4 @@
-import  { Card, CardContent, CardMedia, Typography, Grid, IconButton, TextField, InputAdornment } from '@mui/material'
+import  { Card, CardContent, CardMedia, Typography, Grid, IconButton, TextField, InputAdornment, Button, OutlinedInput } from '@mui/material'
 import { useEffect, useState } from 'react'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
@@ -34,6 +34,7 @@ const RecipeViewPage = () => {
       refetch() // Manually refetch the data after mutation is complete
     },
   })
+
   const [recipe, setRecipe] = useState({})
   const [isLiked, setIsLiked] = useState(false)
   const [isDisliked, setIsDisliked] = useState(false)
@@ -41,6 +42,8 @@ const RecipeViewPage = () => {
   const image = recipe.image
   const [multiplier, setMultiplier] = useState(recipe.yield || 1)
 
+  const [userComment, setUserComment] = useState('')
+  const [comments, setComments] = useState([])
 
   useEffect(() => {
     const savedRecipe = sessionStorage.getItem('recipe')
@@ -99,6 +102,13 @@ const RecipeViewPage = () => {
 
   //regex pattern
   const pattern = /^\d+\s?\d*\/?\d*\s/
+
+  const handleSubmitComment = () => {
+    if (userComment.trim() !== '') {
+      setComments([...comments, userComment])
+      setUserComment('')
+    }
+  }
 
   return (
     <Grid container spacing={2}>
@@ -247,10 +257,56 @@ const RecipeViewPage = () => {
         <Card>
           <CardContent>
             <Typography variant="h6">Comments:</Typography>
+            <br></br>
+            {comments.map((comment, index) => (
+              <Typography
+                key={index}
+                variant="body1"
+                style={{
+                  border: '1px solid #bdbdbd',
+                  borderRadius: '4px',
+                  padding: '10px 14px', // Adjust padding to match the OutlinedInput
+                  marginBottom: '8px',
+                  minHeight: '38px',
+                  height: 'auto',
+                  display: 'flex', // To center the text vertically
+                  alignItems: 'center',
+                  wordWrap: 'break-word',
+                }}
+              >
+                {comment}
+              </Typography>
+            ))}
           </CardContent>
         </Card>
       </Grid>
 
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6">Comment recipe</Typography>
+            <br></br>
+            <OutlinedInput
+              multiline
+              fullWidth
+              placeholder="Add your comment"
+              value={userComment}
+              onChange={(event) => setUserComment(event.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmitComment}
+                  >
+                    Add
+                  </Button>
+                </InputAdornment>
+              }
+            />
+          </CardContent>
+        </Card>
+      </Grid>
     </Grid>
   )
 
