@@ -3,8 +3,6 @@ import userController from '../controllers/userController.js'
 import middleware from '../utils/middleware.js'
 const userRouter = express.Router()
 
-
-
 userRouter.get('/', userController.getUsers)
 userRouter.post('/favorites', userController.addFavorite)
 userRouter.delete('/favorites', userController.removeFavorite)
@@ -19,8 +17,9 @@ userRouter.use(middleware.requireAuthentication)
 userRouter.get('/favorites/favorite', userController.getFavorite)
 userRouter.put('/:userId', userController.updateUser)
 userRouter.delete('/:userId', userController.deleteUser)
-
-
-
+userRouter.post('/likes', userController.addLike)
+userRouter.delete('/likes', userController.removeLike)
+userRouter.get('/likes', userController.getAllLikes)
+userRouter.get('/likes/like', userController.getLike)
 
 export default userRouter

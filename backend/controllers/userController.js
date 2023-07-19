@@ -353,8 +353,116 @@ const removeFollow = async (req, res) => {
   }
 }
 
+//like and dislike
+const addLike = async (req, res) => {
+  const { userId, recipeId, label, image } = req.body
+  console.log('adding like')
+
+  try {
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    // Check if the recipe is already liked by the user
+    const existingLike = user.likes.find((like) => like.recipeId === recipeId)
+    if (existingLike) {
+      return res.status(400).json({ error: 'Recipe already liked' })
+    }
+
+    // Add the new like to the user's likes array
+    user.likes.push({ recipeId, label, image })
+
+    // Save the updated user document
+    await user.save()
+
+    res.status(201).json({ message: 'Like added' })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+}
+
+const removeLike = async (req, res) => {
+  const { userId, recipeId } = req.body
+
+  try {
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    // Find the index of the liked recipe in the user's likes array
+    const likeIndex = user.likes.findIndex((like) => like.recipeId === recipeId)
+
+    if (likeIndex === -1) {
+      return res.status(404).json({ error: 'Like not found' })
+    }
+
+    // Remove the liked recipe from the user's likes array
+    user.likes.splice(likeIndex, 1)
+
+    // Save the updated user document
+    await user.save()
+
+    res.status(200).json({ message: 'Like removed' })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+}
+
+const getLike = async (req, res) => {
+  try {
+    console.log('getting like')
+    const { userId, recipeId } = req.query
+    console.log(req.query)
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    const like = user.likes.find((lik) => lik.recipeId === recipeId)
+
+    if (!like) {
+      return res.status(204).json({ like })
+    }
+
+    res.status(200).json({ like })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+}
+
+const getAllLikes = async (req, res) => {
+  try {
+    const { userId } = req.query
+    console.log(userId)
+
+    // Find the user by userId
+    const user = await User.findById(userId)
+
+    // If user is not found, return a 404 response with an error message
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    // Return the user's liked recipes array
+    res.status(200).json({ likes: user.likes })
+  } catch (error) {
+    // If any error occurs during the process, handle it and return a 500 response with an error message
+    console.log(error)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+}
+
+
 
 
 export default {
-  getUser, getUsers, createUser, updateUser, deleteUser, addFavorite, removeFavorite, getFavorite, getAllFavorites, getAllFollowers, getAllFollowing, addFollow, removeFollow
+  getUser, getUsers, createUser, updateUser, deleteUser, addFavorite, removeFavorite, getFavorite, getAllFavorites, getAllFollowers, getAllFollowing, addFollow, removeFollow, addLike, removeLike, getAllLikes, getLike
 }

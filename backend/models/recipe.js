@@ -15,6 +15,15 @@ const recipeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  likes: {
+    type: Number,
+  },
+  dislikes: {
+    type: Number,
+  },
+  comments: {
+    type: String,
+  }
 })
 
 recipeSchema.set('toJSON', {
