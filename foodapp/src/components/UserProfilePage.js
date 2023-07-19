@@ -42,6 +42,11 @@ const UserProfile = () => {
   const followersCount = followers?.length
   console.log(user)
 
+  //const [recipeId, setRecipeId] = useState('')
+
+  //const { data: recipe } = useGetRecipeQuery(recipeId)
+  //setRecipeId('')
+
   useEffect(() => {
     setProfileDescription(user?.profileText)
     setNewUsername(user?.username)
@@ -62,6 +67,10 @@ const UserProfile = () => {
     dispatch(setUser({ user: updatedUser }))
     console.log(user)
   }
+
+  /*const handleRecipeCardClick = (recipeId) => {
+    setRecipeId(recipeId)
+  }*/
 
   return (
     <Container maxWidth="sm">

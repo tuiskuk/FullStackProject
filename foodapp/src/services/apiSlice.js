@@ -85,6 +85,12 @@ export const apiSlice = createApi({
       query: (emailToken) => ({
         url: `register/${emailToken}`
       })
+    }),
+    getRecipe : builder.query({
+      query: (id) => ({
+        url: '/recipes/id',
+        params: { id: id }
+      })
     })
 
   })

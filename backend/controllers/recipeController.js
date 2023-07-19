@@ -99,6 +99,22 @@ const getLink = async (request, response) => {
   }
 }
 
+const getRecipe = async (request, response) => {
+  try {
+    const id = request.query.id
+    console.log(id)
+
+    const url = `https://api.edamam.com/api/recipes/v2/${id}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
+    console.log(url)
+    const apiResponse = await axios.get(url)
+    console.log(url)
+    const recipe = apiResponse.data
+    response.status(200).json(recipe)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 export default {
-  getRecipes, getLink
+  getRecipes, getLink, getRecipe
 }

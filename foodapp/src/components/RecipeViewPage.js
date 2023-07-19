@@ -1,4 +1,4 @@
-import  { Card, CardContent, CardMedia, Typography, Grid, IconButton } from '@mui/material'
+import  { Card, CardContent, CardMedia, Typography, Grid, IconButton, TextField, InputAdornment } from '@mui/material'
 import { useEffect, useState } from 'react'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
@@ -8,14 +8,13 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
-import { useAddFavoriteMutation } from '../services/favoriteSlice'
-import { useRemoveFavoriteMutation } from '../services/favoriteSlice'
-import { useGetFavoriteQuery } from '../services/favoriteSlice'
+import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetFavoriteQuery } from '../services/favoriteSlice'
 import { useParams } from 'react-router-dom'
-
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
+import Fraction from 'fraction.js'
 
 const RecipeViewPage = () => {
-
   const { recipeId } = useParams()
   const user = useSelector(selectCurrentUser)
   console.log(user)
@@ -40,12 +39,14 @@ const RecipeViewPage = () => {
   const [isDisliked, setIsDisliked] = useState(false)
   const label = recipe.label
   const image = recipe.image
+  const [multiplier, setMultiplier] = useState(recipe.yield || 1)
 
 
   useEffect(() => {
     const savedRecipe = sessionStorage.getItem('recipe')
     const parsedRecipe = JSON.parse(savedRecipe)
     setRecipe(parsedRecipe)
+    setMultiplier(parsedRecipe?.yield || 1)
   }, [])
 
   const roundValue = (value) => {
@@ -80,11 +81,24 @@ const RecipeViewPage = () => {
         console.error('Failed to create user: ', err)
       }
     }
-
   }
 
+  const handleMultiplierChange = (event) => {
+    const value = parseFloat(event.target.value)
+    setMultiplier(value || 1)
+  }
 
+  const convertToFraction = (value) => {
+    const fraction = new Fraction(value)
+    return fraction.toFraction(true)
+  }
 
+  const handleMultiply = (value) => {
+    return ((value/recipe.yield) * multiplier)
+  }
+
+  //regex pattern
+  const pattern = /^\d+\s?\d*\/?\d*\s/
 
   return (
     <Grid container spacing={2}>
@@ -93,7 +107,7 @@ const RecipeViewPage = () => {
           <Card>
             <CardMedia component="img" src={recipe.image} alt={recipe.label} height="300"
               onError={(e) => {
-                e.target.src = 'https://placehold.co/200?text=Photo+Not+Found'
+                e.target.src = 'https://placehold.co/300?text=Photo+Not+Found'
               }}/>
             <CardContent>
               <Grid container alignItems="center">
@@ -130,34 +144,112 @@ const RecipeViewPage = () => {
         </Grid>
       )}
 
-      {recipe && recipe.ingredients && (
-        <Grid item xs={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Ingredients:</Typography>
-              {recipe.ingredients.map((ingredient, index) => (
-                <Typography key={index}>{ingredient.text}</Typography>
-              ))}
-              <Typography variant='subtitle1'>Weight in grams: {roundValue(recipe.totalWeight)} g</Typography>
-            </CardContent>
-          </Card>
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Grid container direction="row" alignItems="center" justify="space-around">
+              <Grid item xs={4} container direction="row" alignItems="center" justify="center">
+                <Typography variant="h6" paddingRight={'20px'}>Serving size</Typography>
+                <TextField
+                  value={multiplier}
+                  onChange={handleMultiplierChange}
+                  InputProps={{
+                    inputProps: {
+                      min: 1,
+                      step: 1,
+                      style: { width: '25px', height: '35px', textAlign: 'center', appearance: 'textfield' } }, // Set the minimum value to 1
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <IconButton onClick={() => setMultiplier(prevMultiplier => Math.max(prevMultiplier - 1, 1))} size="small">
+                          <RemoveIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setMultiplier(prevMultiplier => prevMultiplier + 1)} size="small">
+                          <AddIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              {recipe && recipe.totalTime && (
+                <Grid item xs={4}>
+                  <Typography variant="h6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <span>Time min</span>
+                    <span>{recipe.totalTime}</span>
+                  </Typography>
+                </Grid>
+              )}
+              {recipe && recipe.calories && (
+                <Grid item xs={4}>
+                  <Typography variant="h6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <span>Calories kcal</span>
+                    <span>{roundValue(handleMultiply(recipe.calories))}</span>
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid item xs={6}>
+        <Grid container spacing={2}>
+          {recipe && recipe.ingredients && (
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">Ingredients:</Typography>
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <Typography key={index}>{`${convertToFraction(handleMultiply(ingredient.quantity))} ${ingredient.text.replace(pattern, '')}`}</Typography>
+                  ))}
+                  <Typography variant='subtitle1'>Weight in grams: {roundValue(handleMultiply(recipe.totalWeight))} g</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+          {recipe && recipe.url && (
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">Check directions:</Typography>
+                  <Typography>
+                    <a href={recipe.url} target="_blank" rel="noopener noreferrer">
+                      {recipe.label}
+                    </a>
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
         </Grid>
-      )}
+      </Grid>
 
       {recipe && recipe.totalNutrients && (
         <Grid item xs={6}>
           <Card>
             <CardContent>
-              <Typography variant="h6">Nutritional Information:</Typography>
+              <Typography variant="h6">Nutritional Information ({multiplier} servings):</Typography>
               {Object.entries(recipe.totalNutrients).map(([key, nutrient]) => (
                 <Typography key={key}>
-                  {nutrient.label}: {roundValue(nutrient.quantity)} {nutrient.unit}
+                  {nutrient.label}: {roundValue(handleMultiply(nutrient.quantity))} {nutrient.unit}
                 </Typography>
               ))}
             </CardContent>
           </Card>
         </Grid>
       )}
+
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6">Comments:</Typography>
+          </CardContent>
+        </Card>
+      </Grid>
 
     </Grid>
   )
