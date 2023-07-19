@@ -175,18 +175,22 @@ const RecipeViewPage = () => {
                   }}
                 />
               </Grid>
-              <Grid item xs={4}>
-                <Typography variant="h6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span>Time min</span>
-                  <span>{recipe.totalTime}</span>
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant="h6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span>Calories kcal</span>
-                  <span>{roundValue(handleMultiply(recipe.calories))}</span>
-                </Typography>
-              </Grid>
+              {recipe && recipe.totalTime && (
+                <Grid item xs={4}>
+                  <Typography variant="h6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <span>Time min</span>
+                    <span>{recipe.totalTime}</span>
+                  </Typography>
+                </Grid>
+              )}
+              {recipe && recipe.calories && (
+                <Grid item xs={4}>
+                  <Typography variant="h6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <span>Calories kcal</span>
+                    <span>{roundValue(handleMultiply(recipe.calories))}</span>
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
           </CardContent>
         </Card>
@@ -207,18 +211,20 @@ const RecipeViewPage = () => {
               </Card>
             </Grid>
           )}
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6">Check directions:</Typography>
-                <Typography>
-                  <a href={recipe.url} target="_blank" rel="noopener noreferrer">
-                    {recipe.label}
-                  </a>
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          {recipe && recipe.url && (
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">Check directions:</Typography>
+                  <Typography>
+                    <a href={recipe.url} target="_blank" rel="noopener noreferrer">
+                      {recipe.label}
+                    </a>
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
         </Grid>
       </Grid>
 
