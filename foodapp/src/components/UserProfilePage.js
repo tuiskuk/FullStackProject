@@ -9,7 +9,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Box,
+  Popover
 } from '@mui/material'
 
 import { selectCurrentUser } from '../services/loginSlice'
@@ -22,6 +24,8 @@ import Recipe from './Recipe'
 
 const UserProfile = () => {
   const [profileDescription, setProfileDescription] = useState('')
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [followingListVisible, setFollowingListVisible] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [newUsername, setNewUsername] = useState('')
   const [editProfileVisible, setEditProfileVisible] = useState(false)
@@ -37,6 +41,7 @@ const UserProfile = () => {
   console.log(followers)
   console.log(following?.following)
   console.log(favoritesData)
+  console.log(following)
   const dispatch = useDispatch()
   const followingCount = following?.length
   const followersCount = followers?.length
@@ -61,6 +66,17 @@ const UserProfile = () => {
     updateUser({ id: user?.id, user: updatedUser }).unwrap()
     dispatch(setUser({ user: updatedUser }))
     console.log(user)
+  }
+
+  const handleClickFollowing = (event) => {
+    setAnchorEl(event.currentTarget)
+    setFollowingListVisible(true)
+  }
+
+  // Function to handle close event of following/followers overlay
+  const handleCloseFollowing = () => {
+    setAnchorEl(null)
+    setFollowingListVisible(false)
   }
 
   return (
@@ -89,7 +105,36 @@ const UserProfile = () => {
         </Grid>
         <Grid item xs={4}>
           <Typography variant="h6">{followingCount}</Typography>
-          <Typography>Following</Typography>
+          <Typography onClick={handleClickFollowing} style={{ cursor: 'pointer' }}>Following</Typography>
+          <Popover
+            open={followingListVisible}
+            anchorEl={anchorEl}
+            onClose={handleCloseFollowing}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            {/* Following/Followers list content */}
+            <Box p={2} minWidth={200}>
+              {/* Map over the list of following/followers and render the user information */}
+              {following.map((user) => (
+                <Box key={user.id} display="flex" alignItems="center" marginBottom={1}>
+                  <Avatar src={user.avatar} sx={{ width: 40, height: 40, marginRight: 2 }} />
+                  <Box>
+                    <Typography variant="subtitle2">{user.username}</Typography>
+                    <Typography variant="body2">{user.name}</Typography>
+                  </Box>
+                  <Box flexGrow={1} />
+                  <Button variant="outlined">{user.isFollowing ? 'Following' : 'Follow'}</Button>
+                </Box>
+              ))}
+            </Box>
+          </Popover>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="h6">{user?.name}</Typography>
