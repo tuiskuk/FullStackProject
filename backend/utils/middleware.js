@@ -11,7 +11,7 @@ const requestLogger = (request, response, next) => {
 }
 
 
-const errorHandler = (error, request, response) => {
+const errorHandler = (error, request, response, next) => {
   console.log(error.message)
   console.log('error function entered')
 
@@ -38,6 +38,7 @@ const errorHandler = (error, request, response) => {
     console.log('unknownError')
     return response.status(500).json({ error: 'Something went wrong' })
   }
+  next(error)
 }
 
 const requireAuthentication = async (req, res, next) => {
