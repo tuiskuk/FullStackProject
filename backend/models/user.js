@@ -70,6 +70,16 @@ const userSchema = new mongoose.Schema({
     { recipeId: String,
       image: String,
       label: String }
+  ],
+  likes: [
+    { recipeId: String,
+      image: String,
+      label: String }
+  ],
+  dislikes: [
+    { recipeId: String,
+      image: String,
+      label: String }
   ]
 })
 

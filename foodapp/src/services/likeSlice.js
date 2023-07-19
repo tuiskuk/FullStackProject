@@ -5,11 +5,9 @@ export const likeApiSlice = apiSlice.injectEndpoints({
     addLike: builder.mutation({
       query: ({ userId, recipeId, label, image }) => {
         return ({
-
           url: '/users/likes',
           method: 'POST',
           body: { userId, recipeId, label, image }
-
         })
       },
       invalidatesTags: ['Likes'],
@@ -22,14 +20,13 @@ export const likeApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Likes']
     }),
-    getLikes: builder.query({
+    getLike: builder.query({
       query: ({ userId, recipeId }) => {
         console.log(recipeId)
         return {
           url: '/users/likes/like',
           params: { userId, recipeId },
         }
-
       },
       providesTags: ['Likes']
     }),
@@ -39,11 +36,11 @@ export const likeApiSlice = apiSlice.injectEndpoints({
           url: '/users/likes',
           params: { userId },
         }
-
       },
       providesTags: ['Likes']
     })
-  }) })
+  })
+})
 
 export const {
   useGetAllLikesQuery,

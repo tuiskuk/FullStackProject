@@ -9,6 +9,10 @@ import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
 import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetFavoriteQuery } from '../services/favoriteSlice'
+import { useAddLikeMutation, useRemoveLikeMutation, useGetLikeQuery } from '../services/likeSlice'
+import { useAddDislikeMutation, useRemoveDislikeMutation, useGetDislikeQuery } from '../services/dislikeSlice'
+
+
 import { useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
@@ -17,33 +21,53 @@ import Fraction from 'fraction.js'
 const RecipeViewPage = () => {
   const { recipeId } = useParams()
   const user = useSelector(selectCurrentUser)
-  console.log(user)
   const userId = user?.id
-  console.log(userId, recipeId)
-  const [ addFavorite ] = useAddFavoriteMutation()
-  const { data: favoriteData, refetch } = useGetFavoriteQuery(
-    { userId, recipeId },
-    { skip: !userId || !recipeId, refetchOnMountOrArgChange: true }
-  )
-  console.log(favoriteData)
-
-  const hasFavorited = Boolean(favoriteData)
-  console.log(hasFavorited)
-  const [ removeFavorite ] = useRemoveFavoriteMutation({
-    onSettled: () => {
-      refetch() // Manually refetch the data after mutation is complete
-    },
-  })
 
   const [recipe, setRecipe] = useState({})
-  const [isLiked, setIsLiked] = useState(false)
-  const [isDisliked, setIsDisliked] = useState(false)
   const label = recipe.label
   const image = recipe.image
   const [multiplier, setMultiplier] = useState(recipe.yield || 1)
-
   const [userComment, setUserComment] = useState('')
   const [comments, setComments] = useState([])
+
+  const [ addFavorite ] = useAddFavoriteMutation()
+  const { data: favoriteData, refetch: refetchFavorite } = useGetFavoriteQuery(
+    { userId, recipeId },
+    { skip: !userId || !recipeId, refetchOnMountOrArgChange: true }
+  )
+
+  const hasFavorited = Boolean(favoriteData)
+  const [ removeFavorite ] = useRemoveFavoriteMutation({
+    onSettled: () => {
+      refetchFavorite() // Manually refetch the data after mutation is complete
+    },
+  })
+
+  const [ addLike ] = useAddLikeMutation()
+  const { data: likeData, refetch: refetchLike } = useGetLikeQuery(
+    { userId, recipeId },
+    { skip: !userId || !recipeId, refetchOnMountOrArgChange: true }
+  )
+
+  const isLiked = Boolean(likeData)
+  const [ removeLike ] = useRemoveLikeMutation({
+    onSettled: () => {
+      refetchLike() // Manually refetch the data after removing like
+    },
+  })
+
+  const [ addDislike ] = useAddDislikeMutation()
+  const { data: dislikeData, refetch: refetchDislike } = useGetDislikeQuery(
+    { userId, recipeId },
+    { skip: !userId || !recipeId, refetchOnMountOrArgChange: true }
+  )
+
+  const isDisliked = Boolean(dislikeData)
+  const [ removeDislike ] = useRemoveDislikeMutation({
+    onSettled: () => {
+      refetchDislike() // Manually refetch the data after removing dislike
+    },
+  })
 
   useEffect(() => {
     const savedRecipe = sessionStorage.getItem('recipe')
@@ -52,23 +76,73 @@ const RecipeViewPage = () => {
     setMultiplier(parsedRecipe?.yield || 1)
   }, [])
 
-  const roundValue = (value) => {
-    return Number(value.toFixed(1))
+  const handleLike = async () => {
+    console.log(recipeId)
+
+    if (!isLiked) {
+      try {
+        await addLike({ userId, recipeId, label, image }).unwrap()
+
+        //if recipe was disliked, remove it from dislikes
+        if (isDisliked) {
+          try {
+            console.log(recipeId)
+            console.log(userId)
+            await removeDislike({ userId, recipeId })
+          } catch (err) {
+            console.error('Failed to remove dislike: ', err)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to add like: ', err)
+      }
+    }
+
+    if (isLiked){
+      try {
+        console.log(recipeId)
+        console.log(userId)
+        await removeLike({ userId, recipeId })
+      } catch (err) {
+        console.error('Failed to remove like: ', err)
+      }
+    }
   }
 
-  const handleLike = () => {
-    setIsLiked(!isLiked)
-    setIsDisliked(false)
+  const handleDislike = async () => {
+    console.log(recipeId)
 
+    if (!isDisliked) {
+      try {
+        await addDislike({ userId, recipeId, label, image }).unwrap()
+
+        // If the recipe was liked, remove it from likes
+        if (isLiked) {
+          try {
+            console.log(recipeId)
+            console.log(userId)
+            await removeLike({ userId, recipeId })
+          } catch (err) {
+            console.error('Failed to remove like: ', err)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to add dislike: ', err)
+      }
+    }
+
+    if (isDisliked){
+      try {
+        console.log(recipeId)
+        console.log(userId)
+        await removeDislike({ userId, recipeId })
+      } catch (err) {
+        console.error('Failed to remove dislike: ', err)
+      }
+    }
   }
 
-  const handleDislike = () => {
-    setIsDisliked(!isDisliked)
-    setIsLiked(false)
-
-  }
-
-  const handleFavorite = async() => {
+  const handleFavorite = async () => {
     console.log(recipeId)
     if (!hasFavorited) {
       try {
@@ -77,11 +151,12 @@ const RecipeViewPage = () => {
         console.error('Failed to add favorite: ', err)
       }
     }
+
     if(hasFavorited){
       try {
         await removeFavorite({ userId, recipeId })
       } catch (err) {
-        console.error('Failed to create user: ', err)
+        console.error('Failed to remove favorite: ', err)
       }
     }
   }
@@ -98,6 +173,10 @@ const RecipeViewPage = () => {
 
   const handleMultiply = (value) => {
     return ((value/recipe.yield) * multiplier)
+  }
+
+  const roundValue = (value) => {
+    return Number(value.toFixed(1))
   }
 
   //regex pattern
