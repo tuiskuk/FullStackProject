@@ -7,19 +7,27 @@ const recipeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  likes: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  dislikes: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  comments: {
-    type: String,
-  }
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  ],
+  dislikes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  ],
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  ]
 })
 
 recipeSchema.set('toJSON', {

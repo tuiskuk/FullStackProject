@@ -66,6 +66,7 @@ export const apiSlice = createApi({
     'Following',
     'Likes',
     'Dislikes',
+    'Interactions',
   ],
   endpoints: builder => ({
     getAllRecipes: builder.query({
