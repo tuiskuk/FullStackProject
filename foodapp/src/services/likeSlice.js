@@ -1,50 +1,50 @@
 import { apiSlice } from './apiSlice'
 
-export const favoriteApiSlice = apiSlice.injectEndpoints({
+export const likeApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    addFavorite: builder.mutation({
+    addLike: builder.mutation({
       query: ({ userId, recipeId, label, image }) => {
         return ({
-          url: '/users/favorites',
+          url: '/users/likes',
           method: 'POST',
           body: { userId, recipeId, label, image }
         })
       },
-      invalidatesTags: ['Favorites'],
+      invalidatesTags: ['Likes'],
     }),
-    removeFavorite: builder.mutation({
+    removeLike: builder.mutation({
       query: ({ userId, recipeId }) => ({
-        url: '/users/favorites',
+        url: '/users/likes',
         method: 'DELETE',
         body: { userId, recipeId }
       }),
-      invalidatesTags: ['Favorites']
+      invalidatesTags: ['Likes']
     }),
-    getFavorite: builder.query({
+    getLike: builder.query({
       query: ({ userId, recipeId }) => {
         console.log(recipeId)
         return {
-          url: '/users/favorites/favorite',
+          url: '/users/likes/like',
           params: { userId, recipeId },
         }
       },
-      providesTags: ['Favorites']
+      providesTags: ['Likes']
     }),
-    getAllFavorites: builder.query({
+    getAllLikes: builder.query({
       query: ({ userId }) => {
         return {
-          url: '/users/favorites',
+          url: '/users/likes',
           params: { userId },
         }
       },
-      providesTags: ['Favorites']
+      providesTags: ['Likes']
     })
   })
 })
 
 export const {
-  useGetAllFavoritesQuery,
-  useAddFavoriteMutation,
-  useRemoveFavoriteMutation,
-  useGetFavoriteQuery
-} = favoriteApiSlice
+  useGetAllLikesQuery,
+  useAddLikeMutation,
+  useRemoveLikeMutation,
+  useGetLikeQuery
+} = likeApiSlice

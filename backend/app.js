@@ -5,6 +5,7 @@ import userRouter from './routes/userRouter.js'
 import loginRouter from './routes/loginRouter.js'
 import confirmEmailRouter from './routes/confirmEmailRouter.js'
 import userCreatedrecipesRouter from './routes/userCreatedrecipesRouter.js'
+import interactionRouter from './routes/interactionRouter.js'
 import config from './utils/config.js'
 import middleware from './utils/middleware.js'
 import mongoose from 'mongoose'
@@ -38,6 +39,7 @@ app.use('/api/recipes', recipesRouter)
 app.use('/api/userrecipes', userCreatedrecipesRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/interactions', interactionRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
