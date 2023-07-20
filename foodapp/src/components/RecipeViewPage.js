@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux'
 import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetFavoriteQuery } from '../services/favoriteSlice'
 import { useAddLikeMutation, useRemoveLikeMutation, useGetLikeQuery } from '../services/likeSlice'
 import { useAddDislikeMutation, useRemoveDislikeMutation, useGetDislikeQuery } from '../services/dislikeSlice'
+import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation, useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
 
 
 import { useParams } from 'react-router-dom'
@@ -76,18 +77,31 @@ const RecipeViewPage = () => {
     setMultiplier(parsedRecipe?.yield || 1)
   }, [])
 
+  const [ addLikeInteraction ] = useAddLikeInteractionMutation()
+  const [ removeLikeInteraction ] = useRemoveLikeInteractionMutation()
+  const { data: interactionData } = useGetAllInteractionsQuery({ recipeId })
+  const [ createInteraction ] = useCreateInteractionMutation()
+
   const handleLike = async () => {
     console.log(recipeId)
 
+    if(!interactionData){
+      try {
+        await createInteraction({ recipeId })
+        console.log('create')
+      } catch (err) {
+        console.error('Failed to create interaction: ', err)
+      }
+    }
+
     if (!isLiked) {
       try {
-        await addLike({ userId, recipeId, label, image }).unwrap()
+        await addLike({ userId, recipeId, label, image })
+        await addLikeInteraction({ recipeId, userId })
 
         //if recipe was disliked, remove it from dislikes
         if (isDisliked) {
           try {
-            console.log(recipeId)
-            console.log(userId)
             await removeDislike({ userId, recipeId })
           } catch (err) {
             console.error('Failed to remove dislike: ', err)
@@ -100,9 +114,8 @@ const RecipeViewPage = () => {
 
     if (isLiked){
       try {
-        console.log(recipeId)
-        console.log(userId)
         await removeLike({ userId, recipeId })
+        await removeLikeInteraction({ recipeId, userId })
       } catch (err) {
         console.error('Failed to remove like: ', err)
       }
@@ -119,8 +132,6 @@ const RecipeViewPage = () => {
         // If the recipe was liked, remove it from likes
         if (isLiked) {
           try {
-            console.log(recipeId)
-            console.log(userId)
             await removeLike({ userId, recipeId })
           } catch (err) {
             console.error('Failed to remove like: ', err)
@@ -133,8 +144,6 @@ const RecipeViewPage = () => {
 
     if (isDisliked){
       try {
-        console.log(recipeId)
-        console.log(userId)
         await removeDislike({ userId, recipeId })
       } catch (err) {
         console.error('Failed to remove dislike: ', err)
@@ -215,7 +224,13 @@ const RecipeViewPage = () => {
                         {hasFavorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                       </IconButton>
                     </Grid>
-                    <Grid item>
+                    <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
+                        Likes:
+                      </Typography>
+                      <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
+                        {interactionData ? interactionData.recipe.likes.length : 0}
+                      </Typography>
                       <IconButton onClick={handleLike} aria-label="Like">
                         {isLiked ? <ThumbUpIcon /> : <ThumbUpOffAltIcon />}
                       </IconButton>

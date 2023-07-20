@@ -4,12 +4,12 @@ import mongoose from 'mongoose'
 
 const createInteraction = async (request, response) => {
   try {
-    const recipeId = request.query.recipeId
+    const { recipeId } = request.query
     const recipe = new Recipe({ recipeId, likes: [], dislikes: [], comments: [] })
 
     const savedRecipe = await recipe.save()
 
-    response.status(201).json(savedRecipe)
+    response.status(201).json({ savedRecipe })
   } catch (error) {
     console.log('creating interaction failed')
   }
@@ -87,21 +87,22 @@ const removeLikeInteraction = async (request, response) => {
     response.status(500).json({ error: 'Internal Server Error' })
   }
 }
-const getAllLikeInteractions = async (request, response) => {
+
+const getAllInteractions = async (request, response) => {
   try {
     const recipeId = request.query.recipeId
     console.log(recipeId)
 
     // Find the recipe by recipeId
-    const recipe = await Recipe.findById(recipeId)
-
-    // If recipe is not found, return empty array of likes
+    const recipe = await Recipe.findOne({ recipeId })
+    console.log(recipe)
+    // If recipe is not found, return empty
     if (!recipe) {
-      return response.status(200).json({ likes: [] })
+      return response.status(204).json({ recipe })
     }
 
     // Return the recipes's like array
-    response.status(200).json({ likes: recipe.likes })
+    response.status(200).json({ recipe })
   } catch (error) {
     // If any error occurs during the process, handle it and return a 500 response with an error message
     console.log(error)
@@ -109,4 +110,4 @@ const getAllLikeInteractions = async (request, response) => {
   }
 }
 
-export default { createInteraction, addLikeInteraction, removeLikeInteraction, getAllLikeInteractions }
+export default { createInteraction, addLikeInteraction, removeLikeInteraction, getAllInteractions }

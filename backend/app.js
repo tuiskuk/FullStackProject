@@ -39,7 +39,7 @@ app.use('/api/recipes', recipesRouter)
 app.use('/api/userrecipes', userCreatedrecipesRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
-app.use('/api/interaction', interactionRouter)
+app.use('/api/interactions', interactionRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
