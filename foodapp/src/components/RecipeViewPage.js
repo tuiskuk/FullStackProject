@@ -11,7 +11,9 @@ import { useSelector } from 'react-redux'
 import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetFavoriteQuery } from '../services/favoriteSlice'
 import { useAddLikeMutation, useRemoveLikeMutation, useGetLikeQuery } from '../services/likeSlice'
 import { useAddDislikeMutation, useRemoveDislikeMutation, useGetDislikeQuery } from '../services/dislikeSlice'
-import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation, useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
+import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation,
+  useAddDislikeInteractionMutation, useRemoveDislikeInteractionMutation,
+  useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
 
 
 import { useParams } from 'react-router-dom'
@@ -79,6 +81,8 @@ const RecipeViewPage = () => {
 
   const [ addLikeInteraction ] = useAddLikeInteractionMutation()
   const [ removeLikeInteraction ] = useRemoveLikeInteractionMutation()
+  const [ addDislikeInteraction ] = useAddDislikeInteractionMutation()
+  const [ removeDislikeInteraction ] = useRemoveDislikeInteractionMutation()
   const { data: interactionData } = useGetAllInteractionsQuery({ recipeId })
   const [ createInteraction ] = useCreateInteractionMutation()
 
@@ -89,8 +93,8 @@ const RecipeViewPage = () => {
       try {
         await createInteraction({ recipeId })
         console.log('create')
-      } catch (err) {
-        console.error('Failed to create interaction: ', err)
+      } catch (error) {
+        console.error('Failed to create interaction: ', error)
       }
     }
 
@@ -103,12 +107,13 @@ const RecipeViewPage = () => {
         if (isDisliked) {
           try {
             await removeDislike({ userId, recipeId })
-          } catch (err) {
-            console.error('Failed to remove dislike: ', err)
+            await removeDislikeInteraction({ recipeId, userId })
+          } catch (error) {
+            console.error('Failed to remove dislike: ', error)
           }
         }
-      } catch (err) {
-        console.error('Failed to add like: ', err)
+      } catch (error) {
+        console.error('Failed to add like: ', error)
       }
     }
 
@@ -116,8 +121,8 @@ const RecipeViewPage = () => {
       try {
         await removeLike({ userId, recipeId })
         await removeLikeInteraction({ recipeId, userId })
-      } catch (err) {
-        console.error('Failed to remove like: ', err)
+      } catch (error) {
+        console.error('Failed to remove like: ', error)
       }
     }
   }
@@ -125,28 +130,40 @@ const RecipeViewPage = () => {
   const handleDislike = async () => {
     console.log(recipeId)
 
+    if(!interactionData){
+      try {
+        await createInteraction({ recipeId })
+        console.log('create')
+      } catch (error) {
+        console.error('Failed to create interaction: ', error)
+      }
+    }
+
     if (!isDisliked) {
       try {
         await addDislike({ userId, recipeId, label, image }).unwrap()
+        await addDislikeInteraction({ recipeId, userId })
 
         // If the recipe was liked, remove it from likes
         if (isLiked) {
           try {
             await removeLike({ userId, recipeId })
-          } catch (err) {
-            console.error('Failed to remove like: ', err)
+            await removeLikeInteraction({ recipeId, userId })
+          } catch (error) {
+            console.error('Failed to remove like: ', error)
           }
         }
-      } catch (err) {
-        console.error('Failed to add dislike: ', err)
+      } catch (error) {
+        console.error('Failed to add dislike: ', error)
       }
     }
 
     if (isDisliked){
       try {
         await removeDislike({ userId, recipeId })
-      } catch (err) {
-        console.error('Failed to remove dislike: ', err)
+        await removeDislikeInteraction({ recipeId, userId })
+      } catch (error) {
+        console.error('Failed to remove dislike: ', error)
       }
     }
   }
@@ -235,7 +252,13 @@ const RecipeViewPage = () => {
                         {isLiked ? <ThumbUpIcon /> : <ThumbUpOffAltIcon />}
                       </IconButton>
                     </Grid>
-                    <Grid item>
+                    <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
+                        Dislikes:
+                      </Typography>
+                      <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
+                        {interactionData ? interactionData.recipe.dislikes.length : 0}
+                      </Typography>
                       <IconButton onClick={handleDislike} aria-label="Dislike">
                         {isDisliked ? <ThumbDownIcon /> : <ThumbDownOffAltIcon />}
                       </IconButton>
