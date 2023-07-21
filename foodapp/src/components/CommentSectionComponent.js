@@ -2,14 +2,25 @@ import React from 'react'
 import { useState } from 'react'
 import { Typography, Grid, Card, CardContent, Button, InputAdornment, OutlinedInput } from '@mui/material'
 import { useAddCommentMutation, /*useDeleteCommentMutation, */ useGetCommentsForRecipeQuery, useAddReplyMutation } from '../services/commentSlice'
+import { useCreateInteractionMutation } from '../services/interactionSlice'
 
-const CommentSection = ({ recipeId, userId }) => {
+const CommentSection = ({ recipeId, userId , interactionData }) => {
   const { data: commentData, isLoading, isError, refetch } = useGetCommentsForRecipeQuery({ recipeId }, { refetchOnMountOrArgChange: true })
   const [addComment] = useAddCommentMutation()
   const [userComment, setUserComment] = useState('')
 
+  const [ createInteraction ] = useCreateInteractionMutation()
+
   const handleSubmitComment = async () => {
     if (userComment.trim() !== '') {
+      if(!interactionData) {
+        try {
+          await createInteraction({ recipeId })
+          console.log('create')
+        } catch (error) {
+          console.error('Failed to create interaction: ', error)
+        }
+      }
       try {
         await addComment({ recipeId, userId, text: userComment })
         setUserComment('')
