@@ -362,7 +362,7 @@ const RecipeViewPage = () => {
         </Grid>
       )}
 
-      <CommentSection recipeId={recipeId} />
+      <CommentSection recipeId={recipeId} userId={userId} />
     </Grid>
   )
 }
