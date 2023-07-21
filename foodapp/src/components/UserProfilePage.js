@@ -14,7 +14,7 @@ import {
 
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
-import { useUpdateUserMutation } from '../services/userSlice'
+import { useUpdateUserMutation } from '../services/userApiSlice'
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useGetAllDislikesQuery } from '../services/dislikeSlice'

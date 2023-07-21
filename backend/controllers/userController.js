@@ -45,7 +45,9 @@ const deleteUser = async (request, response, next) => {
 
 const createUser = async (request, response, next) => {
   try {
-    const { username, name, email, profileimage, profileText, password, isEmailConfirmed } = request.body
+    const { username, name, email, profileText, password, isEmailConfirmed } = request.body
+    const profileimage = request.file ? req.file.path : null
+    console.log(profileimage)
 
     console.log(password)
     if(!password) {
