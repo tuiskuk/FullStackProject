@@ -3,7 +3,7 @@ import { UserRecipe } from '../models/useCreatedreceipe.js'
 
 const getrecipes = async (request, response, next) => {
   try {
-    const recipes = await UserRecipe.find({})
+    const recipes = await UserRecipe.find({}).populate('creator')
     response.json(recipes)
   } catch (error) {
     next(error)
@@ -14,7 +14,7 @@ const getRecipe = async (request, response, next) => {
   try {
     console.log(request.params)
     const { recipeId } = request.params
-    const recipe = await UserRecipe.findById(recipeId)
+    const recipe = await UserRecipe.findById(recipeId).populate('creator')
 
     if (!recipe) {
       return response.status(404).json({ error: 'Recipe not found' })
@@ -103,26 +103,136 @@ const createRecipe = async (request, response, next) => {
   }
 }
 
-const addImageToRecipe = async (recipeId, imageUrl, next) => {
+  const addImageToRecipe = async (recipeId, imageUrl, next) => {
+    try {
+        const recipe = await UserRecipe.findById(recipeId);
+        if (!recipe) {
+        throw new Error('Recipe not found');
+        }
+
+        // Add the new image URL to the images array
+        recipe.images.push(imageUrl);
+
+        // Save the updated recipe
+        const updatedRecipe = await recipe.save();
+
+        return updatedRecipe;
+    } catch (error) {
+        next(error)
+    }
+  };
+
+// Function to add a like
+const addLike = async (request, response, next) => {
   try {
-    const recipe = await UserRecipe.findById(recipeId)
+    const { userId, recipeId } = request.body
+    const recipe = await UserRecipe.findById(recipeId).populate('creator')
     if (!recipe) {
-      throw new Error('Recipe not found')
+      return response.status(404).json({ error: 'Recipe not found' })
     }
 
-    // Add the new image URL to the images array
-    recipe.images.push(imageUrl)
+    if (!recipe.likes.includes(userId)) {
+      recipe.likes.push(userId)
+      await recipe.save()
+    }
 
-    // Save the updated recipe
-    const updatedRecipe = await recipe.save()
+    return response.status(200).json(recipe)
+  } catch (error) {
+    next(error)
+  }
+}
 
-    return updatedRecipe
+// Function to delete a like
+const deleteLike = async (request, response, next) => {
+  try {
+    console.log('delete funktion entered')
+    const { userId, recipeId } = request.body
+    const recipe = await UserRecipe.findById(recipeId).populate('creator')
+    console.log(recipeId + ' . ' + userId)
+    if (!recipe) {
+      return response.status(404).json({ error: 'Recipe not found' })
+    }
+
+    console.log('index reached')
+    const index = recipe.likes.indexOf(userId)
+    if (index !== -1) {
+      recipe.likes.splice(index, 1)
+      await recipe.save()
+    }
+
+    return response.status(200).json(recipe)
+  } catch (error) {
+    next(error)
+  }
+}
+
+// Function to add a dislike
+const addDislike = async (request, response, next) => {
+  try {
+    const { userId, recipeId  } = request.body
+    console.log(recipeId + ' . ' + userId)
+    const recipe = await UserRecipe.findById(recipeId).populate('creator')
+    if (!recipe) {
+      return response.status(404).json({ error: 'Recipe not found' })
+    }
+
+    if (!recipe.dislikes.includes(userId)) {
+      recipe.dislikes.push(userId)
+      await recipe.save()
+    }
+
+    return response.status(200).json(recipe)
+  } catch (error) {
+    next(error)
+  }
+}
+
+// Function to delete a dislike
+const deleteDislike = async (request, response, next) => {
+  try {
+    const { userId, recipeId } = request.body
+    const recipe = await UserRecipe.findById(recipeId).populate('creator')
+    if (!recipe) {
+      return response.status(404).json({ error: 'Recipe not found' })
+    }
+
+    const index = recipe.dislikes.indexOf(userId)
+    if (index !== -1) {
+      recipe.dislikes.splice(index, 1)
+      await recipe.save()
+    }
+
+    return response.status(200).json(recipe)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const addIngredient = async (request, response, next) => {
+  try {
+    const { recipeId, dataToInsert } = request.body
+    const recipe = await UserRecipe.findById(recipeId)
+    if (!recipe) {
+      return response.status(404).json({ error: 'Recipe not found' })
+    }
+
+    for (let i = 0; i < dataToInsert.length; i++) {
+      const ingredient = dataToInsert[i]
+      recipe.ingredients.push(ingredient)
+    }
+    await recipe.save()
+
+    return response.status(200).json(recipe)
   } catch (error) {
     next(error)
   }
 }
 
 
+
+
 export default {
-  getRecipe, getrecipes, deleteRecipe, createRecipe, addImageToRecipe
+  getRecipe, getrecipes, deleteRecipe,
+  createRecipe, addImageToRecipe, addLike,
+  addDislike, deleteDislike, deleteLike, addIngredient
 }
