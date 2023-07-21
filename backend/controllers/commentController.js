@@ -91,7 +91,7 @@ const populateReplies = async (comment) => {
 
 // Get all comments for a specific recipe, including replies
 const getCommentsForRecipe = async (req, res) => {
-  const { recipeId } = req.body
+  const { recipeId } = req.query
 
   try {
     // Find the recipe and populate the comments with the actual comment documents, including replies
@@ -145,6 +145,7 @@ const addReply = async (req, res) => {
   }
 }
 
+//TODO: likes
 // Like a comment
 const likeComment = async (req, res) => {
   const { commentId, userId } = req.params

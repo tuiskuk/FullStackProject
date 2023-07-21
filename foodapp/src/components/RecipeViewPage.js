@@ -1,4 +1,4 @@
-import  { Card, CardContent, CardMedia, Typography, Grid, IconButton, TextField, InputAdornment, Button, OutlinedInput } from '@mui/material'
+import  { Card, CardContent, CardMedia, Typography, Grid, IconButton, TextField, InputAdornment } from '@mui/material'
 import { useEffect, useState } from 'react'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
@@ -8,13 +8,13 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
+import CommentSection from './CommentSectionComponent'
 import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetFavoriteQuery } from '../services/favoriteSlice'
 import { useAddLikeMutation, useRemoveLikeMutation, useGetLikeQuery } from '../services/likeSlice'
 import { useAddDislikeMutation, useRemoveDislikeMutation, useGetDislikeQuery } from '../services/dislikeSlice'
 import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation,
   useAddDislikeInteractionMutation, useRemoveDislikeInteractionMutation,
   useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
-
 
 import { useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
@@ -30,8 +30,6 @@ const RecipeViewPage = () => {
   const label = recipe.label
   const image = recipe.image
   const [multiplier, setMultiplier] = useState(recipe.yield || 1)
-  const [userComment, setUserComment] = useState('')
-  const [comments, setComments] = useState([])
 
   const [ addFavorite ] = useAddFavoriteMutation()
   const { data: favoriteData, refetch: refetchFavorite } = useGetFavoriteQuery(
@@ -208,12 +206,6 @@ const RecipeViewPage = () => {
   //regex pattern
   const pattern = /^\d+\s?\d*\/?\d*\s/
 
-  const handleSubmitComment = () => {
-    if (userComment.trim() !== '') {
-      setComments([...comments, userComment])
-      setUserComment('')
-    }
-  }
 
   return (
     <Grid container spacing={2}>
@@ -370,64 +362,9 @@ const RecipeViewPage = () => {
         </Grid>
       )}
 
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Comments:</Typography>
-            <br></br>
-            {comments.map((comment, index) => (
-              <Typography
-                key={index}
-                variant="body1"
-                style={{
-                  border: '1px solid #bdbdbd',
-                  borderRadius: '4px',
-                  padding: '10px 14px', // Adjust padding to match the OutlinedInput
-                  marginBottom: '8px',
-                  minHeight: '38px',
-                  height: 'auto',
-                  display: 'flex', // To center the text vertically
-                  alignItems: 'center',
-                  wordWrap: 'break-word',
-                }}
-              >
-                {comment}
-              </Typography>
-            ))}
-          </CardContent>
-        </Card>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Comment recipe</Typography>
-            <br></br>
-            <OutlinedInput
-              multiline
-              fullWidth
-              placeholder="Add your comment"
-              value={userComment}
-              onChange={(event) => setUserComment(event.target.value)}
-              endAdornment={
-                <InputAdornment position="end">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmitComment}
-                  >
-                    Add
-                  </Button>
-                </InputAdornment>
-              }
-            />
-          </CardContent>
-        </Card>
-      </Grid>
+      <CommentSection recipeId={recipeId} />
     </Grid>
   )
-
-
 }
 
 export default RecipeViewPage
