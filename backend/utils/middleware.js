@@ -1,11 +1,14 @@
 import jwt from 'jsonwebtoken'
 import { User } from '../models/user.js'
 import config from './config.js'
+import multer from 'multer'
+import path from 'path'
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
   console.log('Path:  ', request.path)
   console.log('Body:  ', request.body)
+  console.log('type:  ', request.headers['content-type'])
   console.log('---')
   next()
 }
@@ -73,7 +76,37 @@ const unknownEndpoint = (request, response, next) => {
 }
 
 
+/*definition of multer storages for profile pictures and recipePictures
+name = ${(moment when pictures where loaded) + (original name of picture)} 
+that way chance of storing different images with same name is practically zero*/
+const profilePictureStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      const destinationPath = path.resolve('../backend/images/profilePictures');
+      cb(null, destinationPath)
+  },
+  filename: function (req, file, cb) {
+    console.log(file)
+    cb(null, Date.now() + file.originalname);
+  }
+})
+
+const recipePictureStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const destinationPath = path.resolve('../backend/images/recipePictures');
+    cb(null, destinationPath)
+  },
+  filename: function (req, file, cb) {
+    console.log(file)
+    cb(null, Date.now() + file.originalname);
+  }
+})
+
+//multer middleware definition
+const uploadRecipePicture = multer({ storage: recipePictureStorage })
+const uploadProfilePicture = multer({ storage: profilePictureStorage })
+
 
 export default {
-  requestLogger, errorHandler , unknownEndpoint, requireAuthentication
+  requestLogger, errorHandler , unknownEndpoint, requireAuthentication,
+  uploadProfilePicture, uploadRecipePicture
 }
