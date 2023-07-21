@@ -24,10 +24,10 @@ const recipeSchema = new mongoose.Schema({
   comments: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: null
-    }
-  ]
+      ref: 'Comment',
+      default: null,
+    },
+  ],
 })
 
 recipeSchema.set('toJSON', {
