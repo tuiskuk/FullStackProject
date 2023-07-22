@@ -10,6 +10,6 @@ commentRouter.post('/comment/like', commentController.likeComment)
 commentRouter.delete('/comment/like', commentController.removeLikeComment)
 commentRouter.post('/comment/dislike', commentController.dislikeComment)
 commentRouter.delete('/comment/dislike', commentController.removeDislikeComment)
-
+commentRouter.put('/comment', commentController.editComment)
 
 export default commentRouter

@@ -82,7 +82,7 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
           try {
             await likeComment({ commentId, userId })
 
-            //if recipe was disliked, remove it from dislikes
+            //if comment was disliked, remove it from dislikes
             if (isDisliked) {
               try {
                 await removeDislikeComment({ commentId, userId })
@@ -121,12 +121,10 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
           try {
             await dislikeComment({ commentId, userId })
 
-            // If the recipe was liked, remove it from likes
+            // If the comment was liked, remove it from likes
             if (isLiked) {
               try {
                 await removeLikeComment({ commentId, userId })
-                //await removeLike({ userId, recipeId })
-                //await removeLikeInteraction({ recipeId, userId })
               } catch (error) {
                 console.error('Failed to remove like: ', error)
               }
