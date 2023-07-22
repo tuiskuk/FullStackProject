@@ -27,14 +27,7 @@ const getRecipes = async (request, response) => {
     //['vegetarian', 'kosher']
     let healthFilters = request.query.healthFilters || []
     let mealTypeOptions = request.query.mealTypes || []
-    console.log(mealTypeOptions)
-    console.log(healthFilters)
-    //['bread', 'beef']
-    let excludedFilters = request.query.excludedFilters || []
-
-    if (typeof excludedFilters === 'string') {
-      excludedFilters = excludedFilters.split(',').map((filter) => filter.trim())
-    }
+    let excludedFilters = request.query.excludedChipArray || []
 
     const params = {
       type: 'public',
@@ -64,8 +57,10 @@ const getRecipes = async (request, response) => {
       }
     }
 
+    let excludedString = ''
     if (excludedFilters.length > 0) {
-      params.excluded = excludedFilters.join(' ')
+      const excluded = excludedFilters.split(',').map((filter) => filter.trim())
+      excludedString = `&excluded=${excluded.join('&excluded=')}`
     }
 
     let filterString = ''
@@ -80,7 +75,7 @@ const getRecipes = async (request, response) => {
       mealTypesString = `&mealType=${options.join('&mealType=')}`
     }
 
-    const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}${mealTypesString}${nutrientString}`.trim('')
+    const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}${mealTypesString}${nutrientString}${excludedString}`.trim('')
     console.log(url)
     const apiResponse = await axios.get(url)
 
@@ -104,6 +99,22 @@ const getLink = async (request, response) => {
   }
 }
 
+const getRecipe = async (request, response) => {
+  try {
+    const id = request.query.id
+    console.log(id)
+
+    const url = `https://api.edamam.com/api/recipes/v2/${id}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
+    console.log(url)
+    const apiResponse = await axios.get(url)
+    console.log(url)
+    const recipe = apiResponse.data
+    response.status(200).json(recipe)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 export default {
-  getRecipes, getLink
+  getRecipes, getLink, getRecipe
 }

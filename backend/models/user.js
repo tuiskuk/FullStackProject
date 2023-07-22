@@ -67,9 +67,7 @@ const userSchema = new mongoose.Schema({
     }
   ],
   favorites: [
-    { recipeId: String,
-      image: String,
-      label: String }
+    { recipeId: String }
   ]
 })
 

@@ -234,6 +234,8 @@ const getAllFavorites = async (req, res) => {
 const getAllFollowers = async (req, res) => {
   try {
     const { userId } = req.query
+    console.log(req.query)
+    console.log('followers', userId)
 
     // Find the user by userId and populate the 'followers' field with User objects
     const user = await User.findById(userId).populate('followers')
@@ -255,6 +257,8 @@ const getAllFollowers = async (req, res) => {
 const getAllFollowing = async (req, res) => {
   try {
     const { userId } = req.query
+    console.log(req.query)
+    console.log('following', userId)
 
     // Find the user by userId and populate the 'followers' field with User objects
     const user = await User.findById(userId).populate('following')

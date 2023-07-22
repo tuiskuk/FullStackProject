@@ -15,6 +15,7 @@ const baseQueryWithAccessToken = fetchBaseQuery({
     if (jwt)
       headers.set('authorization', `Bearer ${jwt}`)
 
+    console.log(headers)
     return headers
   }
 })
@@ -24,7 +25,7 @@ const baseQueryWithRefreshToken = async(args, api, extraOptions) => {
   // Call the previously defined baseQuery function to set the authorization header.
   // If the accessToken is still valid, this response will be returned.
   let response = await baseQueryWithAccessToken(args, api, extraOptions)
-
+  console.log(response)
   // 403 means our accessToken has expired and it should be refreshed.
   if (response?.error?.status === 403) {
 
@@ -67,11 +68,11 @@ export const apiSlice = createApi({
   ],
   endpoints: builder => ({
     getAllRecipes: builder.query({
-      query: ({ searchTerm,  filterOptionTerms, excludedTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms }) => {
-        console.log('searchTerm:', searchTerm, filterOptionTerms, excludedTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms)
+      query: ({ searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms }) => {
+        console.log('searchTerm:', searchTerm, filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms)
         return {
           url: '/recipes',
-          params: { search: searchTerm, healthFilters: filterOptionTerms, excludedFilters: excludedTerms, time: timeTerm, calories: caloriesTerm, nutrients: JSON.stringify(nutrientInputsTerms), ingr: ingridientsNumberTerm, mealTypes: mealTypeOptionTerms },
+          params: { search: searchTerm, healthFilters: filterOptionTerms, time: timeTerm, calories: caloriesTerm, nutrients: JSON.stringify(nutrientInputsTerms), ingr: ingridientsNumberTerm, mealTypes: mealTypeOptionTerms, excludedChipArray: excludedChipArrayTerms },
         }
       },
     }),
@@ -84,6 +85,12 @@ export const apiSlice = createApi({
     confirmEmail: builder.query({
       query: (emailToken) => ({
         url: `register/${emailToken}`
+      })
+    }),
+    getRecipe : builder.query({
+      query: (id) => ({
+        url: '/recipes/id',
+        params: { id: id }
       })
     })
 

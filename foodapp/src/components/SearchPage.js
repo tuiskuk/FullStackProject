@@ -1,10 +1,10 @@
-import Recipe from './Recipe'
+import RecipeCard from './RecipeCard'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
 import { Container, Button, FormControl, Select, MenuItem,
-  InputLabel, Checkbox, ListItemText, CircularProgress, InputAdornment,
-  OutlinedInput, Box, Chip, Typography } from '@mui/material'
+  InputLabel, Checkbox, ListItemText, CircularProgress,
+  OutlinedInput, Box, Chip, Typography, InputAdornment } from '@mui/material'
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
@@ -13,8 +13,9 @@ const SearchPage = () => {
   const [search, setSearch] = useState(localStorage.getItem('search') ||'')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const [excluded, setExcluded] = useState(localStorage.getItem('exluded') || [])
-  const [excludedTerms, setExcludedTerms] = useState([])
+  const [excludedChip, setExcludedChip] = useState('')
+  const [excludedChipArray, setExcludedChipArray] = useState(JSON.parse(localStorage.getItem('excludedChips')) || [])
+  const [excludedChipArrayTerms, setExcludedChipArrayTerms] = useState([])
 
   const [time, setTime] = useState(localStorage.getItem('time') || '')
   const [timeTerm, setTimeTerm] = useState('')
@@ -22,7 +23,7 @@ const SearchPage = () => {
   const [calories, setCalories] = useState(localStorage.getItem('calories') || '')
   const [caloriesTerm, setCaloriesTerm] = useState('')
 
-  const [filterOptions, setFilterOptions] = useState(localStorage.getItem('filterOptions') || [])
+  const [filterOptions, setFilterOptions] = useState(JSON.parse(localStorage.getItem('filterOptions')) || [])
   const [filterOptionTerms, setFilterOptionTerms] = useState([])
 
   const [nutrientInputs, setNutrientInputs] = useState(JSON.parse(localStorage.getItem('nutrientInputs')) || [])
@@ -31,23 +32,21 @@ const SearchPage = () => {
   const [ingridientsNumber, setIngridientsNumber] = useState(localStorage.getItem('ingridientsNumber') || '')
   const [ingridientsNumberTerm, setIngridienstNumberTerm] = useState('')
 
-  const [mealTypeOptions, setMealTypeOptions] = useState(localStorage.getItem('mealTypeOptions') || [])
+  const [mealTypeOptions, setMealTypeOptions] = useState(JSON.parse(localStorage.getItem('mealTypeOptions')) || [])
   const [mealTypeOptionTerms, setMealTypeOptionTerms] = useState([])
 
   const [showNutrients, setShowNutrients] = useState(false)
 
-
-
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
-    searchTerm: searchTerm || localStorage.getItem('search') || 'recommended',
-    filterOptionTerms: filterOptionTerms || localStorage.getItem('filterOptions') || [],
-    excludedTerms: excludedTerms || localStorage.getItem('exluded') || [],
-    timeTerm: timeTerm || localStorage.getItem('time') || '',
-    caloriesTerm: caloriesTerm || localStorage.getItem('calories') || '',
-    nutrientInputsTerms: nutrientInputsTerms || localStorage.getItem('nutrientInputs') || [],
-    ingridientsNumberTerm: ingridientsNumberTerm || localStorage.getItem('ingridientsNumber') || '',
-    mealTypeOptionTerms: mealTypeOptionTerms || localStorage.getItem('mealtypeOptions') || []
+    searchTerm: searchTerm || 'recommended',
+    filterOptionTerms: filterOptionTerms || [],
+    timeTerm: timeTerm || '',
+    caloriesTerm: caloriesTerm || '',
+    nutrientInputsTerms: nutrientInputsTerms || [],
+    ingridientsNumberTerm: ingridientsNumberTerm || '',
+    mealTypeOptionTerms: mealTypeOptionTerms || [],
+    excludedChipArrayTerms: excludedChipArrayTerms || []
   })
   const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
 
@@ -58,13 +57,13 @@ const SearchPage = () => {
   const searchRecipes = async () => {
     localStorage.setItem('time', time)
     localStorage.setItem('calories', calories)
-    localStorage.setItem('excluded', excluded)
-    localStorage.setItem('filterOptions', filterOptions)
+    localStorage.setItem('excludedChips', JSON.stringify(excludedChipArray))
+    localStorage.setItem('filterOptions', JSON.stringify(filterOptions))
     localStorage.setItem('search', search)
     localStorage.setItem('nutrientInputs', JSON.stringify(nutrientInputs))
     localStorage.setItem('ingridientsNumber', ingridientsNumber)
-    localStorage.setItem('mealTypeOptions', mealTypeOptions)
-    setExcludedTerms(excluded)
+    localStorage.setItem('mealTypeOptions', JSON.stringify(mealTypeOptions))
+    setExcludedChipArrayTerms(excludedChipArray)
     setSearchTerm(search)
     setFilterOptionTerms(filterOptions)
     setTimeTerm(time)
@@ -82,7 +81,7 @@ const SearchPage = () => {
 
   const clearFilters = async () => {
     setSearch('')
-    setExcluded([])
+    setExcludedChipArray([])
     setFilterOptions([])
     setTime('')
     setCalories('')
@@ -121,6 +120,19 @@ const SearchPage = () => {
     setShowNutrients(!showNutrients)
   }
 
+  const handleAddExcludedFood = () => {
+    if (excludedChip.trim()) {
+      setExcludedChipArray([...excludedChipArray, excludedChip.trim()])
+      setExcludedChip('')
+    }
+  }
+
+  const handleDeleteChip = (index) => {
+    const updatedExcludedArray = [...excludedChipArray]
+    updatedExcludedArray.splice(index, 1)
+    setExcludedChipArray(updatedExcludedArray)
+  }
+
   return (
     <Container>
       <FormControl fullWidth variant="outlined" sx={{ m: 0.5 }} >
@@ -151,7 +163,7 @@ const SearchPage = () => {
             MenuProps={{
               PaperProps: {
                 style: {
-                  maxHeight: 500,
+                  maxHeight: 400,
                   width: 200
                 }
               }
@@ -182,7 +194,8 @@ const SearchPage = () => {
             MenuProps={{
               PaperProps: {
                 style: {
-                  maxHeight: 500,
+                  maxHeight: 400,
+                  width: 200
                 }
               }
             }}
@@ -195,42 +208,58 @@ const SearchPage = () => {
             ))}
           </Select>
         </FormControl>
-
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <OutlinedInput
-            placeholder="Set excluded foods"
-            value={excluded}
-            onChange={(event) => setExcluded(event.target.value)}
-          />
-        </FormControl>
       </div>
 
       <div>
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <OutlinedInput
-            placeholder="Time (MIN+, MIN-MAX, MAX)"
-            value={time}
-            type="number"
-            inputProps={{ min: '0' }}
-            endAdornment={<InputAdornment position="end">h</InputAdornment>}
-            onChange={(event) => setTime(event.target.value)}
+          <RangeInputComponent
+            value={time || ''}
+            nameUser={'Time'}
+            unit={'min'}
+            onChange={setTime}
           />
         </FormControl>
 
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <OutlinedInput
-            placeholder="Calories"
-            value={calories}
-            endAdornment={<InputAdornment position="end">kcal</InputAdornment>}
-            onChange={(event) => setCalories(event.target.value)}
+          <Box display='flex' flexWrap='wrap' gap={0.5}>
+            {excludedChipArray.map((value, index) => (
+              <Chip key={index} label={value} onDelete={() => handleDeleteChip(index)}/>
+            ))}
+            <OutlinedInput
+              placeholder="Set excluded foods"
+              value={excludedChip}
+              onChange={(event) => setExcludedChip(event.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddExcludedFood}
+                  >
+                    Add
+                  </Button>
+                </InputAdornment>
+              }
+            />
+          </Box>
+        </FormControl>
+
+        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+
+          <RangeInputComponent
+            value={calories || ''}
+            nameUser={'Calories'}
+            unit={'kcal'}
+            onChange={setCalories}
           />
         </FormControl>
 
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <OutlinedInput
-            placeholder="Number of incridients (MIN+, MIN-MAX, MAX)"
-            value={ingridientsNumber}
-            onChange={(event) => setIngridientsNumber(event.target.value)}
+          <RangeInputComponent
+            value={ingridientsNumber || ''}
+            nameUser={'Number of incridients'}
+            unit={'pcs'}
+            onChange={setIngridientsNumber}
           />
         </FormControl>
       </div>
@@ -245,7 +274,6 @@ const SearchPage = () => {
         {showNutrients && (
           <div>
             {nutrients.map((nutrient) => {
-              console.log(nutrientInputs[nutrient.backend] || '')
               return (
                 <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
                   <RangeInputComponent
@@ -276,7 +304,7 @@ const SearchPage = () => {
       ) : recipes.length !== 0 ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
           {recipes.map((recipe) => (
-            <Recipe key={recipe.uri} recipe={recipe} />
+            <RecipeCard key={recipe.uri} recipe={recipe} />
           ))}
         </div>
       ) : (
@@ -295,60 +323,69 @@ const SearchPage = () => {
   )
 }
 
-/*
-<OutlinedInput
-  placeholder={nutrient.user}
-  value={nutrientInputs[nutrient.backend] || ''}
-  endAdornment={<InputAdornment position="end">{nutrient.unit}</InputAdornment>}
-  onChange={(event) => {
-    handleNutrientInputChange(nutrient.backend, event.target.value)
-  }}
-/>
-*/
-
 const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) => {
   const [minValue, setMinValue] = useState('')
   const [maxValue, setMaxValue] = useState('')
 
   useEffect(() => {
-    console.log(value)
-    analyze(value)
-  }, [])
+    analyze()
+  }, [value])
 
   useEffect(() => {
-    if (!value) {
+    if (!value || value === '') {
       setMinValue('')
       setMaxValue('')
     }
   }, [value])
 
   useEffect(() => {
-    handleParse()
+    if (minValue || maxValue) {
+      handleParse()
+    }
   }, [minValue, maxValue])
 
   const handleMinValueChange = (event) => {
-    const value = event.target.value
-    if (value === '0'){
+    const valueMin = event.target.value
+    const newValue = parseInt(valueMin)
+
+    if (valueMin === '0' || isNaN(newValue)){
       setMinValue('')
-    }else {
-      setMinValue(value)
+    } else {
+      if (newValue <= maxValue || !maxValue) {
+        setMinValue(newValue)
+      } else {
+        if (newValue >= minValue) {
+          setMaxValue(newValue)
+          setMinValue(newValue)
+        }
+      }
     }
   }
 
   const handleMaxValueChange = (event) => {
-    const value = event.target.value
-    if (value === '0'){
+    const valueMax = event.target.value
+    const newValue = parseInt(valueMax)
+
+    if (valueMax === '0' || isNaN(newValue)){
       setMaxValue('')
     }else {
-      setMaxValue(value)
+      if (newValue >= minValue || !minValue) {
+        setMaxValue(newValue)
+      } else {
+        if (newValue < maxValue) {
+          setMaxValue('')
+        } else {
+          setMaxValue(minValue)
+        }
+      }
     }
   }
 
   const analyze = () => {
-    if(value.includes('-')){
+    if (value.includes('-')) {
       setMinValue(value.split('-')[0])
       setMaxValue(value.split('-')[1])
-    } else if(value.includes('+')){
+    } else if (value.includes('+')) {
       setMinValue(value.split('+')[0])
       setMaxValue('')
     } else if (value) {
@@ -362,16 +399,21 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
 
   const handleParse = () => {
     let string = ''
-    if(minValue && maxValue) {
+    if (minValue && maxValue) {
       string = `${minValue}-${maxValue}`
     } else if (minValue && !maxValue) {
       string = `${minValue}+`
-    } else if (!minValue && maxValue){
+    } else if (!minValue && maxValue) {
       string = `${maxValue}`
     } else {
       string = ''
     }
-    onChange(nameBackend, string)
+
+    if (nameBackend) {
+      onChange(nameBackend, string)
+    } else {
+      onChange(string)
+    }
   }
 
   return (
@@ -386,22 +428,23 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
       <Box
         display="flex"
         alignItems="center"
-        p={1}
+        p={0.5}
         borderRadius="4px"
-        mb={1}
+        mb={0.5}
         justifyContent="space-between"
       >
         <Typography variant="body1">{nameUser}</Typography>
         <Typography variant="body1">{unit}</Typography>
       </Box>
       <Box display="flex" alignItems="center">
-        <FormControl variant="outlined">
+        <FormControl variant="outlined" >
           <OutlinedInput
             placeholder="MIN"
             type="number"
             inputProps={{ min: '0' }}
             value={minValue}
             onChange={handleMinValueChange}
+            size="small"
           />
         </FormControl>
         <Typography variant="body1" sx={{ mx: 1 }}>-</Typography>
@@ -412,6 +455,7 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
             inputProps={{ min: '0' }}
             value={maxValue}
             onChange={handleMaxValueChange}
+            size="small"
           />
         </FormControl>
       </Box>

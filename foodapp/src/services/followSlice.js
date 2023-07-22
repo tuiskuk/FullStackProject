@@ -24,11 +24,11 @@ export const followApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['Follows', 'Users']
     }),
     getAllFollowing: builder.query({
-      query: ({ userId, recipeId }) => {
-        console.log(recipeId)
+      query: ({ userId }) => {
+        console.log(userId)
         return {
           url: '/users/follow/following',
-          params: { userId, recipeId },
+          params: { userId },
         }
 
       },
@@ -36,6 +36,7 @@ export const followApiSlice = apiSlice.injectEndpoints({
     }),
     getAllFollowers: builder.query({
       query: ({ userId }) => {
+        console.log(userId)
         return {
           url: '/users/follow/followers',
           params: { userId },

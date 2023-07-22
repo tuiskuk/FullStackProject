@@ -20,10 +20,14 @@ export const userApiSlice = apiSlice.injectEndpoints({
       providesTags: ['Users']
     }),
     getUser: builder.query({
-      query: (userId) => ({
-        url: `/users/${userId}`,
-        params: { userId }
-      }),
+      query: (userId) =>
+      {
+        if(!userId) return
+        return ({
+          url: `/users/${userId}`,
+          params: { userId }
+        })
+      },
     }),
     createUser: builder.mutation({
       query: newUser => {

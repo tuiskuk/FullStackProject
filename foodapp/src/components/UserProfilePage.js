@@ -14,18 +14,26 @@ import {
   Popover
 } from '@mui/material'
 
+
+
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useUpdateUserMutation } from '../services/userSlice'
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
+import { useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
 
-import Recipe from './Recipe'
+import RecipeCard from './RecipeCard'
+import UserListItem from './userListItem'
+
+
 
 const UserProfile = () => {
   const [profileDescription, setProfileDescription] = useState('')
   const [anchorEl, setAnchorEl] = useState(null)
   const [followingListVisible, setFollowingListVisible] = useState(false)
+  const [anchorElFollowers, setAnchorElFollowers] = useState(null)
+  const [followersListVisible, setFollowersListVisible] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [newUsername, setNewUsername] = useState('')
   const [editProfileVisible, setEditProfileVisible] = useState(false)
@@ -36,8 +44,11 @@ const UserProfile = () => {
   console.log(user?.id)
   const userId = user?.id
   const { data: favoritesData } = useGetAllFavoritesQuery({ userId })
-  const following = user?.following
-  const followers = user?.followers
+  const { data: followingData, refetch: refetchFollowing } = useGetAllFollowingQuery({ userId })
+  const { data: followersData, refetch: refetchFollowers } = useGetAllFollowersQuery({ userId })
+  console.log(followersData)
+  const followers = followersData?.followers
+  const following = followingData?.following
   console.log(followers)
   console.log(following?.following)
   console.log(favoritesData)
@@ -47,9 +58,16 @@ const UserProfile = () => {
   const followersCount = followers?.length
   console.log(user)
 
+  //const [recipeId, setRecipeId] = useState('')
+
+  //const { data: recipe } = useGetRecipeQuery(recipeId)
+  //setRecipeId('')
+
   useEffect(() => {
     setProfileDescription(user?.profileText)
     setNewUsername(user?.username)
+    refetchFollowing()
+    refetchFollowers()
   }, [user])
 
   const handleUpdateProfile = () => {
@@ -74,10 +92,14 @@ const UserProfile = () => {
   }
 
   // Function to handle close event of following/followers overlay
-  const handleCloseFollowing = () => {
-    setAnchorEl(null)
-    setFollowingListVisible(false)
+
+
+  const handleClickFollowers = (event) => {
+    setAnchorElFollowers(event.currentTarget)
+    setFollowersListVisible(true)
   }
+
+  // Function to handle close event of following/followers overlay
 
   return (
     <Container maxWidth="sm">
@@ -92,24 +114,22 @@ const UserProfile = () => {
         <Grid item xs={12}>
           <Typography variant="h5">{user?.username}</Typography>
           <Button variant="outlined" size="small" onClick={() => setEditProfileVisible(!editProfileVisible)}>
-            Edit Profile
+              Edit Profile
           </Button>
         </Grid>
         <Grid item xs={4}>
           <Typography variant="h6">{postCount}</Typography>
-          <Typography>Recipes posted</Typography>
+          <Typography variant="h6">Recipes posted</Typography>
         </Grid>
         <Grid item xs={4}>
           <Typography variant="h6">{followersCount}</Typography>
-          <Typography>Followers</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="h6">{followingCount}</Typography>
-          <Typography onClick={handleClickFollowing} style={{ cursor: 'pointer' }}>Following</Typography>
+          <Typography variant="h6" onClick={handleClickFollowers} sx={{ cursor: 'pointer', textDecoration: 'none' }}>
+              Followers
+          </Typography>
           <Popover
-            open={followingListVisible}
-            anchorEl={anchorEl}
-            onClose={handleCloseFollowing}
+            open={followersListVisible}
+            anchorEl={anchorElFollowers}
+            onClose={() => {setAnchorElFollowers(null); setFollowersListVisible(false)}}
             anchorOrigin={{
               vertical: 'bottom',
               horizontal: 'right',
@@ -118,21 +138,45 @@ const UserProfile = () => {
               vertical: 'top',
               horizontal: 'right',
             }}
+            disablePortal
           >
-            {/* Following/Followers list content */}
             <Box p={2} minWidth={200}>
-              {/* Map over the list of following/followers and render the user information */}
-              {following.map((user) => (
-                <Box key={user.id} display="flex" alignItems="center" marginBottom={1}>
-                  <Avatar src={user.avatar} sx={{ width: 40, height: 40, marginRight: 2 }} />
-                  <Box>
-                    <Typography variant="subtitle2">{user.username}</Typography>
-                    <Typography variant="body2">{user.name}</Typography>
-                  </Box>
-                  <Box flexGrow={1} />
-                  <Button variant="outlined">{user.isFollowing ? 'Following' : 'Follow'}</Button>
-                </Box>
-              ))}
+              {followers ? (
+                followers.map((user) => <UserListItem key={user.id} user={user} />)
+              ) : (
+                <Typography>Loading...</Typography>
+              )}
+            </Box>
+          </Popover>
+        </Grid>
+        <Grid item xs={4}>
+          <Typography variant="h6">{followingCount}</Typography>
+          <Typography variant="h6" onClick={handleClickFollowing} sx={{ cursor: 'pointer', textDecoration: 'none' }}>
+              Following
+          </Typography>
+          <Popover
+            open={followingListVisible}
+            anchorEl={anchorEl}
+            onClose={() => {
+              setAnchorEl(null)
+              setFollowingListVisible(false)
+            }}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            disablePortal
+          >
+            <Box p={2} minWidth={200}>
+              {following ? (
+                following.map((user) => <UserListItem key={user.id} user={user} />)
+              ) : (
+                <Typography>Loading...</Typography>
+              )}
             </Box>
           </Popover>
         </Grid>
@@ -175,43 +219,48 @@ const UserProfile = () => {
           <DialogActions>
             <Button onClick={() => setEditProfileVisible(false)}>Cancel</Button>
             <Button variant="contained" color="primary" onClick={handleUpdateProfile}>
-            Update Profile
+              Update Profile
             </Button>
           </DialogActions>
         </Dialog>
-      </Grid>
-      <Grid container spacing={1} marginTop={1} justifyContent="center">
-        <Grid item>
-          <Button
-            variant={selectedOption === 'favorites' ? 'contained' : 'outlined'}
-          >
-            Favorites
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant={selectedOption === 'myRecipes' ? 'contained' : 'outlined'}
-          >
-            My Recipes
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant={selectedOption === 'comments' ? 'contained' : 'outlined'}
-          >
-            Comments
-          </Button>
-        </Grid>
-      </Grid>
-      <Grid container spacing={3} marginTop={0.2}>
-        {favoritesData?.favorites?.map((favorite, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Recipe key={favorite.recipeId} recipe={favorite} />
+
+        <Grid container spacing={1} marginTop={1} justifyContent="center">
+          <Grid item>
+            <Button
+              variant={selectedOption === 'favorites' ? 'contained' : 'outlined'}
+              sx={{ textTransform: 'none' }}
+            >
+              Favorites
+            </Button>
           </Grid>
-        ))}
+          <Grid item>
+            <Button
+              variant={selectedOption === 'myRecipes' ? 'contained' : 'outlined'}
+              sx={{ textTransform: 'none' }}
+            >
+              My Recipes
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant={selectedOption === 'comments' ? 'contained' : 'outlined'}
+              sx={{ textTransform: 'none' }}
+            >
+              Comments
+            </Button>
+          </Grid>
+        </Grid>
+        <Grid container spacing={3} marginTop={0.2}>
+          {favoritesData?.favorites?.map((favorite, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={favorite.recipeId} recipe={favorite} />
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
     </Container>
   )
+
 }
 
 export default UserProfile

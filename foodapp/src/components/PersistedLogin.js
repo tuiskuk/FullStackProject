@@ -79,7 +79,7 @@ const PersistedUserLogin = () => {
       </Box>
     )
   }
-  else if ((isSuccess && refreshSuccess) || (isUninitialized && accessToken) || (isUninitialized && !accessToken)) // rememberUser is true here.
+  else if ((isSuccess && refreshSuccess) || (isUninitialized && accessToken) || (isUninitialized && !accessToken))
     return <Outlet />
 
 }
