@@ -40,12 +40,8 @@ const userRecipeSchema = new mongoose.Schema({
     default: null,
   },
   images: {
-    type: Object,
-    default: {
-      THUMBNAIL: {},
-      SMALL: {},
-      REGULAR: {},
-    },
+    type: Array,
+    default: [],
   },
   ingredientLines: {
     type: Array,

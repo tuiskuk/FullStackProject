@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import {
@@ -8,9 +8,11 @@ import {
   Grid,
   Typography,
   Snackbar,
-  Alert
+  Alert,
+  Input
 } from '@mui/material'
-import { useCreateUserMutation } from '../services/userSlice'
+import { useCreateUserMutation } from '../services/userApiSlice'
+import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSlice'
 /*import { useConfirmEmailQuery } from '../services/apiSlice'
 import { selectCurrentAccessToken } from '../services/loginSlice'
 import { useSelector } from 'react-redux'*/
@@ -21,19 +23,38 @@ const RegistrationForm = () => {
     control,
     formState: { errors },
     trigger,
-    reset
+    reset,
+    getValues,
   } = useForm()
 
+
   const [isSuccess, setIsSuccess] = useState(false)
-  const [ createUser ] = useCreateUserMutation()
-  const onSubmit = async(submitData) => {
+  const [createUser]  = useCreateUserMutation()
+  const [uploadProfilePicture] = useUploadProfilePictureMutation()
+  const [selectedFile, setSelectedFile] = useState(null)
+
+  useEffect(() => {
+    console.log(selectedFile)
+    // Do something with the profilePictureValue
+  }, [selectedFile])
+
+  const onSubmit = async (submitData) => {
+
     if (Object.keys(errors).length === 0) {
       try {
-        await createUser(submitData).unwrap()
+        console.log(submitData)
+        const response = await createUser(submitData).unwrap()
+        const id = response.id
+
+        if (selectedFile && id) {
+          console.log({ file: selectedFile, id })
+          await uploadProfilePicture({ file: selectedFile, id }).unwrap()
+        }
+
         reset()
         setIsSuccess(true)
       } catch (err) {
-        console.error('Failed to create user: ', err)
+        console.error('Failed to create user or upload profile picture: ', err)
       }
     }
     console.log('Form submitted:', submitData)
@@ -41,20 +62,37 @@ const RegistrationForm = () => {
 
   const handleBlur = (field) => {
     trigger(field.name)
+    if (field.name === 'password') {
+      trigger('confirmPassword')
+    }
   }
 
   const handleCloseSnackbar = () => {
     setIsSuccess(false)
   }
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]
+    setSelectedFile(file)
+  }
+
+
   return (
     <Container maxWidth="sm">
-      <Snackbar open={isSuccess} autoHideDuration={5000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+      <Snackbar
+        open={isSuccess}
+        autoHideDuration={5000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
           Profile successfully created
         </Alert>
       </Snackbar>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form encType="multipart/form-data" onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography variant="h4" align="center">
@@ -170,6 +208,39 @@ const RegistrationForm = () => {
                   onBlur={() => handleBlur(field)}
                 />
               )}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Controller
+              name="confirmPassword" // Change the name to "confirmPassword"
+              control={control}
+              defaultValue=""
+              rules={{ required: true,
+                validate: (value) => {
+                  return getValues('password') === value }
+              }}
+              render={({ field }) => (
+                <TextField
+                  type="password"
+                  label="Confirm Password"
+                  {...field}
+                  error={!!errors.confirmPassword} // Update the error reference to "confirmPassword"
+                  helperText={
+                    errors.confirmPassword && errors.confirmPassword.type === 'required'
+                      ?'password is required'
+                      : errors.confirmPassword ? 'Passwords do not match' : ''}
+                  fullWidth
+                  onBlur={() => field.onBlur()}
+                />
+              )}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6">Profile Picture</Typography>
+            <Input
+              type="file"
+              name="profilePicture"
+              onChange={handleFileChange}
             />
           </Grid>
           <Grid item xs={12}>

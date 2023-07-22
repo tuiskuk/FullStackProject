@@ -1,4 +1,4 @@
-import { useGetUsersQuery } from '../services/userSlice'
+import { useGetUsersQuery } from '../services/userApiSlice'
 import UserCard from './UserCard'
 const UsersPage = () => {
   const { data: users, isLoading, isError, error } = useGetUsersQuery([])
