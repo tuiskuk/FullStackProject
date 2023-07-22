@@ -145,10 +145,9 @@ const addReply = async (req, res) => {
   }
 }
 
-//TODO: likes
 // Like a comment
 const likeComment = async (req, res) => {
-  const { commentId, userId } = req.params
+  const { commentId, userId } = req.body
 
   try {
     // Find the comment to be liked
@@ -174,9 +173,37 @@ const likeComment = async (req, res) => {
   }
 }
 
+// RemoveLike
+const removeLikeComment = async (req, res) => {
+  const { commentId, userId } = req.body
+
+  try {
+    // Find the comment to be liked
+    const comment = await Comment.findById(commentId)
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' })
+    }
+
+    // Check if the user has not liked the comment
+    if (!comment.likes.includes(userId)) {
+      return res.status(400).json({ error: 'You have not liked this comment' })
+    }
+
+    // Add the user's _id to the likes array
+    comment.likes = comment.likes.filter((like) => !like.equals(userId))
+    await comment.save()
+
+    res.status(200).json({ message: 'Like removed successfully' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to remove like' })
+  }
+}
+
 // Dislike a comment
 const dislikeComment = async (req, res) => {
-  const { commentId, userId } = req.params
+  const { commentId, userId } = req.body
 
   try {
     // Find the comment to be disliked
@@ -202,4 +229,32 @@ const dislikeComment = async (req, res) => {
   }
 }
 
-export default { addComment, deleteComment, getCommentsForRecipe, addReply, likeComment, dislikeComment }
+// Remove dislike
+const removeDislikeComment = async (req, res) => {
+  const { commentId, userId } = req.body
+
+  try {
+    // Find the comment to be disliked
+    const comment = await Comment.findById(commentId)
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' })
+    }
+
+    // Check if the user has not disliked the comment
+    if (!comment.dislikes.includes(userId)) {
+      return res.status(400).json({ error: 'You have not disliked this comment' })
+    }
+
+    // Add the user's _id to the likes array
+    comment.dislikes = comment.dislikes.filter((dislike) => !dislike.equals(userId))
+    await comment.save()
+
+    res.status(200).json({ message: 'Dislike removed successfully' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to remove dislike' })
+  }
+}
+
+export default { addComment, deleteComment, getCommentsForRecipe, addReply, likeComment, removeLikeComment, dislikeComment, removeDislikeComment }

@@ -1,8 +1,14 @@
 import React from 'react'
 import { useState } from 'react'
-import { Typography, Grid, Card, CardContent, Button, InputAdornment, OutlinedInput } from '@mui/material'
-import { useAddCommentMutation, /*useDeleteCommentMutation, */ useGetCommentsForRecipeQuery, useAddReplyMutation } from '../services/commentSlice'
+import { Typography, Grid, Card, CardContent, Button, InputAdornment, OutlinedInput, IconButton } from '@mui/material'
+import { useAddCommentMutation, /*useDeleteCommentMutation, */ useGetCommentsForRecipeQuery, useAddReplyMutation,
+  useLikeCommentMutation, useRemoveLikeCommentMutation, useDislikeCommentMutation, useRemoveDislikeCommentMutation, } from '../services/commentSlice'
 import { useCreateInteractionMutation } from '../services/interactionSlice'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt'
+import ThumbDownIcon from '@mui/icons-material/ThumbDown'
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
+
 
 const CommentSection = ({ recipeId, userId , interactionData }) => {
   const { data: commentData, isLoading, isError, refetch } = useGetCommentsForRecipeQuery({ recipeId }, { refetchOnMountOrArgChange: true })
@@ -31,11 +37,17 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
     }
   }
   const CommentComponent = ({ comment, indentLevel = 0, userId }) => {
-    const [addReply] = useAddReplyMutation()
+    const [ addReply ] = useAddReplyMutation()
+    const [ likeComment ] = useLikeCommentMutation()
+    const [ removeLikeComment ] = useRemoveLikeCommentMutation()
+    const [ dislikeComment ] = useDislikeCommentMutation()
+    const [ removeDislikeComment ] = useRemoveDislikeCommentMutation()
 
     const CommentCard = ({ comment }) => {
       const [showReply, setShowReply] = useState(false)
       const [reply, setReply] = useState('')
+      const isLiked = Boolean(comment.likes.includes(userId))
+      const isDisliked = Boolean(comment.dislikes.includes(userId))
 
       const handleReplyToggle = () => {
         setShowReply((state) => !state)
@@ -54,11 +66,90 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
         }
       }
 
+      const handleLike = async (commentId) => {
+        console.log(commentId)
+
+        if(!interactionData){
+          try {
+            await createInteraction({ recipeId })
+            console.log('create')
+          } catch (error) {
+            console.error('Failed to create interaction: ', error)
+          }
+        }
+
+        if (!isLiked) {
+          try {
+            await likeComment({ commentId, userId })
+
+            //if recipe was disliked, remove it from dislikes
+            if (isDisliked) {
+              try {
+                await removeDislikeComment({ commentId, userId })
+              } catch (error) {
+                console.error('Failed to remove dislike: ', error)
+              }
+            }
+          } catch (error) {
+            console.error('Failed to add like: ', error)
+          }
+        }
+
+        if (isLiked){
+          try {
+            await removeLikeComment({ commentId, userId })
+          } catch (error) {
+            console.error('Failed to remove like: ', error)
+          }
+        }
+        refetch()
+      }
+
+      const handleDislike = async (commentId) => {
+        console.log(commentId)
+
+        if(!interactionData){
+          try {
+            await createInteraction({ commentId })
+            console.log('create')
+          } catch (error) {
+            console.error('Failed to create interaction: ', error)
+          }
+        }
+
+        if (!isDisliked) {
+          try {
+            await dislikeComment({ commentId, userId })
+
+            // If the recipe was liked, remove it from likes
+            if (isLiked) {
+              try {
+                await removeLikeComment({ commentId, userId })
+                //await removeLike({ userId, recipeId })
+                //await removeLikeInteraction({ recipeId, userId })
+              } catch (error) {
+                console.error('Failed to remove like: ', error)
+              }
+            }
+          } catch (error) {
+            console.error('Failed to add dislike: ', error)
+          }
+        }
+
+        if (isDisliked){
+          try {
+            await removeDislikeComment({ commentId, userId })
+          } catch (error) {
+            console.error('Failed to remove dislike: ', error)
+          }
+        }
+        refetch()
+      }
+
       return (
         <>
-          <Typography
+          <div
             key={comment._id}
-            variant="body1"
             style={{
               border: '1px solid #bdbdbd',
               borderRadius: '4px',
@@ -72,11 +163,35 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
               marginLeft: `${indentLevel * 20}px`,
             }}
           >
-            {comment.text} {comment.createdAt} {comment.user}
+            <Typography>
+              {comment.text} {comment.createdAt} {comment.user}
+            </Typography>
             <Button color="primary" onClick={handleReplyToggle}>
               {showReply ? 'Cancel' : 'Reply'}
             </Button>
-          </Typography>
+            <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+              <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
+                Likes:
+              </Typography>
+              <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
+                {comment.likes ? comment.likes.length : 0}
+              </Typography>
+              <IconButton onClick={() => handleLike(comment._id)} aria-label="Like">
+                {isLiked ? <ThumbUpIcon /> : <ThumbUpOffAltIcon />}
+              </IconButton>
+            </Grid>
+            <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+              <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
+                Dislikes:
+              </Typography>
+              <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
+                {comment.dislikes ? comment.dislikes.length : 0}
+              </Typography>
+              <IconButton onClick={() => handleDislike(comment._id)} aria-label="Dislike">
+                {isDisliked ? <ThumbDownIcon /> : <ThumbDownOffAltIcon />}
+              </IconButton>
+            </Grid>
+          </div>
           {showReply && (
             <OutlinedInput
               multiline

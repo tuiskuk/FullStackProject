@@ -32,7 +32,35 @@ export const commentSlice = apiSlice.injectEndpoints({
         body: { commentId, userId, text },
       }),
       providesTags: ['Comments']
-    })
+    }),
+    likeComment: builder.mutation({
+      query: ({ commentId, userId }) => ({
+        url: '/comments/comment/like',
+        method: 'POST',
+        body: { commentId, userId },
+      }),
+    }),
+    removeLikeComment: builder.mutation({
+      query: ({ commentId, userId }) => ({
+        url: '/comments/comment/like',
+        method: 'DELETE',
+        body: { commentId, userId },
+      }),
+    }),
+    dislikeComment: builder.mutation({
+      query: ({ commentId, userId }) => ({
+        url: '/comments/comment/dislike',
+        method: 'POST',
+        body: { commentId, userId },
+      }),
+    }),
+    removeDislikeComment: builder.mutation({
+      query: ({ commentId, userId }) => ({
+        url: '/comments/comment/dislike',
+        method: 'DELETE',
+        body: { commentId, userId },
+      }),
+    }),
   })
 })
 
@@ -40,5 +68,9 @@ export const {
   useAddCommentMutation,
   useDeleteCommentMutation,
   useGetCommentsForRecipeQuery,
-  useAddReplyMutation
+  useAddReplyMutation,
+  useLikeCommentMutation,
+  useRemoveLikeCommentMutation,
+  useDislikeCommentMutation,
+  useRemoveDislikeCommentMutation,
 } = commentSlice
