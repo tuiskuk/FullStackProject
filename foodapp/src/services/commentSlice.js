@@ -11,10 +11,10 @@ export const commentSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['Comments'],
     }),
     deleteComment: builder.mutation({
-      query: ({ commentId }) => ({
+      query: ({ userId, commentId }) => ({
         url: '/comments/comment',
         method: 'DELETE',
-        body: { commentId }
+        body: { userId, commentId }
       }),
       invalidatesTags: ['Comments']
     }),
@@ -61,6 +61,13 @@ export const commentSlice = apiSlice.injectEndpoints({
         body: { commentId, userId },
       }),
     }),
+    editComment: builder.mutation({
+      query: ({ userId, commentId, text }) => ({
+        url: '/comments/comment',
+        method: 'PUT',
+        body: { userId, commentId, text },
+      }),
+    }),
   })
 })
 
@@ -73,4 +80,5 @@ export const {
   useRemoveLikeCommentMutation,
   useDislikeCommentMutation,
   useRemoveDislikeCommentMutation,
+  useEditCommentMutation,
 } = commentSlice

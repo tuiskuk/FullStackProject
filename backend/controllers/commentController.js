@@ -42,7 +42,7 @@ const addComment = async (request, response) => {
 // Delete a comment
 const deleteComment = async (request, response) => {
   const { userId, commentId } = request.body
-
+  console.log(userId, commentId)
   try {
     // Find the comment to be deleted
     const comment = await Comment.findById(commentId)

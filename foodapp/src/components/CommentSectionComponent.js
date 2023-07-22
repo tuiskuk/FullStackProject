@@ -1,14 +1,15 @@
 import React from 'react'
 import { useState } from 'react'
 import { Typography, Grid, Card, CardContent, Button, InputAdornment, OutlinedInput, IconButton } from '@mui/material'
-import { useAddCommentMutation, /*useDeleteCommentMutation, */ useGetCommentsForRecipeQuery, useAddReplyMutation,
-  useLikeCommentMutation, useRemoveLikeCommentMutation, useDislikeCommentMutation, useRemoveDislikeCommentMutation, } from '../services/commentSlice'
+import { useAddCommentMutation, useDeleteCommentMutation, useGetCommentsForRecipeQuery, useAddReplyMutation,
+  useLikeCommentMutation, useRemoveLikeCommentMutation, useDislikeCommentMutation, useRemoveDislikeCommentMutation, useEditCommentMutation } from '../services/commentSlice'
 import { useCreateInteractionMutation } from '../services/interactionSlice'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
-
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 const CommentSection = ({ recipeId, userId , interactionData }) => {
   const { data: commentData, isLoading, isError, refetch } = useGetCommentsForRecipeQuery({ recipeId }, { refetchOnMountOrArgChange: true })
@@ -27,6 +28,7 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
           console.error('Failed to create interaction: ', error)
         }
       }
+
       try {
         await addComment({ recipeId, userId, text: userComment })
         setUserComment('')
@@ -36,20 +38,28 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
       }
     }
   }
+
   const CommentComponent = ({ comment, indentLevel = 0, userId }) => {
     const [ addReply ] = useAddReplyMutation()
     const [ likeComment ] = useLikeCommentMutation()
     const [ removeLikeComment ] = useRemoveLikeCommentMutation()
     const [ dislikeComment ] = useDislikeCommentMutation()
     const [ removeDislikeComment ] = useRemoveDislikeCommentMutation()
+    const [ editComment ] = useEditCommentMutation()
+    const [ deleteComment ] = useDeleteCommentMutation()
 
     const CommentCard = ({ comment }) => {
       const [showReply, setShowReply] = useState(false)
+      const [showEdit, setShowEdit] = useState(false)
       const [reply, setReply] = useState('')
+      const [edit, setEdit] = useState('')
       const isLiked = Boolean(comment.likes.includes(userId))
       const isDisliked = Boolean(comment.dislikes.includes(userId))
 
       const handleReplyToggle = () => {
+        if(!userId) {
+          return console.log('Log in needed')
+        }
         setShowReply((state) => !state)
         setReply('')
       }
@@ -68,15 +78,18 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
 
       const handleLike = async (commentId) => {
         console.log(commentId)
+        if(!userId) {
+          return console.log('Log in needed')
+        }
 
-        if(!interactionData){
+        /*if(!interactionData){
           try {
             await createInteraction({ recipeId })
             console.log('create')
           } catch (error) {
             console.error('Failed to create interaction: ', error)
           }
-        }
+        }*/
 
         if (!isLiked) {
           try {
@@ -107,15 +120,18 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
 
       const handleDislike = async (commentId) => {
         console.log(commentId)
+        if(!userId) {
+          return console.log('Log in needed')
+        }
 
-        if(!interactionData){
+        /*if(!interactionData){
           try {
             await createInteraction({ commentId })
             console.log('create')
           } catch (error) {
             console.error('Failed to create interaction: ', error)
           }
-        }
+        }*/
 
         if (!isDisliked) {
           try {
@@ -142,6 +158,30 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
           }
         }
         refetch()
+      }
+
+      const toggleEdit = () => {
+        setShowEdit((state) => !state)
+      }
+
+      const handleEdit = async (commentId) => {
+        try {
+          await editComment({ userId, commentId, text: edit })
+          setEdit('')
+          refetch()
+        } catch (error) {
+          console.error('Failed to edit comment: ', error)
+        }
+      }
+
+      const handleDelete = async (commentId) => {
+        try {
+          console.log(userId)
+          await deleteComment({ userId, commentId })
+          refetch()
+        } catch (error) {
+          console.error('Failed to delete comment: ', error)
+        }
       }
 
       return (
@@ -188,6 +228,12 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
               <IconButton onClick={() => handleDislike(comment._id)} aria-label="Dislike">
                 {isDisliked ? <ThumbDownIcon /> : <ThumbDownOffAltIcon />}
               </IconButton>
+              <IconButton onClick={() => toggleEdit()} aria-label="Edit">
+                {comment.user === userId && <EditIcon />}
+              </IconButton>
+              <IconButton onClick={() => handleDelete(comment._id)} aria-label="Delete">
+                {comment.user === userId && <DeleteIcon />}
+              </IconButton>
             </Grid>
           </div>
           {showReply && (
@@ -200,6 +246,22 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
               endAdornment={
                 <InputAdornment position="end">
                   <Button variant="contained" color="primary" onClick={() => handleSubmitReply(comment._id)}>
+                    Submit
+                  </Button>
+                </InputAdornment>
+              }
+            />
+          )}
+          {showEdit && (
+            <OutlinedInput
+              multiline
+              fullWidth
+              placeholder="Edit comment"
+              value={edit}
+              onChange={(event) => setEdit(event.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <Button variant="contained" color="primary" onClick={() => handleEdit(comment._id)}>
                     Submit
                   </Button>
                 </InputAdornment>
