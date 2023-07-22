@@ -77,27 +77,27 @@ const unknownEndpoint = (request, response, next) => {
 
 
 /*definition of multer storages for profile pictures and recipePictures
-name = ${(moment when pictures where loaded) + (original name of picture)} 
+name = ${(moment when pictures where loaded) + (original name of picture)}
 that way chance of storing different images with same name is practically zero*/
 const profilePictureStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-      const destinationPath = path.resolve('../backend/images/profilePictures');
-      cb(null, destinationPath)
+    const destinationPath = path.resolve('../backend/images/profilePictures')
+    cb(null, destinationPath)
   },
   filename: function (req, file, cb) {
     console.log(file)
-    cb(null, Date.now() + file.originalname);
+    cb(null, Date.now() + file.originalname)
   }
 })
 
 const recipePictureStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const destinationPath = path.resolve('../backend/images/recipePictures');
+    const destinationPath = path.resolve('../backend/images/recipePictures')
     cb(null, destinationPath)
   },
   filename: function (req, file, cb) {
     console.log(file)
-    cb(null, Date.now() + file.originalname);
+    cb(null, Date.now() + file.originalname)
   }
 })
 

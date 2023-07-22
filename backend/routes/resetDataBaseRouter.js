@@ -1,5 +1,5 @@
-import express from "express"
-import resetDatabase from "../controllers/resetDatabaseController.js"
+import express from 'express'
+import resetDatabase from '../controllers/resetDatabaseController.js'
 
 const resetDataBaseRouter = express.Router()
 

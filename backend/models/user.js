@@ -69,18 +69,29 @@ const userSchema = new mongoose.Schema({
   favorites: [
     { recipeId: String,
       image: String,
-      label: String }
+      label: String
+    }
   ],
   likes: [
     { recipeId: String,
       image: String,
-      label: String }
+      label: String
+    }
   ],
   dislikes: [
     { recipeId: String,
       image: String,
-      label: String }
-  ]
+      label: String
+    }
+  ],
+  comments: [
+    {
+      commentId: String,
+      recipeId: String,
+      image: String,
+      label: String
+    }
+  ],
 })
 
 userSchema.set('toJSON', {

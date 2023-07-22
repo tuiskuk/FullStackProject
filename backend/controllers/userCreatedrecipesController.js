@@ -103,26 +103,26 @@ const createRecipe = async (request, response, next) => {
   }
 }
 
-  const addImageToRecipe = async (recipeId, imageUrl, next) => {
-    try {
-        const recipe = await UserRecipe.findById(recipeId);
-        if (!recipe) {
-        throw new Error('Recipe not found');
-        }
-
-        // Add the new image URL to the images array
-        recipe.images.push(imageUrl);
-
-        // Save the updated recipe
-        const updatedRecipe = await recipe.save();
-
-        return updatedRecipe;
-    } catch (error) {
-        next(error)
+const addImageToRecipe = async (recipeId, imageUrl, next) => {
+  try {
+    const recipe = await UserRecipe.findById(recipeId)
+    if (!recipe) {
+      throw new Error('Recipe not found')
     }
-  };
+
+    // Add the new image URL to the images array
+    recipe.images.push(imageUrl)
+
+    // Save the updated recipe
+    const updatedRecipe = await recipe.save()
+
+    return updatedRecipe
+  } catch (error) {
+    next(error)
+  }
+}
 
 
 export default {
-    getRecipe, getrecipes, deleteRecipe, createRecipe, addImageToRecipe
+  getRecipe, getrecipes, deleteRecipe, createRecipe, addImageToRecipe
 }
