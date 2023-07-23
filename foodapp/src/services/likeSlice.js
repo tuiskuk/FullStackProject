@@ -3,11 +3,11 @@ import { apiSlice } from './apiSlice'
 export const likeApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     addLike: builder.mutation({
-      query: ({ userId, recipeId, label, image }) => {
+      query: ({ userId, recipeId }) => {
         return ({
           url: '/users/likes',
           method: 'POST',
-          body: { userId, recipeId, label, image }
+          body: { userId, recipeId }
         })
       },
       invalidatesTags: ['Likes'],

@@ -3,11 +3,11 @@ import { apiSlice } from './apiSlice'
 export const dislikeApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     addDislike: builder.mutation({
-      query: ({ userId, recipeId, label, image }) => {
+      query: ({ userId, recipeId, }) => {
         return ({
           url: '/users/dislikes',
           method: 'POST',
-          body: { userId, recipeId, label, image }
+          body: { userId, recipeId }
         })
       },
       invalidatesTags: ['Dislikes'],

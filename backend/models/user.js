@@ -67,29 +67,30 @@ const userSchema = new mongoose.Schema({
     }
   ],
   favorites: [
-    { recipeId: String,
-      image: String,
-      label: String
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe',
+      default: null
     }
   ],
   likes: [
-    { recipeId: String,
-      image: String,
-      label: String
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe',
+      default: null
     }
   ],
   dislikes: [
-    { recipeId: String,
-      image: String,
-      label: String
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe',
+      default: null
     }
   ],
   comments: [
     {
       commentId: String,
       recipeId: String,
-      image: String,
-      label: String
     }
   ],
 })
@@ -103,7 +104,5 @@ userSchema.set('toJSON', {
     delete returnedObject.passwordHash
   }
 })
-
-
 
 export const User = mongoose.model('User', userSchema)

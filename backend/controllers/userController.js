@@ -2,7 +2,7 @@ import { User } from '../models/user.js'
 import bcrypt from 'bcrypt'
 import { sendUserConfirmationEmail, errorCreator } from '../utils/helperFunctions.js'
 import mongoose from 'mongoose'
-
+import { Recipe } from '../models/recipe.js'
 const getUser = async (request, response, next) => {
   try {
     console.log(request.params)
@@ -130,8 +130,7 @@ const updateUser = async (request, response, next) => {
 }
 
 const addFavorite = async (req, res) => {
-  const { userId, recipeId, label, image } = req.body
-  console.log('adding favorite')
+  const { userId, recipeId } = req.body
 
   try {
     const user = await User.findById(userId)
@@ -140,14 +139,19 @@ const addFavorite = async (req, res) => {
       return res.status(404).json({ error: 'User not found' })
     }
 
+    const recipe = await Recipe.findOne({ recipeId })
+    if (!recipe) {
+      return res.status(404).json({ error: 'Recipe not found' })
+    }
+
     // Check if the recipe is already in the user's favorites
-    const existingFavorite = user.favorites.find(favorite => favorite.recipeId === recipeId)
+    const existingFavorite = user.favorites.includes(recipe._id)
     if (existingFavorite) {
       return res.status(400).json({ error: 'Recipe already favorited' })
     }
 
     // Add the new favorite to the user's favorites array
-    user.favorites.push({ recipeId, label, image })
+    user.favorites.push( recipe._id )
 
     // Save the updated user document
     await user.save()
@@ -169,44 +173,22 @@ const removeFavorite = async (req, res) => {
       return res.status(404).json({ error: 'User not found' })
     }
 
-    // Find the index of the favorite in the user's favorites array
-    const favoriteIndex = user.favorites.findIndex(favorite => favorite.recipeId === recipeId)
-
-    if (favoriteIndex === -1) {
-      return res.status(404).json({ error: 'Favorite not found' })
+    const recipe = await Recipe.findOne({ recipeId })
+    if (!recipe) {
+      return res.status(404).json({ error: 'Recipe not found' })
     }
 
-    // Remove the favorite from the user's favorites array
-    user.favorites.splice(favoriteIndex, 1)
+    const existingFavorite = user.favorites.includes(recipe._id)
+    if (!existingFavorite) {
+      return res.status(400).json({ error: 'Recipe has not been favorited' })
+    }
+
+    user.favorites = user.favorites.filter((fav) => !fav.equals(recipe._id))
 
     // Save the updated user document
     await user.save()
 
     res.status(200).json({ message: 'Favorite removed' })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const getFavorite = async (req, res) => {
-  try {
-    console.log('getting favorite')
-    const { userId, recipeId } = req.query
-    console.log(req.query)
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    const favorite = user.favorites.find((fav) => fav.recipeId === recipeId)
-
-    if (!favorite) {
-      return res.status(204).json({ favorite })
-    }
-
-    res.status(200).json({ favorite })
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: 'Something went wrong' })
@@ -358,7 +340,7 @@ const removeFollow = async (req, res) => {
 }
 
 const addLike = async (req, res) => {
-  const { userId, recipeId, label, image } = req.body
+  const { userId, recipeId } = req.body
   console.log('adding like')
 
   try {
@@ -375,7 +357,7 @@ const addLike = async (req, res) => {
     }
 
     // Add the new like to the user's likes array
-    user.likes.push({ recipeId, label, image })
+    user.likes.push({ recipeId })
 
     // Save the updated user document
     await user.save()
@@ -464,7 +446,7 @@ const getAllLikes = async (req, res) => {
 }
 
 const addDislike = async (req, res) => {
-  const { userId, recipeId, label, image } = req.body
+  const { userId, recipeId } = req.body
   console.log('adding dislike')
 
   try {
@@ -481,7 +463,7 @@ const addDislike = async (req, res) => {
     }
 
     // Add the new dislike to the user's dislikes array
-    user.dislikes.push({ recipeId, label, image })
+    user.dislikes.push({ recipeId })
 
     // Save the updated user document
     await user.save()
@@ -571,5 +553,5 @@ const getAllDislikes = async (req, res) => {
 
 
 export default {
-  getUser, getUsers, createUser, updateUser, deleteUser, addFavorite, removeFavorite, getFavorite, getAllFavorites, getAllFollowers, getAllFollowing, addFollow, removeFollow, addLike, removeLike, getAllLikes, getLike, addDislike, removeDislike, getAllDislikes, getDislike
+  getUser, getUsers, createUser, updateUser, deleteUser, addFavorite, removeFavorite, getAllFavorites, getAllFollowers, getAllFollowing, addFollow, removeFollow, addLike, removeLike, getAllLikes, getLike, addDislike, removeDislike, getAllDislikes, getDislike
 }

@@ -7,7 +7,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
         return ({
           url: '/interactions/likes',
           method: 'POST',
-          params: { recipeId, userId }
+          body: { recipeId, userId }
         })
       },
       invalidatesTags: ['Interactions'],
@@ -16,7 +16,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       query: ({ recipeId, userId }) => ({
         url: '/interactions/likes',
         method: 'DELETE',
-        params: { recipeId, userId }
+        body: { recipeId, userId }
       }),
       invalidatesTags: ['Interactions']
     }),
@@ -25,7 +25,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
         return ({
           url: '/interactions/dislikes',
           method: 'POST',
-          params: { recipeId, userId }
+          body: { recipeId, userId }
         })
       },
       invalidatesTags: ['Interactions'],
@@ -34,7 +34,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       query: ({ recipeId, userId }) => ({
         url: '/interactions/dislikes',
         method: 'DELETE',
-        params: { recipeId, userId }
+        body: { recipeId, userId }
       }),
       invalidatesTags: ['Interactions']
     }),
@@ -48,11 +48,11 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       providesTags: ['Interactions']
     }),
     createInteraction: builder.mutation({
-      query: ({ recipeId }) => {
+      query: ({ recipeId, label, image }) => {
         return ({
           url: '/interactions',
           method: 'POST',
-          params: { recipeId },
+          body: { recipeId, label, image },
         })
       },
       invalidatesTags: ['Interactions'],
