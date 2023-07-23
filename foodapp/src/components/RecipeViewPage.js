@@ -23,7 +23,6 @@ const RecipeViewPage = () => {
   const { recipeId } = useParams()
   const user = useSelector(selectCurrentUser)
   const userId = user?.id
-  console.log(userId)
   const [recipe, setRecipe] = useState({})
   const label = recipe.label
   const image = recipe.image
@@ -43,18 +42,17 @@ const RecipeViewPage = () => {
   const [ removeDislikeInteraction ] = useRemoveDislikeInteractionMutation()
   const [ addFavorite ] = useAddFavoriteMutation()
   const [ removeFavorite ] = useRemoveFavoriteMutation()
-  const { data: interactionData } = useGetAllInteractionsQuery({ recipeId })
-  const { data: favoriteData, refetch } = useGetAllFavoritesQuery({ userId: userId })
+  const { data: interactionData } = useGetAllInteractionsQuery(
+    { recipeId }, { skip: !recipeId, refetchOnMountOrArgChange: true })
+  const { data: favoriteData, refetch } = useGetAllFavoritesQuery(
+    { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
   const [ createInteraction ] = useCreateInteractionMutation()
 
   //can search also from user
   const isLiked = Boolean(interactionData?.recipe?.likes.some((user) => user === userId))
   const isDisliked = Boolean(interactionData?.recipe?.dislikes.some((user) => user === userId))
 
-  const isFavorite = Boolean(favoriteData?.favorites?.some((recip) => recip === recipe._id))
-
-  console.log(isFavorite)
-
+  const isFavorite = Boolean(favoriteData?.favorites?.some((recip) => recip === interactionData?.recipe.id))
   const handleLike = async () => {
     console.log(recipeId)
 
@@ -338,7 +336,7 @@ const RecipeViewPage = () => {
         </Grid>
       )}
 
-      <CommentSection recipeId={recipeId} userId={userId} interactionData={interactionData} />
+      <CommentSection recipeId={recipeId} userId={userId} interactionData={interactionData} label={label} image={image} />
     </Grid>
   )
 }

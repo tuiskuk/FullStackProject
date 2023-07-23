@@ -28,7 +28,6 @@ const addComment = async (request, response) => {
 
     // Find the corresponding recipe and push the comment to its comments array
     const recipe = await Recipe.findOne({ recipeId })
-    console.log(recipe)
     recipe.comments.push(newComment._id)
     await recipe.save()
 
@@ -42,11 +41,10 @@ const addComment = async (request, response) => {
 // Delete a comment
 const deleteComment = async (request, response) => {
   const { userId, commentId } = request.body
-  console.log(userId, commentId)
+
   try {
     // Find the comment to be deleted
     const comment = await Comment.findById(commentId)
-    console.log(comment)
     if (!comment) {
       return response.status(404).json({ error: 'Comment not found' })
     }
@@ -129,7 +127,7 @@ const getCommentsForRecipe = async (req, res) => {
     const recipe = await Recipe.findOne({ recipeId }).populate('comments')
 
     if (!recipe) {
-      return res.status(404).json({ error: 'Recipe not found' })
+      return res.status(204).json({ error: 'Recipe/comments not found' })
     }
 
     // Populate the replies at each level of nesting
@@ -301,7 +299,6 @@ const editComment = async (req, res) => {
 
     const userIdObject = new mongoose.Types.ObjectId(userId)
     if (!comment.user.equals(userIdObject)) {
-      console.log(comment.user)
       return res.status(404).json({ error: 'Editing comment is not allowed' })
     }
 
