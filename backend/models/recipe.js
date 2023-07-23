@@ -7,6 +7,14 @@ const recipeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+    required: true,
+  },
+  label: {
+    type: String,
+    required: true,
+  },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,

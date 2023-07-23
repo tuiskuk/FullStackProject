@@ -4,63 +4,64 @@ import mongoose from 'mongoose'
 
 const createInteraction = async (request, response) => {
   try {
-    const { recipeId } = request.query
+    const { recipeId, label, image } = request.body
 
     //check that recipe do not already exist
-    if(await Recipe.findOne({ recipeId })) {
+    const searchRecipe = await Recipe.findOne({ recipeId })
+    if(searchRecipe) {
       return response.status(400).json({ error: 'Recipe already exist' })
     }
 
-    const recipe = new Recipe({ recipeId, likes: [], dislikes: [], comments: [] })
-
+    const recipe = new Recipe({ recipeId, label, image, likes: [], dislikes: [], comments: [] })
     const savedRecipe = await recipe.save()
 
     response.status(201).json({ savedRecipe })
   } catch (error) {
-    console.log('creating interaction failed')
+    console.log('creating interaction failed', error)
   }
 }
 
 const addLikeInteraction = async (request, response) => {
   try {
-    const { recipeId, userId } = request.query
+    const { recipeId, userId } = request.body
     const userIdObject = new mongoose.Types.ObjectId(userId)
     const currentUser = await User.findById(userIdObject)
 
+    console.log(recipeId)
     // If either user is not found, return a 404 response with an error message
     if (!currentUser) {
       return response.status(404).json({ error: 'UserId not found' })
     }
 
     const recipe = await Recipe.findOne({ recipeId })
-
     if (!recipe) {
       return response.status(404).json({ error: 'Recipe not found' })
     }
 
     // Check if the user already liked the recipe
-    const existingLike = recipe.likes.includes(userId)
-
+    const existingLike = recipe.likes.includes(userIdObject)
     if (existingLike) {
       return response.status(400).json({ error: 'Recipe already liked' })
     }
 
     // Add the new like to the recipe's likes array
     recipe.likes.push(userIdObject)
+    currentUser.likes.push(recipe._id)
 
     // Save the updated recipe document
     await recipe.save()
+    await currentUser.save()
 
     response.status(201).json({ message: 'Like added' })
   } catch (error) {
-    console.log('Liking interaction failed')
+    console.log('Liking interaction failed', error)
     response.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
 const removeLikeInteraction = async (request, response) => {
   try {
-    const { recipeId, userId } = request.query
+    const { recipeId, userId } = request.body
     const userIdObject = new mongoose.Types.ObjectId(userId)
     const currentUser = await User.findById(userIdObject)
 
@@ -70,33 +71,32 @@ const removeLikeInteraction = async (request, response) => {
     }
 
     const recipe = await Recipe.findOne({ recipeId })
-
     if (!recipe) {
       return response.status(404).json({ error: 'Recipe not found' })
     }
 
     // Check if the user hasn't liked the recipe
     const existingLike = recipe.likes.includes(userId)
-
     if (!existingLike) {
       return response.status(400).json({ error: 'Recipe hasn not been liked' })
     }
 
-    // Update the current user's 'following' array by removing the target user's ObjectId
-    recipe.likes = recipe.likes.filter((like) => !like.equals(userIdObject))
+    recipe.likes = recipe.likes.filter((user) => !user.equals(userIdObject))
+    currentUser.likes = currentUser.likes.filter((like) => !like.equals(recipe._id))
 
     await recipe.save()
+    await currentUser.save()
 
     response.status(201).json({ message: 'Like removed' })
   } catch (error) {
-    console.log('Removing like interaction failed')
+    console.log('Removing like interaction failed', error)
     response.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
 const addDislikeInteraction = async (request, response) => {
   try {
-    const { recipeId, userId } = request.query
+    const { recipeId, userId } = request.body
     const userIdObject = new mongoose.Types.ObjectId(userId)
     const currentUser = await User.findById(userIdObject)
 
@@ -106,34 +106,34 @@ const addDislikeInteraction = async (request, response) => {
     }
 
     const recipe = await Recipe.findOne({ recipeId })
-
     if (!recipe) {
       return response.status(404).json({ error: 'Recipe not found' })
     }
 
     // Check if the user already disliked the recipe
-    const existingDislike = recipe.dislikes.includes(userId)
-
+    const existingDislike = recipe.dislikes.includes(userIdObject)
     if (existingDislike) {
       return response.status(400).json({ error: 'Recipe already disliked' })
     }
 
     // Add the new dislike to the recipe's dislikes array
     recipe.dislikes.push(userIdObject)
+    currentUser.dislikes.push(recipe._id)
 
     // Save the updated recipe document
     await recipe.save()
+    await currentUser.save()
 
     response.status(201).json({ message: 'Dislike added' })
   } catch (error) {
-    console.log('Liking interaction failed')
+    console.log('Liking interaction failed', error)
     response.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
 const removeDislikeInteraction = async (request, response) => {
   try {
-    const { recipeId, userId } = request.query
+    const { recipeId, userId } = request.body
     const userIdObject = new mongoose.Types.ObjectId(userId)
     const currentUser = await User.findById(userIdObject)
 
@@ -143,26 +143,25 @@ const removeDislikeInteraction = async (request, response) => {
     }
 
     const recipe = await Recipe.findOne({ recipeId })
-
     if (!recipe) {
       return response.status(404).json({ error: 'Recipe not found' })
     }
 
     // Check if the user hasn't disliked the recipe
     const existingDislike = recipe.dislikes.includes(userId)
-
     if (!existingDislike) {
       return response.status(400).json({ error: 'Recipe hasn not been disliked' })
     }
 
-    // Update the current user's 'following' array by removing the target user's ObjectId
-    recipe.dislikes = recipe.dislikes.filter((dislike) => !dislike.equals(userIdObject))
+    recipe.dislikes = recipe.dislikes.filter((user) => !user.equals(userIdObject))
+    currentUser.dislikes = currentUser.dislikes.filter((dis) => !dis.equals(recipe._id))
 
     await recipe.save()
+    await currentUser.save()
 
     response.status(201).json({ message: 'Dislike removed' })
   } catch (error) {
-    console.log('Removing dislike interaction failed')
+    console.log('Removing dislike interaction failed', error)
     response.status(500).json({ error: 'Internal Server Error' })
   }
 }
@@ -170,11 +169,9 @@ const removeDislikeInteraction = async (request, response) => {
 const getAllInteractions = async (request, response) => {
   try {
     const recipeId = request.query.recipeId
-    console.log(recipeId)
 
     // Find the recipe by recipeId
     const recipe = await Recipe.findOne({ recipeId })
-    console.log(recipe)
     // If recipe is not found, return empty
     if (!recipe) {
       return response.status(204).json({ recipe })

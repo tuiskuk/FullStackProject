@@ -2,7 +2,7 @@ import { User } from '../models/user.js'
 import bcrypt from 'bcrypt'
 import { sendUserConfirmationEmail, errorCreator } from '../utils/helperFunctions.js'
 import mongoose from 'mongoose'
-
+import { Recipe } from '../models/recipe.js'
 const getUser = async (request, response, next) => {
   try {
     console.log(request.params)
@@ -130,8 +130,7 @@ const updateUser = async (request, response, next) => {
 }
 
 const addFavorite = async (req, res) => {
-  const { userId, recipeId, label, image } = req.body
-  console.log('adding favorite')
+  const { userId, recipeId } = req.body
 
   try {
     const user = await User.findById(userId)
@@ -140,14 +139,19 @@ const addFavorite = async (req, res) => {
       return res.status(404).json({ error: 'User not found' })
     }
 
+    const recipe = await Recipe.findOne({ recipeId })
+    if (!recipe) {
+      return res.status(404).json({ error: 'Recipe not found' })
+    }
+
     // Check if the recipe is already in the user's favorites
-    const existingFavorite = user.favorites.find(favorite => favorite.recipeId === recipeId)
+    const existingFavorite = user.favorites.includes(recipe._id)
     if (existingFavorite) {
       return res.status(400).json({ error: 'Recipe already favorited' })
     }
 
     // Add the new favorite to the user's favorites array
-    user.favorites.push({ recipeId, label, image })
+    user.favorites.push( recipe._id )
 
     // Save the updated user document
     await user.save()
@@ -169,44 +173,22 @@ const removeFavorite = async (req, res) => {
       return res.status(404).json({ error: 'User not found' })
     }
 
-    // Find the index of the favorite in the user's favorites array
-    const favoriteIndex = user.favorites.findIndex(favorite => favorite.recipeId === recipeId)
-
-    if (favoriteIndex === -1) {
-      return res.status(404).json({ error: 'Favorite not found' })
+    const recipe = await Recipe.findOne({ recipeId })
+    if (!recipe) {
+      return res.status(404).json({ error: 'Recipe not found' })
     }
 
-    // Remove the favorite from the user's favorites array
-    user.favorites.splice(favoriteIndex, 1)
+    const existingFavorite = user.favorites.includes(recipe._id)
+    if (!existingFavorite) {
+      return res.status(400).json({ error: 'Recipe has not been favorited' })
+    }
+
+    user.favorites = user.favorites.filter((fav) => !fav.equals(recipe._id))
 
     // Save the updated user document
     await user.save()
 
     res.status(200).json({ message: 'Favorite removed' })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const getFavorite = async (req, res) => {
-  try {
-    console.log('getting favorite')
-    const { userId, recipeId } = req.query
-    console.log(req.query)
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    const favorite = user.favorites.find((fav) => fav.recipeId === recipeId)
-
-    if (!favorite) {
-      return res.status(204).json({ favorite })
-    }
-
-    res.status(200).json({ favorite })
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: 'Something went wrong' })
@@ -357,219 +339,6 @@ const removeFollow = async (req, res) => {
   }
 }
 
-const addLike = async (req, res) => {
-  const { userId, recipeId, label, image } = req.body
-  console.log('adding like')
-
-  try {
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    // Check if the recipe is already liked by the user
-    const existingLike = user.likes.find((like) => like.recipeId === recipeId)
-    if (existingLike) {
-      return res.status(400).json({ error: 'Recipe already liked' })
-    }
-
-    // Add the new like to the user's likes array
-    user.likes.push({ recipeId, label, image })
-
-    // Save the updated user document
-    await user.save()
-
-    res.status(201).json({ message: 'Like added' })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const removeLike = async (req, res) => {
-  const { userId, recipeId } = req.body
-
-  try {
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    // Find the index of the liked recipe in the user's likes array
-    const likeIndex = user.likes.findIndex((like) => like.recipeId === recipeId)
-
-    if (likeIndex === -1) {
-      return res.status(404).json({ error: 'Like not found' })
-    }
-
-    // Remove the liked recipe from the user's likes array
-    user.likes.splice(likeIndex, 1)
-
-    // Save the updated user document
-    await user.save()
-
-    res.status(200).json({ message: 'Like removed' })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const getLike = async (req, res) => {
-  try {
-    console.log('getting like')
-    const { userId, recipeId } = req.query
-    console.log(req.query)
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    const like = user.likes.find((lik) => lik.recipeId === recipeId)
-
-    if (!like) {
-      return res.status(204).json({ like })
-    }
-
-    res.status(200).json({ like })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const getAllLikes = async (req, res) => {
-  try {
-    const { userId } = req.query
-    console.log(userId)
-
-    // Find the user by userId
-    const user = await User.findById(userId)
-
-    // If user is not found, return a 404 response with an error message
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    // Return the user's liked recipes array
-    res.status(200).json({ likes: user.likes })
-  } catch (error) {
-    // If any error occurs during the process, handle it and return a 500 response with an error message
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const addDislike = async (req, res) => {
-  const { userId, recipeId, label, image } = req.body
-  console.log('adding dislike')
-
-  try {
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    // Check if the recipe is already disliked by the user
-    const existingDislike = user.dislikes.find((dislike) => dislike.recipeId === recipeId)
-    if (existingDislike) {
-      return res.status(400).json({ error: 'Recipe already disliked' })
-    }
-
-    // Add the new dislike to the user's dislikes array
-    user.dislikes.push({ recipeId, label, image })
-
-    // Save the updated user document
-    await user.save()
-
-    res.status(201).json({ message: 'Dislike added' })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const removeDislike = async (req, res) => {
-  const { userId, recipeId } = req.body
-
-  try {
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    // Find the index of the disliked recipe in the user's dislikes array
-    const dislikeIndex = user.dislikes.findIndex((dislike) => dislike.recipeId === recipeId)
-
-    if (dislikeIndex === -1) {
-      return res.status(404).json({ error: 'Dislike not found' })
-    }
-
-    // Remove the disliked recipe from the user's dislikes array
-    user.dislikes.splice(dislikeIndex, 1)
-
-    // Save the updated user document
-    await user.save()
-
-    res.status(200).json({ message: 'Dislike removed' })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const getDislike = async (req, res) => {
-  try {
-    console.log('getting dislike')
-    const { userId, recipeId } = req.query
-    console.log(req.query)
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    const dislike = user.dislikes.find((dis) => dis.recipeId === recipeId)
-
-    if (!dislike) {
-      return res.status(204).json({ dislike })
-    }
-
-    res.status(200).json({ dislike })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-const getAllDislikes = async (req, res) => {
-  try {
-    const { userId } = req.query
-    console.log(userId)
-
-    // Find the user by userId
-    const user = await User.findById(userId)
-
-    // If user is not found, return a 404 response with an error message
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    // Return the user's disliked recipes array
-    res.status(200).json({ dislikes: user.dislikes })
-  } catch (error) {
-    // If any error occurs during the process, handle it and return a 500 response with an error message
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
-  }
-}
-
-
 export default {
-  getUser, getUsers, createUser, updateUser, deleteUser, addFavorite, removeFavorite, getFavorite, getAllFavorites, getAllFollowers, getAllFollowing, addFollow, removeFollow, addLike, removeLike, getAllLikes, getLike, addDislike, removeDislike, getAllDislikes, getDislike
+  getUser, getUsers, createUser, updateUser, deleteUser, addFavorite, removeFavorite, getAllFavorites, getAllFollowers, getAllFollowing, addFollow, removeFollow
 }

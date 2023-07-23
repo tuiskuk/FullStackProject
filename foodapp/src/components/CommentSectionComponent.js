@@ -11,7 +11,7 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-const CommentSection = ({ recipeId, userId , interactionData }) => {
+const CommentSection = ({ recipeId, userId , interactionData, label, image }) => {
   const { data: commentData, isLoading, isError, refetch } = useGetCommentsForRecipeQuery({ recipeId }, { refetchOnMountOrArgChange: true })
   const [addComment] = useAddCommentMutation()
   const [userComment, setUserComment] = useState('')
@@ -20,9 +20,10 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
 
   const handleSubmitComment = async () => {
     if (userComment.trim() !== '') {
+      console.log(interactionData)
       if(!interactionData) {
         try {
-          await createInteraction({ recipeId })
+          await createInteraction({ recipeId, label, image })
           console.log('create')
         } catch (error) {
           console.error('Failed to create interaction: ', error)
@@ -82,15 +83,6 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
           return console.log('Log in needed')
         }
 
-        /*if(!interactionData){
-          try {
-            await createInteraction({ recipeId })
-            console.log('create')
-          } catch (error) {
-            console.error('Failed to create interaction: ', error)
-          }
-        }*/
-
         if (!isLiked) {
           try {
             await likeComment({ commentId, userId })
@@ -124,14 +116,14 @@ const CommentSection = ({ recipeId, userId , interactionData }) => {
           return console.log('Log in needed')
         }
 
-        /*if(!interactionData){
+        if(!interactionData){
           try {
             await createInteraction({ commentId })
             console.log('create')
           } catch (error) {
             console.error('Failed to create interaction: ', error)
           }
-        }*/
+        }
 
         if (!isDisliked) {
           try {

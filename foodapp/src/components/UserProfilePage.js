@@ -1,26 +1,11 @@
 import { useEffect, useState } from 'react'
-import {
-  TextField,
-  Button,
-  Grid,
-  Container,
-  Avatar,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Input
-} from '@mui/material'
-
+import { TextField, Button, Grid, Container, Avatar, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Input } from '@mui/material'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useUpdateUserMutation } from '../services/userApiSlice'
 import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSlice'
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
-import { useGetAllDislikesQuery } from '../services/dislikeSlice'
-import { useGetAllLikesQuery } from '../services/likeSlice'
 
 import RecipeCard from './RecipeCard'
 
@@ -37,9 +22,11 @@ const UserProfile = () => {
   const [uploadProfilePicture] = useUploadProfilePictureMutation()
   console.log(user?.id)
   const userId = user?.id
-  const { data: favoritesData } = useGetAllFavoritesQuery({ userId })
-  const { data: dislikesData } = useGetAllDislikesQuery({ userId })
-  const { data: likesData } = useGetAllLikesQuery({ userId })
+  const { data: favoritesData } = useGetAllFavoritesQuery(
+    { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
+  //TODO: dislikesData, LikesData, favoritesData, commentsData
+  const dislikesData = null
+  const likesData = null
   const following = user?.following
   const followers = user?.followers
   console.log(followers)
