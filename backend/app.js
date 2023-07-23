@@ -13,8 +13,8 @@ import config from './utils/config.js'
 import middleware from './utils/middleware.js'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
-import { URL } from 'url'
-import path  from 'path'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 mongoose.set('strictQuery', false)
 
 
@@ -23,12 +23,11 @@ const app = express()
 
 //little manipulation to avoid harcoded path to images folder
 //in order to make it possible for everybody to use this
-const currentModuleUrl = new URL(import.meta.url)
-const currentModulePath = currentModuleUrl.pathname
-const currentDirectoryPath = path.dirname(currentModulePath)
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 //allow requests under images folder to return picctures
-app.use('/images' ,express.static(path.join(currentDirectoryPath, 'images')))
+app.use('/images', express.static(join(__dirname, 'images')))
 
 const corsOptions = {
   origin: 'http://localhost:3000',

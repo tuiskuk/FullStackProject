@@ -48,8 +48,8 @@ const userSchema = new mongoose.Schema({
     default: null // Set a default value if the user doesn't have a profile image
   },
   profileText: {
-    type: String, // Store the file name or path of the profile image
-    default: null // Set a default value if the user doesn't have a profile image
+    type: String,
+    default: null
   },
   passwordHash: String,
   followers: [

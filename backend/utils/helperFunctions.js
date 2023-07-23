@@ -1,7 +1,11 @@
 import config from './config.js'
 import nodemailer from 'nodemailer'
 import  jwt  from 'jsonwebtoken'
+import { fileURLToPath } from 'url'
+import { dirname, resolve } from 'path'
+import fs from 'fs'
 
+//sends confirm email mail to given email
 export const sendUserConfirmationEmail = (email, user) => {
 
   const emailToken = jwt.sign( { id: user._id,
@@ -40,9 +44,29 @@ export const sendUserConfirmationEmail = (email, user) => {
   })
 }
 
+//throws error
 export const errorCreator = (message, name) => {
   const error = new Error(message)
   error.name = name
   return error
 }
 
+//deletes picture from user.profileImage
+export const imageDeleter = (user) => {
+  /*little manipulation to avoid harcoded path to images folder
+  in order to make it possible for everybody to use this*/
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = dirname(__filename)
+
+  const oldProfilePicturePathEnd = '../' + user.profileImage.replace('http://localhost:3001/', '')
+  const oldProfilePicturePath = resolve(__dirname, oldProfilePicturePathEnd)
+
+  if(fs.existsSync(oldProfilePicturePath)) {
+    fs.unlink(oldProfilePicturePath, (err) => {
+      if (err) {
+        console.log('error deleting picture')
+      }
+    })
+  }
+  console.log('old profile picture deleted')
+}

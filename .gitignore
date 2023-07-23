@@ -2,6 +2,7 @@ hours.md
 /node_modules
 /.pnp
 .pnp.js
+backend/images
 
 # production
 /build
