@@ -5,16 +5,23 @@ import { User } from '../models/user.js'
 import mongoose from 'mongoose'
 
 // Add a new comment to a recipe
-const addComment = async (request, response) => {
-  const { recipeId, userId, text } = request.body
-
+const addComment = async (request, response, next) => {
   try {
-    const userIdObject = new mongoose.Types.ObjectId(userId)
-    const currentUser = await User.findById(userIdObject)
+    const { recipeId, userId, text } = request.body
 
-    // If either user is not found, return a 404 response with an error message
+    const userIdObject = new mongoose.Types.ObjectId(userId)
+
+    const [currentUser, recipe] = await Promise.all([
+      User.findById(userIdObject),
+      Recipe.findOne({ recipeId }),
+    ])
+
     if (!currentUser) {
-      return response.status(404).json({ error: 'UserId not found' })
+      return response.status(404).json({ error: 'User not found' })
+    }
+
+    if (!recipe) {
+      return response.status(404).json({ error: 'Recipe not found' })
     }
 
     // Create a new comment document
@@ -22,28 +29,23 @@ const addComment = async (request, response) => {
       user: userIdObject,
       text,
     })
-
-    // Save the comment in the database
     await newComment.save()
 
-    // Find the corresponding recipe and push the comment to its comments array
-    const recipe = await Recipe.findOne({ recipeId })
+    // Find the recipe and push the comment to its comments array
     recipe.comments.push(newComment._id)
     await recipe.save()
 
     response.status(201).json({ message: 'Comment added successfully' })
   } catch (error) {
-    console.error(error)
-    response.status(500).json({ error: 'Failed to add the comment' })
+    next(error)
   }
 }
 
 // Delete a comment
-const deleteComment = async (request, response) => {
-  const { userId, commentId } = request.body
-
+const deleteComment = async (request, response, next) => {
   try {
-    // Find the comment to be deleted
+    const { userId, commentId } = request.body
+
     const comment = await Comment.findById(commentId)
     if (!comment) {
       return response.status(404).json({ error: 'Comment not found' })
@@ -51,39 +53,42 @@ const deleteComment = async (request, response) => {
 
     const userIdObject = new mongoose.Types.ObjectId(userId)
     if (!comment.user.equals(userIdObject)) {
-      return response.status(404).json({ error: 'Deleting comment is not allowed' })
+      return response.status(403).json({ error: 'Deleting comment is not allowed' })
     }
 
     // Recursive function to delete comment and its replies
     const deleteCommentAndReplies = async (commentId) => {
-      // Find the comment to be deleted
-      const comment = await Comment.findById(commentId)
+      try {
+        const comment = await Comment.findById(commentId)
 
-      if (!comment) {
-        return // Comment not found, terminate recursion
-      }
+        if (!comment) {
+          return // Comment not found, terminate recursion
+        }
 
-      // Recursively delete the replies
-      for (const replyId of comment.replies) {
-        await deleteCommentAndReplies(replyId)
-      }
+        // Recursively delete the replies
+        for (const replyId of comment.replies) {
+          await deleteCommentAndReplies(replyId)
+        }
 
-      // Delete the comment
-      await Comment.deleteOne({ _id: commentId })
+        // Delete the comment
+        await Comment.deleteOne({ _id: commentId })
 
-      // Remove the comment reference from the parent comment's replies array
-      if (comment.parentComment) {
-        await Comment.findOneAndUpdate(
-          { replies: commentId },
-          { $pull: { replies: commentId } }
+        // Remove the comment reference from the parent comment's replies array
+        if (comment.parentComment) {
+          await Comment.findOneAndUpdate(
+            { replies: commentId },
+            { $pull: { replies: commentId } }
+          )
+        }
+
+        // Remove the comment reference from the parent recipe's comments array
+        await Recipe.findOneAndUpdate(
+          { comments: commentId },
+          { $pull: { comments: commentId } }
         )
+      } catch (error) {
+        next(error)
       }
-
-      // Remove the comment reference from the parent recipe's comments array
-      await Recipe.findOneAndUpdate(
-        { comments: commentId },
-        { $pull: { comments: commentId } }
-      )
     }
 
     // Start recursive deletion
@@ -91,8 +96,7 @@ const deleteComment = async (request, response) => {
 
     response.status(200).json({ message: 'Comment deleted successfully' })
   } catch (error) {
-    console.error(error)
-    response.status(500).json({ error: 'Failed to delete the comment' })
+    next(error)
   }
 }
 
@@ -119,15 +123,14 @@ const populateReplies = async (comment) => {
 
 
 // Get all comments for a specific recipe, including replies
-const getCommentsForRecipe = async (req, res) => {
-  const { recipeId } = req.query
-
+const getCommentsForRecipe = async (request, response, next) => {
   try {
-    // Find the recipe and populate the comments with the actual comment documents, including replies
+    const { recipeId } = request.query
+
     const recipe = await Recipe.findOne({ recipeId }).populate('comments')
 
     if (!recipe) {
-      return res.status(204).json({ error: 'Recipe/comments not found' })
+      return response.status(204).json({ error: 'Recipe/comments not found' })
     }
 
     // Populate the replies at each level of nesting
@@ -136,22 +139,30 @@ const getCommentsForRecipe = async (req, res) => {
     )
 
     // Return the comments for the recipe (including replies)
-    res.status(200).json(populatedComments)
+    response.status(200).json(populatedComments)
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to get comments for the recipe' })
+    next(error)
   }
 }
 
 // Comment on a specific comment (reply to a comment)
-const addReply = async (req, res) => {
-  const { commentId, userId, text } = req.body
-
+const addReply = async (request, response, next) => {
   try {
-    // Find the parent comment to which the reply will be added
-    const parentComment = await Comment.findById(commentId)
+    const { commentId, userId, text } = request.body
+
+    const userIdObject = new mongoose.Types.ObjectId(userId)
+
+    const [currentUser, parentComment] = await Promise.all([
+      User.findById(userIdObject),
+      Comment.findById(commentId),
+    ])
+
     if (!parentComment) {
-      return res.status(404).json({ error: 'Parent comment not found' })
+      return response.status(404).json({ error: 'Parent comment not found' })
+    }
+
+    if(!currentUser) {
+      return response.status(404).json({ error: 'User not found' })
     }
 
     // Create a new comment document for the reply
@@ -159,157 +170,188 @@ const addReply = async (req, res) => {
       user: userId,
       text,
     })
-
-    // Save the reply in the database
     await newReply.save()
 
     // Add the reply's _id to the parent comment's replies array
     parentComment.replies.push(newReply._id)
     await parentComment.save()
 
-    res.status(201).json({ message: 'Reply added successfully' })
+    response.status(201).json({ message: 'Reply added successfully' })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to add the reply' })
+    next(error)
   }
 }
 
 // Like a comment
-const likeComment = async (req, res) => {
-  const { commentId, userId } = req.body
-
+const likeComment = async (request, response, next) => {
   try {
-    // Find the comment to be liked
-    const comment = await Comment.findById(commentId)
+    const { commentId, userId } = request.body
+
+    const userIdObject = new mongoose.Types.ObjectId(userId)
+
+    const [currentUser, comment] = await Promise.all([
+      User.findById(userIdObject),
+      Comment.findById(commentId),
+    ])
+
+    if (!currentUser) {
+      return response.status(404).json({ error: 'User not found' })
+    }
 
     if (!comment) {
-      return res.status(404).json({ error: 'Comment not found' })
+      return response.status(404).json({ error: 'Comment not found' })
     }
 
     // Check if the user has already liked the comment
     if (comment.likes.includes(userId)) {
-      return res.status(400).json({ error: 'You have already liked this comment' })
+      return response.status(400).json({ error: 'You have already liked this comment' })
     }
 
     // Add the user's _id to the likes array
     comment.likes.push(userId)
     await comment.save()
 
-    res.status(200).json({ message: 'Comment liked successfully' })
+    response.status(200).json({ message: 'Comment liked successfully' })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to like the comment' })
+    next(error)
   }
 }
 
 // RemoveLike
-const removeLikeComment = async (req, res) => {
-  const { commentId, userId } = req.body
-
+const removeLikeComment = async (request, response, next) => {
   try {
-    // Find the comment to be liked
-    const comment = await Comment.findById(commentId)
+    const { commentId, userId } = request.body
+
+    const userIdObject = new mongoose.Types.ObjectId(userId)
+
+    const [currentUser, comment] = await Promise.all([
+      User.findById(userIdObject),
+      Comment.findById(commentId),
+    ])
+
+    if (!currentUser) {
+      return response.status(404).json({ error: 'User not found' })
+    }
 
     if (!comment) {
-      return res.status(404).json({ error: 'Comment not found' })
+      return response.status(404).json({ error: 'Comment not found' })
     }
 
     // Check if the user has not liked the comment
     if (!comment.likes.includes(userId)) {
-      return res.status(400).json({ error: 'You have not liked this comment' })
+      return response.status(400).json({ error: 'You have not liked this comment' })
     }
 
-    // Add the user's _id to the likes array
+    // Remove the user's _id from the likes array
     comment.likes = comment.likes.filter((like) => !like.equals(userId))
     await comment.save()
 
-    res.status(200).json({ message: 'Like removed successfully' })
+    response.status(200).json({ message: 'Like removed successfully' })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to remove like' })
+    next(error)
   }
 }
 
 // Dislike a comment
-const dislikeComment = async (req, res) => {
-  const { commentId, userId } = req.body
-
+const dislikeComment = async (request, response, next) => {
   try {
+    const { commentId, userId } = request.body
+
     // Find the comment to be disliked
-    const comment = await Comment.findById(commentId)
+    const userIdObject = new mongoose.Types.ObjectId(userId)
+
+    const [currentUser, comment] = await Promise.all([
+      User.findById(userIdObject),
+      Comment.findById(commentId),
+    ])
+
+    if (!currentUser) {
+      return response.status(404).json({ error: 'User not found' })
+    }
 
     if (!comment) {
-      return res.status(404).json({ error: 'Comment not found' })
+      return response.status(404).json({ error: 'Comment not found' })
     }
 
     // Check if the user has already disliked the comment
     if (comment.dislikes.includes(userId)) {
-      return res.status(400).json({ error: 'You have already disliked this comment' })
+      return response.status(400).json({ error: 'You have already disliked this comment' })
     }
 
     // Add the user's _id to the dislikes array
     comment.dislikes.push(userId)
     await comment.save()
 
-    res.status(200).json({ message: 'Comment disliked successfully' })
+    response.status(200).json({ message: 'Comment disliked successfully' })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to dislike the comment' })
+    next(error)
   }
 }
 
 // Remove dislike
-const removeDislikeComment = async (req, res) => {
-  const { commentId, userId } = req.body
-
+const removeDislikeComment = async (request, response, next) => {
   try {
-    // Find the comment to be disliked
-    const comment = await Comment.findById(commentId)
+    const { commentId, userId } = request.body
+
+    const userIdObject = new mongoose.Types.ObjectId(userId)
+
+    const [currentUser, comment] = await Promise.all([
+      User.findById(userIdObject),
+      Comment.findById(commentId),
+    ])
+
+    if (!currentUser) {
+      return response.status(404).json({ error: 'User not found' })
+    }
 
     if (!comment) {
-      return res.status(404).json({ error: 'Comment not found' })
+      return response.status(404).json({ error: 'Comment not found' })
     }
 
     // Check if the user has not disliked the comment
     if (!comment.dislikes.includes(userId)) {
-      return res.status(400).json({ error: 'You have not disliked this comment' })
+      return response.status(400).json({ error: 'You have not disliked this comment' })
     }
 
-    // Add the user's _id to the likes array
+    // Remove the user's _id from the dislikes array
     comment.dislikes = comment.dislikes.filter((dislike) => !dislike.equals(userId))
     await comment.save()
 
-    res.status(200).json({ message: 'Dislike removed successfully' })
+    response.status(200).json({ message: 'Dislike removed successfully' })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to remove dislike' })
+    next(error)
   }
 }
 
-const editComment = async (req, res) => {
-  const { userId, commentId, text } = req.body
-
+const editComment = async (request, response, next) => {
   try {
-    // Find the comment to be edited
-    const comment = await Comment.findById(commentId)
-
-    if (!comment) {
-      return res.status(404).json({ error: 'Comment not found' })
-    }
+    const { userId, commentId, text } = request.body
 
     const userIdObject = new mongoose.Types.ObjectId(userId)
+
+    const [currentUser, comment] = await Promise.all([
+      User.findById(userIdObject),
+      Comment.findById(commentId),
+    ])
+
+    if (!currentUser) {
+      return response.status(404).json({ error: 'User not found' })
+    }
+    if (!comment) {
+      return response.status(404).json({ error: 'Comment not found' })
+    }
+
     if (!comment.user.equals(userIdObject)) {
-      return res.status(404).json({ error: 'Editing comment is not allowed' })
+      return response.status(403).json({ error: 'Editing comment is not allowed' })
     }
 
     // Update the comment text
     comment.text = text
     await comment.save()
 
-    res.status(200).json({ message: 'Comment edited successfully', updatedComment: comment })
+    response.status(200).json({ message: 'Comment edited successfully', updatedComment: comment })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to edit the comment' })
+    next(error)
   }
 }
 

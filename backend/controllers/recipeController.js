@@ -2,33 +2,24 @@ import { Recipe } from '../models/recipe.js'
 import config from '../utils/config.js'
 import axios from 'axios'
 
-
-const getRecipes = async (request, response) => {
+//get recipes by params
+const getRecipes = async (request, response, next) => {
   console.log('you are in getrecipes')
 
   try {
-    const searchTerm = request.query.search
-    // calories, time, same with every nutrien,... MIN+, MIN-MAX, MAX (string)
-    const calories = request.query.calories
-    const time = request.query.time
-    const ingr = request.query.ingr
+    const { search: searchTerm, calories, time, ingr, nutrients,
+      healthFilters = [], mealTypeOptions = [], excludedFilters = [] } = request.query
 
-    let nutrients = []
-    const payload = JSON.parse(request.query.nutrients)
-    console.log(payload)
-    if(payload){
-      nutrients = Object.entries(payload).reduce((acc, [key, value]) => {
+    // parseing nutrients to return format MIN+, MIN-MAX, MAX (string)
+    let nutrientsData = []
+    if(nutrients){
+      nutrientsData = Object.entries(JSON.parse(nutrients)).reduce((acc, [key, value]) => {
         if (value !== ''){
           acc[key] = value
         }
         return acc
       }, {})
     }
-
-    //['vegetarian', 'kosher']
-    let healthFilters = request.query.healthFilters || []
-    let mealTypeOptions = request.query.mealTypes || []
-    let excludedFilters = request.query.excludedChipArray || []
 
     const params = {
       type: 'public',
@@ -50,12 +41,10 @@ const getRecipes = async (request, response) => {
     }
 
     let nutrientString = ''
-    if (nutrients) {
-      if (Object.keys(nutrients).length > 0) {
-        nutrientString = Object.keys(nutrients)
-          .map((key) => `&${encodeURIComponent('nutrients[' + key + ']')}=${encodeURIComponent(nutrients[key])}`)
-          .join('')
-      }
+    if (nutrientsData && Object.keys(nutrientsData).length > 0) {
+      nutrientString = Object.keys(nutrientsData)
+        .map((key) => `&${encodeURIComponent('nutrients[' + key + ']')}=${encodeURIComponent(nutrientsData[key])}`)
+        .join('')
     }
 
     let excludedString = ''
@@ -83,11 +72,12 @@ const getRecipes = async (request, response) => {
     const recipes = apiResponse.data
     response.status(200).json(recipes)
   } catch (error) {
-    console.error(error)
+    next(error)
   }
 }
 
-const getLink = async (request, response) => {
+//get data from link
+const getLink = async (request, response, next) => {
   try {
     const searchTerm = request.query.link
     console.log(searchTerm)
@@ -96,11 +86,12 @@ const getLink = async (request, response) => {
     const recipes = apiResponse.data
     response.status(200).json(recipes)
   } catch (error) {
-    console.error(error)
+    next(error)
   }
 }
 
-const getRecipe = async (request, response) => {
+//Get recipe by id
+const getRecipe = async (request, response, next) => {
   try {
     const { id } = request.query
     console.log(id)
@@ -114,12 +105,12 @@ const getRecipe = async (request, response) => {
 
     const url = `https://api.edamam.com/api/recipes/v2/${recipeId}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
     console.log(url)
+
     const apiResponse = await axios.get(url)
-    console.log(url)
     const recipe = apiResponse.data
     response.status(200).json(recipe)
   } catch (error) {
-    console.error(error)
+    next(error)
   }
 }
 

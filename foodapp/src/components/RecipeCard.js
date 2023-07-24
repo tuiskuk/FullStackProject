@@ -7,7 +7,7 @@ const RecipeCard = ({ recipe }) => {
   let favoriteRecipe = null
   let isLoading = false
   let isFetching = false
-  console.log(recipe)
+  //console.log(recipe)
 
   try {
     recipe_id =  recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1)
@@ -21,7 +21,7 @@ const RecipeCard = ({ recipe }) => {
   }
 
   const displayedRecipe = favoriteRecipe?.recipe || recipe
-  console.log(displayedRecipe)
+  //console.log(displayedRecipe)
 
   const handleRecipeClick = () => {
     try {
