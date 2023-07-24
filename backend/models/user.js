@@ -48,8 +48,8 @@ const userSchema = new mongoose.Schema({
     default: null // Set a default value if the user doesn't have a profile image
   },
   profileText: {
-    type: String, // Store the file name or path of the profile image
-    default: null // Set a default value if the user doesn't have a profile image
+    type: String,
+    default: null
   },
   passwordHash: String,
   followers: [
@@ -67,14 +67,32 @@ const userSchema = new mongoose.Schema({
     }
   ],
   favorites: [
-    { recipeId: String }
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe',
+      default: null
+    }
   ],
   likes: [
-    { recipeId: String }
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe',
+      default: null
+    }
   ],
   dislikes: [
-    { recipeId: String }
-  ]
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe',
+      default: null
+    }
+  ],
+  comments: [
+    {
+      commentId: String,
+      recipeId: String,
+    }
+  ],
 })
 
 userSchema.set('toJSON', {
@@ -86,7 +104,5 @@ userSchema.set('toJSON', {
     delete returnedObject.passwordHash
   }
 })
-
-
 
 export const User = mongoose.model('User', userSchema)

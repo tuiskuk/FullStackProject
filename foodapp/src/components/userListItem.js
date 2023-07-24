@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Typography, Tooltip } from '@mui/material'
+import { Avatar, Box, Typography, Tooltip } from '@mui/material'
 import { Link } from 'react-router-dom'
 const UserListItem = ({ user }) => {
   return (
@@ -20,10 +20,15 @@ const UserListItem = ({ user }) => {
       }}
     >
       <Tooltip title={`${user?.name} (${user?.followers?.length} followers)`} arrow>
-        <Avatar src={user?.avatar} sx={{ width: 40, height: 40, marginRight: 2 }} />
+        <Avatar src={user?.profileImage} sx={{ width: 40, height: 40, marginRight: 2 }} />
       </Tooltip>
       <Box>
-        <Link to={`/users/${user?.id}`} style={{ textDecoration: 'none' }}>
+        <Link to={`/users/${user?.id}`} style={{
+          textDecoration: 'none',
+          '&:hover': {
+            color: 'red',
+          },
+        }}>
           <Typography variant="subtitle2" marginRight={1} fontWeight="bold">
             {user?.username}
           </Typography>
@@ -33,20 +38,6 @@ const UserListItem = ({ user }) => {
         </Typography>
       </Box>
       <Box flexGrow={1} />
-      <Button
-        variant="contained"
-        color={user.isFollowing ? 'secondary' : 'primary'}
-        size="small"
-        disableElevation
-        disableRipple
-        sx={{
-          '&:hover': {
-            backgroundColor: user.isFollowing ? '#E57373' : '#64B5F6',
-          },
-        }}
-      >
-        {user.isFollowing ? 'Unfollow' : 'Follow'}
-      </Button>
     </Box>
   )
 }

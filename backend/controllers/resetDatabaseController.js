@@ -3,8 +3,9 @@ import { UserRecipe } from '../models/useCreatedreceipe.js'
 
 async function resetDatabase(request, response) {
   try {
-  // Delete all records from the User collection
+    // Delete all records from the User collection
     await User.deleteMany({})
+
     // Delete all records from the UserRecipe collection
     await UserRecipe.deleteMany({})
 

@@ -7,17 +7,21 @@ const RecipeCard = ({ recipe }) => {
   let favoriteRecipe = null
   let isLoading = false
   let isFetching = false
+  console.log(recipe)
 
   try {
     recipe_id =  recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1)
   } catch (e) {
-    const query = useGetRecipeQuery(recipe.recipeId)
+    const query = useGetRecipeQuery(recipe)
     favoriteRecipe = query.data
+    console.log(query)
+    console.log(favoriteRecipe)
     isLoading = query.isLoading
     isFetching = query.isFetching
   }
 
   const displayedRecipe = favoriteRecipe?.recipe || recipe
+  console.log(displayedRecipe)
 
   const handleRecipeClick = () => {
     try {
@@ -34,7 +38,7 @@ const RecipeCard = ({ recipe }) => {
       {isLoading || isFetching ? (
         <CircularProgress /> // Render the loading spinner when loading is true
       ) : (
-        <Link to={`/recipes/${recipe_id || recipe.recipeId}`} onClick={handleRecipeClick} style={{ textDecoration: 'none' }}>
+        <Link to={`/recipes/${recipe_id || displayedRecipe?.uri?.split('_').pop()}`} onClick={handleRecipeClick} style={{ textDecoration: 'none' }}>
           <Card sx={{ maxWidth: 200 }}>
             <CardActionArea>
               <CardMedia

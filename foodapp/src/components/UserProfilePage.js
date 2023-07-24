@@ -11,19 +11,16 @@ import {
   DialogContent,
   DialogActions,
   Box,
-  Popover
+  Popover,
+  Input
 } from '@mui/material'
-
-
-
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useUpdateUserMutation } from '../services/userApiSlice'
+import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSlice'
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
-import { useGetAllDislikesQuery } from '../services/dislikeSlice'
-import { useGetAllLikesQuery } from '../services/likeSlice'
 
 import RecipeCard from './RecipeCard'
 import UserListItem from './userListItem'
@@ -38,25 +35,25 @@ const UserProfile = () => {
   const [followersListVisible, setFollowersListVisible] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [newUsername, setNewUsername] = useState('')
+  const [newProfilPicture, setNewProfilPicture] = useState(null)
   const [editProfileVisible, setEditProfileVisible] = useState(false)
   const [selectedOption, setSelectedOption] = useState('favorites')
   const postCount = 0
   const user = useSelector(selectCurrentUser)
   const [ updateUser ] = useUpdateUserMutation()
-  console.log(user?.id)
+  const [uploadProfilePicture] = useUploadProfilePictureMutation()
+
   const userId = user?.id
-  const { data: favoritesData } = useGetAllFavoritesQuery({ userId })
   const { data: followingData, refetch: refetchFollowing } = useGetAllFollowingQuery({ userId })
   const { data: followersData, refetch: refetchFollowers } = useGetAllFollowersQuery({ userId })
-  console.log(followersData)
+
   const followers = followersData?.followers
   const following = followingData?.following
-  const { data: dislikesData } = useGetAllDislikesQuery({ userId })
-  const { data: likesData } = useGetAllLikesQuery({ userId })
-  console.log(followers)
-  console.log(following?.following)
-  console.log(favoritesData)
-  console.log(following)
+  const dislikesData = null
+  const likesData = null
+  const { data: favoritesData } = useGetAllFavoritesQuery(
+    { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
+  //TODO: dislikesData, LikesData, favoritesData, commentsData
   const dispatch = useDispatch()
   const followingCount = following?.length
   const followersCount = followers?.length
@@ -74,20 +71,39 @@ const UserProfile = () => {
     refetchFollowers()
   }, [user])
 
-  const handleUpdateProfile = () => {
+  const handleUpdateProfile = async () => {
     if(!user) return
-    console.log(user?.id)
-    // Handle updating profile logic
-    const updatedUser = {
-      ...user,
-      profileText: profileDescription,
-      password: newPassword,
-      username: newUsername,
+
+    let updatedProfilePicture = null
+    let updatedUser = null
+    if(newProfilPicture !== null) {
+      const response = await uploadProfilePicture({ file: newProfilPicture, id: user?.id })
+      updatedProfilePicture = response.data.profileImage
+      updatedUser = {
+        ...user,
+        profileImage: updatedProfilePicture,
+        profileText: profileDescription,
+        password: newPassword,
+        username: newUsername,
+      }
+    } else {
+      updatedUser = {
+        ...user,
+        profileText: profileDescription,
+        password: newPassword,
+        username: newUsername,
+      }
     }
-    console.log(updatedUser)
-    updateUser({ id: user?.id, user: updatedUser }).unwrap()
+
+
+    await updateUser({ id: user?.id, user: updatedUser }).unwrap()
     dispatch(setUser({ user: updatedUser }))
-    console.log(user)
+    setNewProfilPicture(null)
+  }
+
+  const handleFileChange = (event) => {
+    const ProfilePicture = event.target.files[0]
+    setNewProfilPicture(ProfilePicture)
   }
 
   const handleClickFollowing = (event) => {
@@ -216,6 +232,14 @@ const UserProfile = () => {
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   fullWidth
+                />
+              </Grid>
+              <Grid   container direction="column" alignItems="center" justifyContent="center">
+                <Typography variant="h6"> new profile picture</Typography>
+                <Input
+                  type="file"
+                  name="profilePicture"
+                  onChange={handleFileChange}
                 />
               </Grid>
             </Grid>

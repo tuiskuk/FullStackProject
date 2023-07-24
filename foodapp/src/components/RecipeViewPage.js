@@ -1,4 +1,4 @@
-import  { Card, CardContent, CardMedia, Typography, Grid, IconButton, TextField, InputAdornment, Button, OutlinedInput } from '@mui/material'
+import  { Card, CardContent, CardMedia, Typography, Grid, IconButton, TextField, InputAdornment } from '@mui/material'
 import { useEffect, useState } from 'react'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
@@ -8,13 +8,11 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
-import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetFavoriteQuery } from '../services/favoriteSlice'
-import { useAddLikeMutation, useRemoveLikeMutation, useGetLikeQuery } from '../services/likeSlice'
-import { useAddDislikeMutation, useRemoveDislikeMutation, useGetDislikeQuery } from '../services/dislikeSlice'
+import CommentSection from './CommentSectionComponent'
+import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation,
   useAddDislikeInteractionMutation, useRemoveDislikeInteractionMutation,
   useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
-
 
 import { useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
@@ -25,52 +23,10 @@ const RecipeViewPage = () => {
   const { recipeId } = useParams()
   const user = useSelector(selectCurrentUser)
   const userId = user?.id
-
   const [recipe, setRecipe] = useState({})
   const label = recipe.label
   const image = recipe.image
   const [multiplier, setMultiplier] = useState(recipe.yield || 1)
-  const [userComment, setUserComment] = useState('')
-  const [comments, setComments] = useState([])
-
-  const [ addFavorite ] = useAddFavoriteMutation()
-  const { data: favoriteData, refetch: refetchFavorite } = useGetFavoriteQuery(
-    { userId, recipeId },
-    { skip: !userId || !recipeId, refetchOnMountOrArgChange: true }
-  )
-
-  const hasFavorited = Boolean(favoriteData)
-  const [ removeFavorite ] = useRemoveFavoriteMutation({
-    onSettled: () => {
-      refetchFavorite() // Manually refetch the data after mutation is complete
-    },
-  })
-
-  const [ addLike ] = useAddLikeMutation()
-  const { data: likeData, refetch: refetchLike } = useGetLikeQuery(
-    { userId, recipeId },
-    { skip: !userId || !recipeId, refetchOnMountOrArgChange: true }
-  )
-
-  const isLiked = Boolean(likeData)
-  const [ removeLike ] = useRemoveLikeMutation({
-    onSettled: () => {
-      refetchLike() // Manually refetch the data after removing like
-    },
-  })
-
-  const [ addDislike ] = useAddDislikeMutation()
-  const { data: dislikeData, refetch: refetchDislike } = useGetDislikeQuery(
-    { userId, recipeId },
-    { skip: !userId || !recipeId, refetchOnMountOrArgChange: true }
-  )
-
-  const isDisliked = Boolean(dislikeData)
-  const [ removeDislike ] = useRemoveDislikeMutation({
-    onSettled: () => {
-      refetchDislike() // Manually refetch the data after removing dislike
-    },
-  })
 
   useEffect(() => {
     const savedRecipe = sessionStorage.getItem('recipe')
@@ -79,19 +35,30 @@ const RecipeViewPage = () => {
     setMultiplier(parsedRecipe?.yield || 1)
   }, [])
 
+
   const [ addLikeInteraction ] = useAddLikeInteractionMutation()
   const [ removeLikeInteraction ] = useRemoveLikeInteractionMutation()
   const [ addDislikeInteraction ] = useAddDislikeInteractionMutation()
   const [ removeDislikeInteraction ] = useRemoveDislikeInteractionMutation()
-  const { data: interactionData } = useGetAllInteractionsQuery({ recipeId })
+  const [ addFavorite ] = useAddFavoriteMutation()
+  const [ removeFavorite ] = useRemoveFavoriteMutation()
+  const { data: interactionData } = useGetAllInteractionsQuery(
+    { recipeId }, { skip: !recipeId, refetchOnMountOrArgChange: true })
+  const { data: favoriteData, refetch } = useGetAllFavoritesQuery(
+    { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
   const [ createInteraction ] = useCreateInteractionMutation()
 
+  //can search also from user
+  const isLiked = Boolean(interactionData?.recipe?.likes.some((user) => user === userId))
+  const isDisliked = Boolean(interactionData?.recipe?.dislikes.some((user) => user === userId))
+
+  const isFavorite = Boolean(favoriteData?.favorites?.some((recip) => recip === interactionData?.recipe.id))
   const handleLike = async () => {
     console.log(recipeId)
 
     if(!interactionData){
       try {
-        await createInteraction({ recipeId })
+        await createInteraction({ recipeId, label, image })
         console.log('create')
       } catch (error) {
         console.error('Failed to create interaction: ', error)
@@ -100,13 +67,11 @@ const RecipeViewPage = () => {
 
     if (!isLiked) {
       try {
-        await addLike({ userId, recipeId, label, image })
         await addLikeInteraction({ recipeId, userId })
 
         //if recipe was disliked, remove it from dislikes
         if (isDisliked) {
           try {
-            await removeDislike({ userId, recipeId })
             await removeDislikeInteraction({ recipeId, userId })
           } catch (error) {
             console.error('Failed to remove dislike: ', error)
@@ -119,7 +84,6 @@ const RecipeViewPage = () => {
 
     if (isLiked){
       try {
-        await removeLike({ userId, recipeId })
         await removeLikeInteraction({ recipeId, userId })
       } catch (error) {
         console.error('Failed to remove like: ', error)
@@ -132,7 +96,7 @@ const RecipeViewPage = () => {
 
     if(!interactionData){
       try {
-        await createInteraction({ recipeId })
+        await createInteraction({ recipeId, label, image })
         console.log('create')
       } catch (error) {
         console.error('Failed to create interaction: ', error)
@@ -141,13 +105,11 @@ const RecipeViewPage = () => {
 
     if (!isDisliked) {
       try {
-        await addDislike({ userId, recipeId, label, image }).unwrap()
         await addDislikeInteraction({ recipeId, userId })
 
         // If the recipe was liked, remove it from likes
         if (isLiked) {
           try {
-            await removeLike({ userId, recipeId })
             await removeLikeInteraction({ recipeId, userId })
           } catch (error) {
             console.error('Failed to remove like: ', error)
@@ -160,7 +122,6 @@ const RecipeViewPage = () => {
 
     if (isDisliked){
       try {
-        await removeDislike({ userId, recipeId })
         await removeDislikeInteraction({ recipeId, userId })
       } catch (error) {
         console.error('Failed to remove dislike: ', error)
@@ -170,17 +131,28 @@ const RecipeViewPage = () => {
 
   const handleFavorite = async () => {
     console.log(recipeId)
-    if (!hasFavorited) {
+    if (!isFavorite) {
+      if(!interactionData){
+        try {
+          await createInteraction({ recipeId, label, image })
+          console.log('create')
+        } catch (error) {
+          console.error('Failed to create interaction: ', error)
+        }
+      }
+
       try {
-        await addFavorite({ userId, recipeId, label, image }).unwrap()
+        await addFavorite({ userId, recipeId })
+        refetch()
       } catch (err) {
         console.error('Failed to add favorite: ', err)
       }
     }
 
-    if(hasFavorited){
+    if(isFavorite){
       try {
         await removeFavorite({ userId, recipeId })
+        refetch()
       } catch (err) {
         console.error('Failed to remove favorite: ', err)
       }
@@ -208,12 +180,6 @@ const RecipeViewPage = () => {
   //regex pattern
   const pattern = /^\d+\s?\d*\/?\d*\s/
 
-  const handleSubmitComment = () => {
-    if (userComment.trim() !== '') {
-      setComments([...comments, userComment])
-      setUserComment('')
-    }
-  }
 
   return (
     <Grid container spacing={2}>
@@ -238,7 +204,7 @@ const RecipeViewPage = () => {
                   <Grid container direction="column" alignItems="flex-end">
                     <Grid item>
                       <IconButton onClick={handleFavorite} aria-label="Favorite">
-                        {hasFavorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                        {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                       </IconButton>
                     </Grid>
                     <Grid item style={{ display: 'flex', alignItems: 'center' }}>
@@ -370,64 +336,9 @@ const RecipeViewPage = () => {
         </Grid>
       )}
 
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Comments:</Typography>
-            <br></br>
-            {comments.map((comment, index) => (
-              <Typography
-                key={index}
-                variant="body1"
-                style={{
-                  border: '1px solid #bdbdbd',
-                  borderRadius: '4px',
-                  padding: '10px 14px', // Adjust padding to match the OutlinedInput
-                  marginBottom: '8px',
-                  minHeight: '38px',
-                  height: 'auto',
-                  display: 'flex', // To center the text vertically
-                  alignItems: 'center',
-                  wordWrap: 'break-word',
-                }}
-              >
-                {comment}
-              </Typography>
-            ))}
-          </CardContent>
-        </Card>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Comment recipe</Typography>
-            <br></br>
-            <OutlinedInput
-              multiline
-              fullWidth
-              placeholder="Add your comment"
-              value={userComment}
-              onChange={(event) => setUserComment(event.target.value)}
-              endAdornment={
-                <InputAdornment position="end">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmitComment}
-                  >
-                    Add
-                  </Button>
-                </InputAdornment>
-              }
-            />
-          </CardContent>
-        </Card>
-      </Grid>
+      <CommentSection recipeId={recipeId} userId={userId} interactionData={interactionData} label={label} image={image} />
     </Grid>
   )
-
-
 }
 
 export default RecipeViewPage

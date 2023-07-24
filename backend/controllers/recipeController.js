@@ -1,3 +1,4 @@
+import { Recipe } from '../models/recipe.js'
 import config from '../utils/config.js'
 import axios from 'axios'
 
@@ -101,10 +102,17 @@ const getLink = async (request, response) => {
 
 const getRecipe = async (request, response) => {
   try {
-    const id = request.query.id
+    const { id } = request.query
     console.log(id)
 
-    const url = `https://api.edamam.com/api/recipes/v2/${id}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
+    const foundRecipe = await Recipe.findById(id)
+
+    if (!foundRecipe) {
+      return response.status(404).json({ error: 'Recipe not found' })
+    }
+    const recipeId = foundRecipe.recipeId
+
+    const url = `https://api.edamam.com/api/recipes/v2/${recipeId}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
     console.log(url)
     const apiResponse = await axios.get(url)
     console.log(url)

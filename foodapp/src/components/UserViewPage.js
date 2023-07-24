@@ -12,38 +12,27 @@ import UserListItem from './userListItem'
 const UserViewPage = () => {
 
   const { id } = useParams()
-  console.log(id)
+  const [selectedOption, setSelectedOption] = useState('favorites')
   const dispatch = useDispatch()
   const currentUser = useSelector(selectCurrentUser)
-  console.log(currentUser)
   const currentUserId = currentUser?.id
   const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(currentUserId)
   const { data: targetUser, isLoading, refetch } = useGetUserQuery(id)
   const targetUserId = id
+  const currentUserIsTarget = currentUserId === targetUserId ? true : false
   const [ follow, { isLoading: isFollowMutateLoading } ] = useFollowMutation()
   const [ unfollow, { isLoading: isUnfollowMutateLoading } ] = useUnfollowMutation()
-  console.log(targetUserId)
   const { data: followersData } = useGetAllFollowersQuery({ userId: targetUserId })
   const { data: followingData } = useGetAllFollowingQuery({ userId: targetUserId })
   const isFollowing = Boolean(userCurrent?.following.includes(targetUserId))
-  console.log(userCurrent)
-  console.log(isFollowing)
-  console.log(targetUserId, targetUser)
   const [anchorEl, setAnchorEl] = useState(null)
   const [followingListVisible, setFollowingListVisible] = useState(false)
   const [anchorElFollowers, setAnchorElFollowers] = useState(null)
   const [followersListVisible, setFollowersListVisible] = useState(false)
-  const selectedOption = 'favorites'
   const postCount = 0
   const followers = followersData?.followers
   const following = followingData?.following
   const favorites = targetUser?.favorites
-  console.log(followersData)
-  console.log(followingData)
-  console.log(followers)
-
-
-  console.log(following)
   const followingCount = following?.length
   const followersCount = followers?.length
 
@@ -66,7 +55,6 @@ const UserViewPage = () => {
       refetch() // Manually refetch the data after mutation is complete
       const updatedUser = await refetchCurrent().unwrap() // Get the updated user data
       dispatch(setUser({ user: updatedUser }))
-      console.log(updatedUser)
     }
   }
 
@@ -103,12 +91,12 @@ const UserViewPage = () => {
         </Grid>
         <Grid item xs={12}>
           <Typography variant="h5">{targetUser?.username}</Typography>
-          {userCurrent &&
+          {userCurrent && !currentUserIsTarget &&
             <Button
               variant={isFollowing ? 'outlined' : 'contained'}
               onClick={isFollowing ? handleUnfollow : handleFollow}
             >
-              {isFollowing ? 'Unfollow' : 'Follow'}
+              {isFollowing ? 'Unfollow' :  'Follow'}
             </Button>
           }
 
@@ -137,10 +125,10 @@ const UserViewPage = () => {
             disablePortal
           >
             <Box p={2} minWidth={200}>
-              {followers ? (
+              {followers?.length > 0 ? (
                 followers.map((user) => <UserListItem key={user.id} user={user} />)
               ) : (
-                <Typography>Loading...</Typography>
+                <Typography>No followers.</Typography>
               )}
             </Box>
           </Popover>
@@ -168,10 +156,10 @@ const UserViewPage = () => {
             disablePortal
           >
             <Box p={2} minWidth={200}>
-              {following ? (
+              {following?.length > 0 ? (
                 following.map((user) => <UserListItem key={user.id} user={user} />)
               ) : (
-                <Typography>Loading...</Typography>
+                <Typography>Not following anyone.</Typography>
               )}
             </Box>
           </Popover>
@@ -184,7 +172,7 @@ const UserViewPage = () => {
         <Grid item>
           <Button
             variant={selectedOption === 'favorites' ? 'contained' : 'outlined'}
-            sx={{ textTransform: 'none' }}
+            onClick={() => setSelectedOption('favorites')}
           >
             Favorites
           </Button>
@@ -192,17 +180,33 @@ const UserViewPage = () => {
         <Grid item>
           <Button
             variant={selectedOption === 'myRecipes' ? 'contained' : 'outlined'}
-            sx={{ textTransform: 'none' }}
+            onClick={() => setSelectedOption('myRecipes')}
           >
-            My Recipes
+            {currentUserIsTarget ? 'My Recipes' : 'Their recipes'}
           </Button>
         </Grid>
         <Grid item>
           <Button
             variant={selectedOption === 'comments' ? 'contained' : 'outlined'}
-            sx={{ textTransform: 'none' }}
+            onClick={() => setSelectedOption('comments')}
           >
             Comments
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant={selectedOption === 'likes' ? 'contained' : 'outlined'}
+            onClick={() => setSelectedOption('likes')}
+          >
+            Likes
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant={selectedOption === 'dislikes' ? 'contained' : 'outlined'}
+            onClick={() => setSelectedOption('dislikes')}
+          >
+            Dislikes
           </Button>
         </Grid>
       </Grid>
