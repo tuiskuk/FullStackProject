@@ -48,7 +48,8 @@ const SearchPage = () => {
     mealTypeOptionTerms: mealTypeOptionTerms || [],
     excludedChipArrayTerms: excludedChipArrayTerms || []
   })
-  const { data: NextPageData } = useGetNextPageQuery(nextPageLink)
+  const { data: NextPageData } = useGetNextPageQuery(
+    nextPageLink, { skip: !nextPageLink, refetchOnMountOrArgChange: true })
 
   useEffect(() => {
     searchRecipes()
@@ -329,34 +330,26 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
 
   useEffect(() => {
     analyze()
-  }, [value])
+  }, [])
 
   useEffect(() => {
-    if (!value || value === '') {
-      setMinValue('')
-      setMaxValue('')
-    }
-  }, [value])
-
-  useEffect(() => {
-    if (minValue || maxValue) {
-      handleParse()
-    }
+    handleParse()
   }, [minValue, maxValue])
 
   const handleMinValueChange = (event) => {
     const valueMin = event.target.value
     const newValue = parseInt(valueMin)
-
-    if (valueMin === '0' || isNaN(newValue)){
+    if (valueMin === '0'){
       setMinValue('')
     } else {
       if (newValue <= maxValue || !maxValue) {
-        setMinValue(newValue)
+        setMinValue(valueMin)
       } else {
         if (newValue >= minValue) {
-          setMaxValue(newValue)
-          setMinValue(newValue)
+          setMaxValue(valueMin)
+          setMinValue(valueMin)
+        } else {
+          setMinValue('')
         }
       }
     }
@@ -366,11 +359,11 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) =
     const valueMax = event.target.value
     const newValue = parseInt(valueMax)
 
-    if (valueMax === '0' || isNaN(newValue)){
+    if (valueMax === '0'){
       setMaxValue('')
-    }else {
+    } else {
       if (newValue >= minValue || !minValue) {
-        setMaxValue(newValue)
+        setMaxValue(valueMax)
       } else {
         if (newValue < maxValue) {
           setMaxValue('')
