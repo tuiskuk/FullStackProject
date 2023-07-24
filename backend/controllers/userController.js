@@ -6,7 +6,6 @@ import { Recipe } from '../models/recipe.js'
 
 const getUser = async (request, response, next) => {
   try {
-    console.log(request.params)
     const { userId } = request.params
     const user = await User.findById(userId)
 
@@ -47,14 +46,10 @@ const createUser = async (request, response, next) => {
   try {
     const { username, name, email, profileText, password, isEmailConfirmed } = request.body
     const profileimage = request.file ? request.file.path : null
-    console.log(profileimage)
 
-    console.log(password)
     if(!password) {
       throw errorCreator('Path `password` is required.' , 'ValidationError' )
     }
-
-    console.log('are we alive')
 
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
@@ -88,7 +83,6 @@ const updateUser = async (request, response, next) => {
   try {
     const { userId } = request.params
     const { password, profileText, profileImage, favorites, likes, dislikes, isEmailConfirmed, username } = request.body
-    console.log(userId)
 
     if (!isEmailConfirmed && !password && !profileText && !profileImage && !favorites && !likes && !dislikes && !username) {
       return response.status(400).json({ error: 'something to modify must be provided' })
@@ -217,7 +211,6 @@ const getAllFollowers = async (request, response, next) => {
 
     // Find the user by userId and populate the 'followers' field with User objects
     const user = await User.findById(userId).populate('followers')
-
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
     }
@@ -251,20 +244,20 @@ const addFollow = async (request, response, next) => {
   try {
     const { currentUserId, targetUserId } = request.body
 
-    // Find the current user and the target user
     const currentUserIdObj = new mongoose.Types.ObjectId(currentUserId)
     const targetUserIdObj = new mongoose.Types.ObjectId(targetUserId)
-    const currentUser = await User.findById(currentUserIdObj)
-    const targetUser = await User.findById(targetUserIdObj)
 
-    // If either user is not found, return a 404 response with an error message
+    const [currentUser, targetUser] = await Promise.all([
+      User.findById(currentUserIdObj),
+      User.findById(targetUserIdObj),
+    ])
+
     if (!currentUser || !targetUser) {
       return response.status(404).json({ error: 'User not found' })
     }
 
     // Check if the target user is already being followed by the current user
     const isAlreadyFollowing = currentUser.following.includes(targetUserId)
-
     if (isAlreadyFollowing) {
       return response.status(400).json({ error: 'User already being followed' })
     }
@@ -287,20 +280,20 @@ const removeFollow = async (request, response, next) => {
   try {
     const { currentUserId, targetUserId } = request.body
 
-    // Find the current user and the target user
     const currentUserIdObj = new mongoose.Types.ObjectId(currentUserId)
     const targetUserIdObj = new mongoose.Types.ObjectId(targetUserId)
-    const currentUser = await User.findById(currentUserIdObj)
-    const targetUser = await User.findById(targetUserIdObj)
 
-    // If either user is not found, return a 404 response with an error message
+    const [currentUser, targetUser] = await Promise.all([
+      User.findById(currentUserIdObj),
+      User.findById(targetUserIdObj),
+    ])
+
     if (!currentUser || !targetUser) {
       return response.status(404).json({ error: 'User not found' })
     }
 
     // Check if the target user is being followed by the current user
     const isFollowing = currentUser.following.includes(targetUserId)
-
     if (!isFollowing) {
       return response.status(400).json({ error: 'User is not being followed' })
     }

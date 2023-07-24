@@ -31,9 +31,13 @@ const addComment = async (request, response, next) => {
     })
     await newComment.save()
 
-    // Find the recipe and push the comment to its comments array
+    // Push the comment to recipe's comments array
     recipe.comments.push(newComment._id)
     await recipe.save()
+
+    // Push the comment to users's comments array
+    currentUser.comments.push(newComment._id)
+    await currentUser.save()
 
     response.status(201).json({ message: 'Comment added successfully' })
   } catch (error) {
@@ -52,6 +56,9 @@ const deleteComment = async (request, response, next) => {
     }
 
     const userIdObject = new mongoose.Types.ObjectId(userId)
+    const user = await User.findById(userIdObject)
+    console.log(user)
+
     if (!comment.user.equals(userIdObject)) {
       return response.status(403).json({ error: 'Deleting comment is not allowed' })
     }
@@ -86,6 +93,12 @@ const deleteComment = async (request, response, next) => {
           { comments: commentId },
           { $pull: { comments: commentId } }
         )
+
+        // Remove the comment from user's comments array
+        console.log(user.comments)
+        user.comments = user.comments.filter((comm) => !comm.equals(commentId))
+
+        await user.save()
       } catch (error) {
         next(error)
       }
@@ -175,6 +188,10 @@ const addReply = async (request, response, next) => {
     // Add the reply's _id to the parent comment's replies array
     parentComment.replies.push(newReply._id)
     await parentComment.save()
+
+    // Push the comment to users's comments array
+    currentUser.comments.push(newReply._id)
+    await currentUser.save()
 
     response.status(201).json({ message: 'Reply added successfully' })
   } catch (error) {
