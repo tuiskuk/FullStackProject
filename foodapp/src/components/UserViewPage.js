@@ -1,5 +1,5 @@
 import { Typography, Grid, Avatar, Button, CircularProgress, Container, Popover, Box } from '@mui/material'
-import { useGetUserQuery } from '../services/userSlice'
+import { useGetUserQuery } from '../services/userApiSlice'
 import { useParams } from 'react-router-dom'
 import { useFollowMutation, useUnfollowMutation, useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
 import { selectCurrentUser, setUser } from '../services/loginSlice'

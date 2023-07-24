@@ -6,7 +6,6 @@ export const followApiSlice = apiSlice.injectEndpoints({
       query: ({ currentUserId, targetUserId  }) => {
         console.log(currentUserId, targetUserId)
         return ({
-
           url: '/users/follow',
           method: 'POST',
           body: { currentUserId, targetUserId  }

@@ -18,10 +18,12 @@ import {
 
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
-import { useUpdateUserMutation } from '../services/userSlice'
+import { useUpdateUserMutation } from '../services/userApiSlice'
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
+import { useGetAllDislikesQuery } from '../services/dislikeSlice'
+import { useGetAllLikesQuery } from '../services/likeSlice'
 
 import RecipeCard from './RecipeCard'
 import UserListItem from './userListItem'
@@ -37,7 +39,7 @@ const UserProfile = () => {
   const [newPassword, setNewPassword] = useState('')
   const [newUsername, setNewUsername] = useState('')
   const [editProfileVisible, setEditProfileVisible] = useState(false)
-  const selectedOption = 'favorites'
+  const [selectedOption, setSelectedOption] = useState('favorites')
   const postCount = 0
   const user = useSelector(selectCurrentUser)
   const [ updateUser ] = useUpdateUserMutation()
@@ -49,6 +51,8 @@ const UserProfile = () => {
   console.log(followersData)
   const followers = followersData?.followers
   const following = followingData?.following
+  const { data: dislikesData } = useGetAllDislikesQuery({ userId })
+  const { data: likesData } = useGetAllLikesQuery({ userId })
   console.log(followers)
   console.log(following?.following)
   console.log(favoritesData)
@@ -223,40 +227,75 @@ const UserProfile = () => {
             </Button>
           </DialogActions>
         </Dialog>
-
-        <Grid container spacing={1} marginTop={1} justifyContent="center">
-          <Grid item>
-            <Button
-              variant={selectedOption === 'favorites' ? 'contained' : 'outlined'}
-              sx={{ textTransform: 'none' }}
-            >
-              Favorites
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant={selectedOption === 'myRecipes' ? 'contained' : 'outlined'}
-              sx={{ textTransform: 'none' }}
-            >
-              My Recipes
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant={selectedOption === 'comments' ? 'contained' : 'outlined'}
-              sx={{ textTransform: 'none' }}
-            >
-              Comments
-            </Button>
-          </Grid>
+      </Grid>
+      <Grid container spacing={1} marginTop={1} justifyContent="center">
+        <Grid item>
+          <Button
+            variant={selectedOption === 'favorites' ? 'contained' : 'outlined'}
+            onClick={() => setSelectedOption('favorites')}
+          >
+            Favorites
+          </Button>
         </Grid>
-        <Grid container spacing={3} marginTop={0.2}>
-          {favoritesData?.favorites?.map((favorite, index) => (
+        <Grid item>
+          <Button
+            variant={selectedOption === 'myRecipes' ? 'contained' : 'outlined'}
+            onClick={() => setSelectedOption('myRecipes')}
+          >
+            My Recipes
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant={selectedOption === 'comments' ? 'contained' : 'outlined'}
+            onClick={() => setSelectedOption('comments')}
+          >
+            Comments
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant={selectedOption === 'likes' ? 'contained' : 'outlined'}
+            onClick={() => setSelectedOption('likes')}
+          >
+            Likes
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant={selectedOption === 'dislikes' ? 'contained' : 'outlined'}
+            onClick={() => setSelectedOption('dislikes')}
+          >
+            Dislikes
+          </Button>
+        </Grid>
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {favoritesData?.favorites?.map((favorite, index) => (
+          selectedOption === 'favorites' && (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={favorite.recipeId} recipe={favorite} />
             </Grid>
-          ))}
-        </Grid>
+          )
+        ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {dislikesData?.dislikes?.map((dislike, index) => (
+          selectedOption === 'dislikes' && (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={dislike.recipeId} recipe={dislike} />
+            </Grid>
+          )
+        ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {likesData?.likes?.map((like, index) => (
+          selectedOption === 'likes' && (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={like.recipeId} recipe={like} />
+            </Grid>
+          )
+        ))}
       </Grid>
     </Container>
   )

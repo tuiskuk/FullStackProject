@@ -1,4 +1,4 @@
-import { useGetUsersQuery } from '../services/userSlice'
+import { useGetUsersQuery } from '../services/userApiSlice'
 import UserCard from './UserCard'
 import MostFollowedUsers from './MostFollowedUsers'
 

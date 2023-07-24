@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'
+/*import dotenv from 'dotenv'
 dotenv.config()
 import mongoose from 'mongoose'
 
@@ -25,4 +25,4 @@ likeSchema.set('toJSON', {
 
 
 
-export const Likes = mongoose.model('Likes', likeSchema)
+export const Likes = mongoose.model('Likes', likeSchema)*/

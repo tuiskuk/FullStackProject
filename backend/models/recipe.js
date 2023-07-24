@@ -7,14 +7,27 @@ const recipeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  label: {
-    type: String,
-    required: true,
-  },
-  image: {
-    type: String,
-    required: true,
-  },
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  ],
+  dislikes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  ],
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  ]
 })
 
 recipeSchema.set('toJSON', {
@@ -24,7 +37,5 @@ recipeSchema.set('toJSON', {
     delete returnedObject.__v
   }
 })
-
-
 
 export const Recipe = mongoose.model('Recipe', recipeSchema)

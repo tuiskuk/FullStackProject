@@ -1,50 +1,50 @@
 import { apiSlice } from './apiSlice'
 
-export const favoriteApiSlice = apiSlice.injectEndpoints({
+export const dislikeApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    addFavorite: builder.mutation({
+    addDislike: builder.mutation({
       query: ({ userId, recipeId, label, image }) => {
         return ({
-          url: '/users/favorites',
+          url: '/users/dislikes',
           method: 'POST',
           body: { userId, recipeId, label, image }
         })
       },
-      invalidatesTags: ['Favorites'],
+      invalidatesTags: ['Dislikes'],
     }),
-    removeFavorite: builder.mutation({
+    removeDislike: builder.mutation({
       query: ({ userId, recipeId }) => ({
-        url: '/users/favorites',
+        url: '/users/dislikes',
         method: 'DELETE',
         body: { userId, recipeId }
       }),
-      invalidatesTags: ['Favorites']
+      invalidatesTags: ['Dislikes']
     }),
-    getFavorite: builder.query({
+    getDislike: builder.query({
       query: ({ userId, recipeId }) => {
         console.log(recipeId)
         return {
-          url: '/users/favorites/favorite',
+          url: '/users/dislikes/dislike',
           params: { userId, recipeId },
         }
       },
-      providesTags: ['Favorites']
+      providesTags: ['Dislikes']
     }),
-    getAllFavorites: builder.query({
+    getAllDislikes: builder.query({
       query: ({ userId }) => {
         return {
-          url: '/users/favorites',
+          url: '/users/dislikes',
           params: { userId },
         }
       },
-      providesTags: ['Favorites']
+      providesTags: ['Dislikes']
     })
   })
 })
 
 export const {
-  useGetAllFavoritesQuery,
-  useAddFavoriteMutation,
-  useRemoveFavoriteMutation,
-  useGetFavoriteQuery
-} = favoriteApiSlice
+  useGetAllDislikesQuery,
+  useAddDislikeMutation,
+  useRemoveDislikeMutation,
+  useGetDislikeQuery
+} = dislikeApiSlice
