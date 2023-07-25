@@ -44,8 +44,8 @@ const userSchema = new mongoose.Schema({
     default: false
   },
   profileImage: {
-    type: String, // Store the file name or path of the profile image
-    default: null // Set a default value if the user doesn't have a profile image
+    type: String,
+    default: null
   },
   profileText: {
     type: String,
@@ -89,8 +89,9 @@ const userSchema = new mongoose.Schema({
   ],
   comments: [
     {
-      commentId: String,
-      recipeId: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+      default: null
     }
   ],
 })

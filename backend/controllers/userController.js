@@ -3,9 +3,9 @@ import bcrypt from 'bcrypt'
 import { sendUserConfirmationEmail, errorCreator } from '../utils/helperFunctions.js'
 import mongoose from 'mongoose'
 import { Recipe } from '../models/recipe.js'
+
 const getUser = async (request, response, next) => {
   try {
-    console.log(request.params)
     const { userId } = request.params
     const user = await User.findById(userId)
 
@@ -19,7 +19,6 @@ const getUser = async (request, response, next) => {
 }
 
 const getUsers = async (request, response, next) => {
-
   try {
     const users = await User.find({})
     response.json(users)
@@ -47,14 +46,10 @@ const createUser = async (request, response, next) => {
   try {
     const { username, name, email, profileText, password, isEmailConfirmed } = request.body
     const profileimage = request.file ? request.file.path : null
-    console.log(profileimage)
 
-    console.log(password)
     if(!password) {
       throw errorCreator('Path `password` is required.' , 'ValidationError' )
     }
-
-    console.log('are we alive')
 
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
@@ -88,7 +83,6 @@ const updateUser = async (request, response, next) => {
   try {
     const { userId } = request.params
     const { password, profileText, profileImage, favorites, likes, dislikes, isEmailConfirmed, username } = request.body
-    console.log(userId)
 
     if (!isEmailConfirmed && !password && !profileText && !profileImage && !favorites && !likes && !dislikes && !username) {
       return response.status(400).json({ error: 'something to modify must be provided' })
@@ -129,160 +123,143 @@ const updateUser = async (request, response, next) => {
   }
 }
 
-const addFavorite = async (req, res) => {
-  const { userId, recipeId } = req.body
-
+const addFavorite = async (request, response, next) => {
   try {
-    const user = await User.findById(userId)
+    const { userId, recipeId } = request.body
+
+    const [user, recipe] = await Promise.all([
+      User.findById(userId),
+      Recipe.findOne({ recipeId }),
+    ])
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      return response.status(404).json({ error: 'User not found' })
     }
 
-    const recipe = await Recipe.findOne({ recipeId })
     if (!recipe) {
-      return res.status(404).json({ error: 'Recipe not found' })
+      return response.status(404).json({ error: 'Recipe not found' })
     }
 
     // Check if the recipe is already in the user's favorites
     const existingFavorite = user.favorites.includes(recipe._id)
     if (existingFavorite) {
-      return res.status(400).json({ error: 'Recipe already favorited' })
+      return response.status(400).json({ error: 'Recipe already favorited' })
     }
 
     // Add the new favorite to the user's favorites array
     user.favorites.push( recipe._id )
-
-    // Save the updated user document
     await user.save()
 
-    res.status(201).json({ message: 'Favorite added' })
+    response.status(201).json({ message: 'Favorite added' })
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const removeFavorite = async (req, res) => {
-  const { userId, recipeId } = req.body
-
+const removeFavorite = async (request, response, next) => {
   try {
-    const user = await User.findById(userId)
+    const { userId, recipeId } = request.body
+
+    const [user, recipe] = await Promise.all([
+      User.findById(userId),
+      Recipe.findOne({ recipeId }),
+    ])
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      return response.status(404).json({ error: 'User not found' })
     }
 
-    const recipe = await Recipe.findOne({ recipeId })
     if (!recipe) {
-      return res.status(404).json({ error: 'Recipe not found' })
+      return response.status(404).json({ error: 'Recipe not found' })
     }
 
+    // Check if the recipe is not in the user's favorites
     const existingFavorite = user.favorites.includes(recipe._id)
     if (!existingFavorite) {
-      return res.status(400).json({ error: 'Recipe has not been favorited' })
+      return response.status(400).json({ error: 'Recipe has not been favorited' })
     }
 
+    // Remove favorite from user's favorites array
     user.favorites = user.favorites.filter((fav) => !fav.equals(recipe._id))
-
-    // Save the updated user document
     await user.save()
 
-    res.status(200).json({ message: 'Favorite removed' })
+    response.status(200).json({ message: 'Favorite removed' })
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const getAllFavorites = async (req, res) => {
+const getAllFavorites = async (request, response, next) => {
   try {
-    const { userId } = req.query
-    console.log(userId)
-
-    // Find the user by userId
+    const { userId } = request.query
     const user = await User.findById(userId)
 
-    // If user is not found, return a 404 response with an error message
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      return response.status(404).json({ error: 'User not found' })
     }
 
     // Return the user's favorites array
-    res.status(200).json({ favorites: user.favorites })
+    response.status(200).json({ favorites: user.favorites })
   } catch (error) {
-    // If any error occurs during the process, handle it and return a 500 response with an error message
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const getAllFollowers = async (req, res) => {
+const getAllFollowers = async (request, response, next) => {
   try {
-    const { userId } = req.query
-    console.log(req.query)
-    console.log('followers', userId)
+    const { userId } = request.query
 
     // Find the user by userId and populate the 'followers' field with User objects
     const user = await User.findById(userId).populate('followers')
-
-    // If user is not found, return a 404 response with an error message
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      return response.status(404).json({ error: 'User not found' })
     }
 
     // Return the followers array with user objects
-    res.status(200).json({ followers: user.followers })
+    response.status(200).json({ followers: user.followers })
   } catch (error) {
-    // If any error occurs during the process, handle it and return a 500 response with an error message
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const getAllFollowing = async (req, res) => {
+const getAllFollowing = async (request, response, next) => {
   try {
-    const { userId } = req.query
-    console.log(req.query)
-    console.log('following', userId)
+    const { userId } = request.query
 
     // Find the user by userId and populate the 'followers' field with User objects
     const user = await User.findById(userId).populate('following')
 
-    // If user is not found, return a 404 response with an error message
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      return response.status(404).json({ error: 'User not found' })
     }
 
     // Return the followers array with user objects
-    res.status(200).json({ following: user.following })
+    response.status(200).json({ following: user.following })
   } catch (error) {
-    // If any error occurs during the process, handle it and return a 500 response with an error message
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const addFollow = async (req, res) => {
+const addFollow = async (request, response, next) => {
   try {
-    const { currentUserId, targetUserId } = req.body
+    const { currentUserId, targetUserId } = request.body
 
-    // Find the current user and the target user
     const currentUserIdObj = new mongoose.Types.ObjectId(currentUserId)
     const targetUserIdObj = new mongoose.Types.ObjectId(targetUserId)
-    const currentUser = await User.findById(currentUserIdObj)
-    const targetUser = await User.findById(targetUserIdObj)
 
-    // If either user is not found, return a 404 response with an error message
+    const [currentUser, targetUser] = await Promise.all([
+      User.findById(currentUserIdObj),
+      User.findById(targetUserIdObj),
+    ])
+
     if (!currentUser || !targetUser) {
-      return res.status(404).json({ error: 'User not found' })
+      return response.status(404).json({ error: 'User not found' })
     }
 
     // Check if the target user is already being followed by the current user
     const isAlreadyFollowing = currentUser.following.includes(targetUserId)
-
     if (isAlreadyFollowing) {
-      return res.status(400).json({ error: 'User already being followed' })
+      return response.status(400).json({ error: 'User already being followed' })
     }
 
     // Update the current user's 'following' array with the target user's ObjectId
@@ -293,34 +270,32 @@ const addFollow = async (req, res) => {
     targetUser.followers.push(currentUserIdObj)
     await targetUser.save()
 
-    res.status(200).json({ message: 'Successfully added follow' })
+    response.status(200).json({ message: 'Successfully added follow' })
   } catch (error) {
-    // If any error occurs during the process, handle it and return a 500 response with an error message
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
-const removeFollow = async (req, res) => {
+const removeFollow = async (request, response, next) => {
   try {
-    const { currentUserId, targetUserId } = req.body
+    const { currentUserId, targetUserId } = request.body
 
-    // Find the current user and the target user
     const currentUserIdObj = new mongoose.Types.ObjectId(currentUserId)
     const targetUserIdObj = new mongoose.Types.ObjectId(targetUserId)
-    const currentUser = await User.findById(currentUserIdObj)
-    const targetUser = await User.findById(targetUserIdObj)
 
-    // If either user is not found, return a 404 response with an error message
+    const [currentUser, targetUser] = await Promise.all([
+      User.findById(currentUserIdObj),
+      User.findById(targetUserIdObj),
+    ])
+
     if (!currentUser || !targetUser) {
-      return res.status(404).json({ error: 'User not found' })
+      return response.status(404).json({ error: 'User not found' })
     }
 
     // Check if the target user is being followed by the current user
     const isFollowing = currentUser.following.includes(targetUserId)
-
     if (!isFollowing) {
-      return res.status(400).json({ error: 'User is not being followed' })
+      return response.status(400).json({ error: 'User is not being followed' })
     }
 
     // Update the current user's 'following' array by removing the target user's ObjectId
@@ -335,11 +310,9 @@ const removeFollow = async (req, res) => {
     )
     await targetUser.save()
 
-    res.status(200).json({ message: 'Successfully removed follow' })
+    response.status(200).json({ message: 'Successfully removed follow' })
   } catch (error) {
-    // If any error occurs during the process, handle it and return a 500 response with an error message
-    console.log(error)
-    res.status(500).json({ error: 'Something went wrong' })
+    next(error)
   }
 }
 
