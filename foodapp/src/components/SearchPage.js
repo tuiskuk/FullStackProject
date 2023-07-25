@@ -36,6 +36,7 @@ const SearchPage = () => {
   const [mealTypeOptionTerms, setMealTypeOptionTerms] = useState([])
 
   const [showNutrients, setShowNutrients] = useState(false)
+  const [clear, setClear] = useState(false)
 
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
@@ -89,7 +90,7 @@ const SearchPage = () => {
     setNutrientInputs([])
     setIngridientsNumber('')
     setMealTypeOptions([])
-
+    setClear(!clear)
     await searchRecipes()
   }
 
@@ -218,6 +219,7 @@ const SearchPage = () => {
             nameUser={'Time'}
             unit={'min'}
             onChange={setTime}
+            clear={clear}
           />
         </FormControl>
 
@@ -246,12 +248,12 @@ const SearchPage = () => {
         </FormControl>
 
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-
           <RangeInputComponent
             value={calories || ''}
             nameUser={'Calories'}
             unit={'kcal'}
             onChange={setCalories}
+            clear={clear}
           />
         </FormControl>
 
@@ -261,6 +263,7 @@ const SearchPage = () => {
             nameUser={'Number of incridients'}
             unit={'pcs'}
             onChange={setIngridientsNumber}
+            clear={clear}
           />
         </FormControl>
       </div>
@@ -274,19 +277,18 @@ const SearchPage = () => {
 
         {showNutrients && (
           <div>
-            {nutrients.map((nutrient) => {
-              return (
-                <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
-                  <RangeInputComponent
-                    value={nutrientInputs[nutrient.backend] || ''}
-                    nameBackend={nutrient.backend}
-                    nameUser={nutrient.user}
-                    unit={nutrient.unit}
-                    onChange={handleNutrientInputChange}
-                  />
-                </FormControl>
-              )
-            })}
+            {nutrients.map((nutrient) => (
+              <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
+                <RangeInputComponent
+                  value={nutrientInputs[nutrient.backend] || ''}
+                  nameBackend={nutrient.backend}
+                  nameUser={nutrient.user}
+                  unit={nutrient.unit}
+                  onChange={handleNutrientInputChange}
+                  clear={clear}
+                />
+              </FormControl>
+            ))}
           </div>
         )}
 
@@ -324,13 +326,18 @@ const SearchPage = () => {
   )
 }
 
-const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange }) => {
+const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, clear }) => {
   const [minValue, setMinValue] = useState('')
   const [maxValue, setMaxValue] = useState('')
 
   useEffect(() => {
+    console.log(value)
     analyze()
   }, [])
+
+  useEffect(() => {
+    analyze()
+  }, [clear])
 
   useEffect(() => {
     handleParse()

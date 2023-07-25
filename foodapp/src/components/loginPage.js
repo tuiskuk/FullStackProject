@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {  selectCurrentUser, setUser } from '../services/loginSlice'
 
 
-const LoginPage = () => {
+const LoginPage = ({ action }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [openSnackbar, setOpenSnackbar] = useState(false)
@@ -47,7 +47,9 @@ const LoginPage = () => {
       dispatch(setUser(loggedInUser))
       setEmail('')
       setPassword('')
-      navigate('/')
+      if(!action) {
+        navigate('/')
+      }
     } catch (error) {
       console.log(error)
     }

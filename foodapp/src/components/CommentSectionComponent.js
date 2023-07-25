@@ -13,6 +13,7 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Link } from 'react-router-dom'
+import WarningDialog from './WarningDialog'
 
 function formatFinnishDate(dateString) {
   const date = dayjs(dateString)
@@ -29,8 +30,14 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
   const [addComment] = useAddCommentMutation()
   const [userComment, setUserComment] = useState('')
   const [ createInteraction ] = useCreateInteractionMutation()
+  const [openWarningDialog, setOpenWarningDialog] = useState(false)
 
   const handleSubmitComment = async () => {
+    if (!userId) {
+      setOpenWarningDialog(true)
+      return
+    }
+
     if (userComment.trim() !== '') {
       console.log(interactionData)
       if(!interactionData) {
@@ -60,6 +67,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
     const [ removeDislikeComment ] = useRemoveDislikeCommentMutation()
     const [ editComment ] = useEditCommentMutation()
     const [ deleteComment ] = useDeleteCommentMutation()
+
     const CommentCard = ({ comment }) => {
       console.log(comment)
       const formattedDate = formatFinnishDate(comment.createdAt)
@@ -71,9 +79,11 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
       const isDisliked = Boolean(comment.dislikes.includes(userId))
 
       const handleReplyToggle = () => {
-        if(!userId) {
-          return console.log('Log in needed')
+        if (!userId) {
+          setOpenWarningDialog(true)
+          return
         }
+
         setShowReply((state) => !state)
         setReply('')
       }
@@ -92,8 +102,9 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
 
       const handleLike = async (commentId) => {
         console.log(commentId)
-        if(!userId) {
-          return console.log('Log in needed')
+        if (!userId) {
+          setOpenWarningDialog(true)
+          return
         }
 
         if (!isLiked) {
@@ -125,8 +136,9 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
 
       const handleDislike = async (commentId) => {
         console.log(commentId)
-        if(!userId) {
-          return console.log('Log in needed')
+        if (!userId) {
+          setOpenWarningDialog(true)
+          return
         }
 
         if(!interactionData){
@@ -353,6 +365,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
                 </InputAdornment>
               }
             />
+            <WarningDialog open={openWarningDialog} onClose={() => setOpenWarningDialog(false)} />
           </CardContent>
         </Card>
       </Grid>

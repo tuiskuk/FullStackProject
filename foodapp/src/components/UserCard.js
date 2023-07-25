@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardActionArea, CardMedia, CardContent, Typography, Button, Box } from '@mui/material'
 import { useFollowMutation, useUnfollowMutation } from '../services/followSlice'
@@ -5,6 +6,7 @@ import { useGetUserQuery } from '../services/userApiSlice'
 import { styled } from '@mui/system'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../services/loginSlice'
+import WarningDialog from './WarningDialog'
 
 const StyledCard = styled(Card)(({ theme }) => ({
   maxWidth: 300,
@@ -30,12 +32,11 @@ const StyledCardMedia = styled(CardMedia)({
 const StyledCardContent = styled(CardContent)({
   height: 60,
 })
+
 const CenteredBox = styled(Box)({
   display: 'flex',
   justifyContent: 'center',
 })
-
-
 
 const UserCard = ({ user, currentUser }) => {
   const handleUserClick = () => {
@@ -46,17 +47,21 @@ const UserCard = ({ user, currentUser }) => {
       console.log('Error saving user:', error)
     }
   }
+
   const dispatch = useDispatch()
   const targetUserId = user?.id
   const currentUserId = currentUser?.id
   const currentUserIsTarget = currentUserId === targetUserId ? true : false
-  const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(currentUserId)
+  const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(
+    currentUserId , { skip: !currentUserId, refetchOnMountOrArgChange: true })
   const { data: targetUser, refetch } = useGetUserQuery(targetUserId)
   console.log(currentUser, targetUserId)
   console.log(userCurrent?.following)
   const isFollowing = Boolean(userCurrent?.following.includes(targetUserId))
   const [ follow, { isLoading: isFollowMutateLoading } ] = useFollowMutation()
   const [ unfollow, { isLoading: isUnfollowMutateLoading } ] = useUnfollowMutation()
+  const [showWarningDialog, setShowWarningDialog] = useState(false)
+
   const handleUnfollow = async(event) => {
     event.preventDefault()
     // Check if user data is available before unfollowing
@@ -72,6 +77,10 @@ const UserCard = ({ user, currentUser }) => {
 
   const handleFollow = async(event) => {
     event.preventDefault()
+    if(!currentUser) {
+      setShowWarningDialog(true)
+      return
+    }
     // Check if user data is available before following
     if (targetUser && !isFollowing && !isFollowMutateLoading) {
       await follow({ currentUserId, targetUserId }).unwrap()
@@ -81,37 +90,39 @@ const UserCard = ({ user, currentUser }) => {
       console.log(updatedUser)
     }
   }
-  console.log(user)
   return (
-    <Link to={`/users/${user.id}`} style={{ textDecoration: 'none' }}>
-      <StyledCard>
-        <CardActionArea onClick={handleUserClick}>
-          <CenteredBox>
-            <StyledCardMedia
-              component="img"
-              src={user.profileImage || `https://eu.ui-avatars.com/api/?name=${user.username}&size=200`}
-              alt={user.name}
-            />
-          </CenteredBox>
-          <StyledCardContent>
-            <Typography variant="h6">{user.name}</Typography>
-            <Typography variant="subtitle1">{user.username}</Typography>
-            <Typography variant="subtitle1">followers: {user.followers.length}</Typography>
-          </StyledCardContent>
-        </CardActionArea>
-        <Box display="flex" justifyContent="space-between" alignItems="center" padding="8px">
-          {userCurrent && !currentUserIsTarget &&
-            <Button
-              variant={isFollowing ? 'outlined' : 'contained'}
-              onClick={isFollowing ? handleUnfollow : handleFollow}
-            >
-              {isFollowing ? 'Unfollow' :  'Follow'}
-            </Button>
-          }
+    <>
+      <Link to={`/users/${user.id}`} style={{ textDecoration: 'none' }}>
+        <StyledCard>
+          <CardActionArea onClick={handleUserClick}>
+            <CenteredBox>
+              <StyledCardMedia
+                component="img"
+                src={user.profileImage || `https://eu.ui-avatars.com/api/?name=${user.username}&size=200`}
+                alt={user.name}
+              />
+            </CenteredBox>
+            <StyledCardContent>
+              <Typography variant="h6">{user.name}</Typography>
+              <Typography variant="subtitle1">{user.username}</Typography>
+              <Typography variant="subtitle1">followers: {user.followers.length}</Typography>
+            </StyledCardContent>
+          </CardActionArea>
+          <Box display="flex" justifyContent="space-between" alignItems="center" padding="8px">
+            {!currentUserIsTarget &&
+              <Button
+                variant={isFollowing ? 'outlined' : 'contained'}
+                onClick={isFollowing ? handleUnfollow : handleFollow}
+              >
+                {isFollowing ? 'Unfollow' :  'Follow'}
+              </Button>
+            }
 
-        </Box>
-      </StyledCard>
-    </Link>
+          </Box>
+        </StyledCard>
+      </Link>
+      <WarningDialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)} user={user} />
+    </>
   )
 }
 
