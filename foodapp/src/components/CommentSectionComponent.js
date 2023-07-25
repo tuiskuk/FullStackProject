@@ -1,6 +1,8 @@
 import React from 'react'
 import { useState } from 'react'
-import { Typography, Grid, Card, CardContent, Button, InputAdornment, OutlinedInput, IconButton } from '@mui/material'
+import dayjs from 'dayjs'
+import 'dayjs/locale/fi'
+import { Typography, Grid, Card, CardContent, Button, InputAdornment, OutlinedInput, IconButton, CardActions, Avatar } from '@mui/material'
 import { useAddCommentMutation, useDeleteCommentMutation, useGetCommentsForRecipeQuery, useAddReplyMutation,
   useLikeCommentMutation, useRemoveLikeCommentMutation, useDislikeCommentMutation, useRemoveDislikeCommentMutation, useEditCommentMutation } from '../services/commentSlice'
 import { useCreateInteractionMutation } from '../services/interactionSlice'
@@ -10,12 +12,22 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { Link } from 'react-router-dom'
+
+function formatFinnishDate(dateString) {
+  const date = dayjs(dateString)
+  const day = date.format('D')
+  const month = date.locale('fi').format('MMMM') // Format month in Finnish
+  const year = date.format('YYYY')
+  const time = date.format('HH:mm')
+
+  return `${day}. ${month} ${year} klo ${time}`
+}
 
 const CommentSection = ({ recipeId, userId , interactionData, label, image }) => {
   const { data: commentData, isLoading, isError, refetch } = useGetCommentsForRecipeQuery({ recipeId }, { refetchOnMountOrArgChange: true })
   const [addComment] = useAddCommentMutation()
   const [userComment, setUserComment] = useState('')
-
   const [ createInteraction ] = useCreateInteractionMutation()
 
   const handleSubmitComment = async () => {
@@ -48,8 +60,9 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
     const [ removeDislikeComment ] = useRemoveDislikeCommentMutation()
     const [ editComment ] = useEditCommentMutation()
     const [ deleteComment ] = useDeleteCommentMutation()
-
     const CommentCard = ({ comment }) => {
+      console.log(comment)
+      const formattedDate = formatFinnishDate(comment.createdAt)
       const [showReply, setShowReply] = useState(false)
       const [showEdit, setShowEdit] = useState(false)
       const [reply, setReply] = useState('')
@@ -178,56 +191,67 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
 
       return (
         <>
-          <div
-            key={comment._id}
-            style={{
-              border: '1px solid #bdbdbd',
-              borderRadius: '4px',
-              padding: '10px 14px',
-              marginBottom: '8px',
-              minHeight: '38px',
-              height: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              wordWrap: 'break-word',
-              marginLeft: `${indentLevel * 20}px`,
-            }}
-          >
-            <Typography>
-              {comment.text} {comment.createdAt} {comment.user}
-            </Typography>
-            <Button color="primary" onClick={handleReplyToggle}>
-              {showReply ? 'Cancel' : 'Reply'}
-            </Button>
-            <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-              <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
-                Likes:
-              </Typography>
-              <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
-                {comment.likes ? comment.likes.length : 0}
-              </Typography>
-              <IconButton onClick={() => handleLike(comment._id)} aria-label="Like">
-                {isLiked ? <ThumbUpIcon /> : <ThumbUpOffAltIcon />}
-              </IconButton>
-            </Grid>
-            <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-              <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
-                Dislikes:
-              </Typography>
-              <Typography variant="subtitle1" style={{ marginRight: '4px' }}>
-                {comment.dislikes ? comment.dislikes.length : 0}
-              </Typography>
-              <IconButton onClick={() => handleDislike(comment._id)} aria-label="Dislike">
-                {isDisliked ? <ThumbDownIcon /> : <ThumbDownOffAltIcon />}
-              </IconButton>
-              <IconButton onClick={() => toggleEdit()} aria-label="Edit">
-                {comment.user === userId && <EditIcon />}
-              </IconButton>
-              <IconButton onClick={() => handleDelete(comment._id)} aria-label="Delete">
-                {comment.user === userId && <DeleteIcon />}
-              </IconButton>
-            </Grid>
-          </div>
+          <Card variant="outlined" style={{ marginBottom: '8px' }}>
+            <CardContent>
+              <Grid container alignItems="center" justifyContent="space-between">
+                <Grid item xs={10}>
+                  <Grid container alignItems="center" spacing={2}>
+                    <Grid item>
+                      <Avatar src={comment.user.profileImage || `https://eu.ui-avatars.com/api/?name=${comment.user.username}&size=200`} alt={comment.user.name} />
+                    </Grid>
+                    <Grid item>
+                      <Link to={`/users/${comment.user?.id}`} style={{
+                        textDecoration: 'none', color: 'black',
+                      }}><Typography variant="body1" fontWeight="bold">
+                          {comment.user.name}
+                        </Typography></Link>
+                      <Typography variant="body2" color="textSecondary">
+                        @{comment.user.username} - {formattedDate}
+                      </Typography>
+                      <Typography variant="body1">
+                        {comment.text}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                {comment.user.id === userId && (
+                  <Grid item>
+                    <IconButton onClick={() => toggleEdit()} aria-label="Edit">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(comment._id)} aria-label="Delete">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+            <CardActions disableSpacing>
+              <Grid container alignItems="center" justifyContent="flex-end">
+                <Grid item>
+                  <IconButton onClick={() => handleLike(comment._id)} aria-label="Like">
+                    {isLiked ? <ThumbUpIcon color="primary" /> : <ThumbUpOffAltIcon />}
+                  </IconButton>
+                  <Typography variant="body2" style={{ marginRight: '8px' }}>
+                    {comment.likes ? comment.likes.length : 0}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <IconButton onClick={() => handleDislike(comment._id)} aria-label="Dislike">
+                    {isDisliked ? <ThumbDownIcon color="error" /> : <ThumbDownOffAltIcon />}
+                  </IconButton>
+                  <Typography variant="body2" style={{ marginRight: '8px' }}>
+                    {comment.dislikes ? comment.dislikes.length : 0}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Button color="primary" onClick={handleReplyToggle}>
+                    {showReply ? 'Cancel' : 'Reply'}
+                  </Button>
+                </Grid>
+              </Grid>
+            </CardActions>
+          </Card>
           {showReply && (
             <OutlinedInput
               multiline
@@ -242,6 +266,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
                   </Button>
                 </InputAdornment>
               }
+              style={{ marginBottom: '8px' }}
             />
           )}
           {showEdit && (
@@ -258,6 +283,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
                   </Button>
                 </InputAdornment>
               }
+              style={{ marginBottom: '8px' }}
             />
           )}
         </>
@@ -265,14 +291,17 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
     }
 
     const renderReplies = (replies, level) => {
+      console.log(replies)
       return (
         <div className="reply-box">
-          {replies.map((reply) => (
-            <div key={reply._id} style={{ marginLeft: `${level * 20}px` }}>
-              <CommentCard comment={reply} />
-              {reply.replies.length > 0 && renderReplies(reply.replies, level + 1)}
-            </div>
-          ))}
+          {replies.map((reply) => {
+            console.log(reply)
+            return(
+              <div key={reply._id} style={{ marginLeft: `${level * 20}px` }}>
+                <CommentCard comment={reply} />
+                {reply.replies.length > 0 && renderReplies(reply.replies, level + 1)}
+              </div>
+            )})}
         </div>
       )
     }

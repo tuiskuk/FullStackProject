@@ -25,9 +25,6 @@ const UserListItem = ({ user }) => {
       <Box>
         <Link to={`/users/${user?.id}`} style={{
           textDecoration: 'none',
-          '&:hover': {
-            color: 'red',
-          },
         }}>
           <Typography variant="subtitle2" marginRight={1} fontWeight="bold">
             {user?.username}

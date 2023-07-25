@@ -104,10 +104,17 @@ const populateReplies = async (comment) => {
 
   const populatedReplies = await Comment.populate(comment, {
     path: 'replies',
-    populate: {
-      path: 'replies',
-      model: 'Comment',
-    },
+    populate: [
+      {
+        path: 'replies',
+        model: 'Comment',
+      },
+      {
+        path: 'user', // Assuming 'user' is the field containing the user reference in 'Comment' model
+        model: 'User', // Change this to the correct model name if different
+        select: 'username profileImage name _id',
+      },
+    ],
   })
 
   for (const reply of populatedReplies.replies) {
@@ -124,8 +131,16 @@ const getCommentsForRecipe = async (req, res) => {
 
   try {
     // Find the recipe and populate the comments with the actual comment documents, including replies
-    const recipe = await Recipe.findOne({ recipeId }).populate('comments')
-
+    const recipe = await Recipe.findOne({ recipeId }).populate({
+      path: 'comments',
+      populate: {
+        path: 'user',
+        model: 'User',
+        /* Optionally, select only specific fields of the user object if needed */
+        select: 'username profileImage name _id',
+      },
+    })
+    console.log(recipe)
     if (!recipe) {
       return res.status(204).json({ error: 'Recipe/comments not found' })
     }
