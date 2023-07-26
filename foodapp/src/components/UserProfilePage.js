@@ -16,7 +16,7 @@ import {
 } from '@mui/material'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
-import { useUpdateUserMutation } from '../services/userApiSlice'
+import { useGetUserQuery, useUpdateUserMutation } from '../services/userApiSlice'
 import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSlice'
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
@@ -44,15 +44,18 @@ const UserProfile = () => {
   const [uploadProfilePicture] = useUploadProfilePictureMutation()
 
   const userId = user?.id
-  const { data: followingData, refetch: refetchFollowing } = useGetAllFollowingQuery({ userId })
-  const { data: followersData, refetch: refetchFollowers } = useGetAllFollowersQuery({ userId })
+  const { data: followingData, refetch: refetchFollowing } = useGetAllFollowingQuery(
+    { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
+  const { data: followersData, refetch: refetchFollowers } = useGetAllFollowersQuery(
+    { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
 
   const followers = followersData?.followers
   const following = followingData?.following
-  const dislikesData = null
-  const likesData = null
   const { data: favoritesData } = useGetAllFavoritesQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
+  const { data: userData } = useGetUserQuery(
+    userId, { skip: !userId, refetchOnMountOrArgChange: true })
+  console.log(userData)
   //TODO: dislikesData, LikesData, favoritesData, commentsData
   const dispatch = useDispatch()
   const followingCount = following?.length
@@ -67,8 +70,10 @@ const UserProfile = () => {
   useEffect(() => {
     setProfileDescription(user?.profileText)
     setNewUsername(user?.username)
-    refetchFollowing()
-    refetchFollowers()
+    if(user) {
+      refetchFollowing()
+      refetchFollowers()
+    }
   }, [user])
 
   const handleUpdateProfile = async () => {
@@ -295,31 +300,36 @@ const UserProfile = () => {
         </Grid>
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
-        {favoritesData?.favorites?.map((favorite, index) => (
-          selectedOption === 'favorites' && (
+        {selectedOption === 'favorites' &&
+          favoritesData?.favorites?.map((favorite, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={favorite.recipeId} recipe={favorite} />
             </Grid>
-          )
-        ))}
+          ))}
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
-        {dislikesData?.dislikes?.map((dislike, index) => (
-          selectedOption === 'dislikes' && (
+        {selectedOption === 'dislikes' &&
+          userData?.dislikes?.map((dislike, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={dislike.recipeId} recipe={dislike} />
             </Grid>
-          )
-        ))}
+          ))}
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
-        {likesData?.likes?.map((like, index) => (
-          selectedOption === 'likes' && (
+        {selectedOption === 'likes' &&
+          userData?.likes?.map((like, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={like.recipeId} recipe={like} />
             </Grid>
-          )
-        ))}
+          ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {selectedOption === 'comments' &&
+          userData?.comments?.map((comment, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              {comment}
+            </Grid>
+          ))}
       </Grid>
     </Container>
   )

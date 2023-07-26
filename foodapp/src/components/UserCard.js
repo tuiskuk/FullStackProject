@@ -6,7 +6,7 @@ import { useGetUserQuery } from '../services/userApiSlice'
 import { styled } from '@mui/system'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../services/loginSlice'
-import WarningDialog from './WarningDialog'
+import { WarningDialog } from './WarningDialog'
 
 const StyledCard = styled(Card)(({ theme }) => ({
   maxWidth: 300,

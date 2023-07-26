@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useState } from 'react'
 import RecipeCard from './RecipeCard'
 import UserListItem from './userListItem'
+import { WarningDialog } from './WarningDialog'
 
 
 const UserViewPage = () => {
@@ -16,7 +17,8 @@ const UserViewPage = () => {
   const dispatch = useDispatch()
   const currentUser = useSelector(selectCurrentUser)
   const currentUserId = currentUser?.id
-  const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(currentUserId)
+  const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(
+    currentUserId , { skip: !currentUserId, refetchOnMountOrArgChange: true })
   const { data: targetUser, isLoading, refetch } = useGetUserQuery(id)
   const targetUserId = id
   const currentUserIsTarget = currentUserId === targetUserId ? true : false
@@ -35,9 +37,13 @@ const UserViewPage = () => {
   const favorites = targetUser?.favorites
   const followingCount = following?.length
   const followersCount = followers?.length
-
+  const [showWarningDialog, setShowWarningDialog] = useState(false)
 
   const handleUnfollow = async() => {
+    if(!currentUser) {
+      setShowWarningDialog(true)
+      return
+    }
     // Check if user data is available before unfollowing
     if (targetUser && isFollowing && !isUnfollowMutateLoading) {
       await unfollow({ currentUserId, targetUserId }).unwrap()
@@ -49,6 +55,10 @@ const UserViewPage = () => {
   }
 
   const handleFollow = async() => {
+    if(!currentUser) {
+      setShowWarningDialog(true)
+      return
+    }
     // Check if user data is available before following
     if (targetUser && !isFollowing && !isFollowMutateLoading) {
       await follow({ currentUserId, targetUserId }).unwrap()
@@ -91,7 +101,7 @@ const UserViewPage = () => {
         </Grid>
         <Grid item xs={12}>
           <Typography variant="h5">{targetUser?.username}</Typography>
-          {userCurrent && !currentUserIsTarget &&
+          {!currentUserIsTarget &&
             <Button
               variant={isFollowing ? 'outlined' : 'contained'}
               onClick={isFollowing ? handleUnfollow : handleFollow}
@@ -101,6 +111,7 @@ const UserViewPage = () => {
           }
 
         </Grid>
+        <WarningDialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)} user={currentUser} />
         <Grid item xs={4}>
           <Typography variant="h6">{postCount}</Typography>
           <Typography variant="h6">Recipes posted</Typography>
@@ -211,11 +222,36 @@ const UserViewPage = () => {
         </Grid>
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
-        {favorites?.map((favorite, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <RecipeCard key={favorite.recipeId} recipe={favorite} />
-          </Grid>
-        ))}
+        {selectedOption === 'favorites' &&
+          favorites?.map((favorite, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={favorite.recipeId} recipe={favorite} />
+            </Grid>
+          ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {selectedOption === 'likes' &&
+          targetUser.likes?.map((like, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={like.recipeId} recipe={like} />
+            </Grid>
+          ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {selectedOption === 'dislikes' &&
+          targetUser.dislikes?.map((dislike, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={dislike.recipeId} recipe={dislike} />
+            </Grid>
+          ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {selectedOption === 'comments' &&
+          targetUser.comments?.map((comment, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              {comment}
+            </Grid>
+          ))}
       </Grid>
     </Container>
   )

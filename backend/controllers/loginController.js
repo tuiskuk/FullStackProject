@@ -24,26 +24,29 @@ const login = async (request, response) => {
       id: user._id
     }
 
+    const accessTokenExpirationTime = 60 * 1
+
     const accessToken = jwt.sign(userForToken, config.SECRET, {
-      expiresIn:  60 * 60,
+      expiresIn:  60 * 1,
     })
 
     const refreshToken = jwt.sign(
       { id: user._id  },
       config.REFRESH_TOKEN_SECRET,
-      { expiresIn: 60 * 60 }
+      { expiresIn: 60 * 1 }
     )
 
     response.cookie('token', refreshToken, {
       httpOnly: true, // The cookie should be inaccessible to Javascript as possible, to reduce the chance of XSS.
       secure: true, // The cookie should be retrieved only over SSL or HTTPS.
-      maxAge:  60 * 60 * 1000, // The Refresh Token has a longer life than the Access Token. Convert seconds to ms.
+      maxAge:  60 * 1 * 1000, // The Refresh Token has a longer life than the Access Token. Convert seconds to ms.
       sameSite: 'None' // The cookie is cross-site
     })
 
     console.log({ accessToken, user })
+    const accessTokenExpiration = Date.now() + accessTokenExpirationTime * 1000
 
-    response.status(200).json({ accessToken, user })
+    response.status(200).json({ accessToken, user, accessTokenExpiration })
   } catch (error) {
     // Handle any potential errors
     console.error('Login error:', error)
@@ -91,7 +94,7 @@ const getRefreshToken = async (req, res) => {
       const accessToken = jwt.sign(
         userForToken,
         process.env.SECRET,
-        { expiresIn:  60 * 15 }
+        { expiresIn:  60 * 1 }
       )
 
       res.send({ accessToken })

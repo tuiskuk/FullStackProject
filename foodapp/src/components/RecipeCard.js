@@ -14,8 +14,8 @@ const RecipeCard = ({ recipe }) => {
   } catch (e) {
     const query = useGetRecipeQuery(recipe)
     favoriteRecipe = query.data
-    console.log(query)
-    console.log(favoriteRecipe)
+    //console.log(query)
+    //console.log(favoriteRecipe)
     isLoading = query.isLoading
     isFetching = query.isFetching
   }

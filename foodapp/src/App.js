@@ -13,6 +13,8 @@ import CreateRecipePage from './components/createRecipe'
 import PersistedLogin from './components/PersistedLogin'
 import { selectCurrentUser } from './services/loginSlice'
 import { useSelector } from 'react-redux'
+import ErrorLayout from './components/ErrorLayout'
+
 
 const App = () => {
   const user = useSelector(selectCurrentUser)
@@ -46,27 +48,29 @@ const App = () => {
           </Toolbar>
         </AppBar>
 
-        <Routes>
+        <ErrorLayout>
+          <Routes>
 
 
-          <Route element={ <PersistedLogin />}>
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path='/register' element={<RegistrationForm/>}/>
-            <Route path='/users' element={<UsersPage/>}/>
-            <Route path='/createrecipe' element={<CreateRecipePage/>}/>
-            <Route path='/recipes/:recipeId' element={
-              <RecipeViewPage/>
-            }/>
-            <Route path='/users/:id' element={
-              <UserViewPage/>
-            }/>
+            <Route element={ <PersistedLogin />}>
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path='/register' element={<RegistrationForm/>}/>
+              <Route path='/users' element={<UsersPage/>}/>
+              <Route path='/createrecipe' element={<CreateRecipePage/>}/>
+              <Route path='/recipes/:recipeId' element={
+                <RecipeViewPage/>
+              }/>
+              <Route path='/users/:id' element={
+                <UserViewPage/>
+              }/>
 
-            <Route path='/profile' element={<UserProfile/>
-            }/>
-          </Route>
-        </Routes>
+              <Route path='/profile' element={<UserProfile/>
+              }/>
+            </Route>
+          </Routes>
+        </ErrorLayout>
       </Container>
     </Router>)
 }

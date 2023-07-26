@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useLoginMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import {  selectCurrentUser, setUser } from '../services/loginSlice'
-
+import { ExpirationWarningDialog } from './WarningDialog'
 
 const LoginPage = ({ action }) => {
   const [email, setEmail] = useState('')
@@ -13,6 +13,7 @@ const LoginPage = ({ action }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [ login, error ] = useLoginMutation()
   const [logout] = useSendLogoutMutation()
+  const [ showWarning, setShowWarning ] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const user = useSelector(selectCurrentUser)
@@ -35,18 +36,38 @@ const LoginPage = ({ action }) => {
     }
   }, [error])
 
-
   const handleLogin = async (event) => {
     event.preventDefault()
 
-    try{
+    try {
       const response = await login({ email, password }).unwrap()
       console.log(response)
       const loggedInUser = response.user
-      console.log(loggedInUser)
+      console.log(loggedInUser.accessTokenExpiration)
       dispatch(setUser(loggedInUser))
       setEmail('')
       setPassword('')
+
+      console.log('Counting')
+
+      // Set the threshold time for showing the warning
+      const thresholdTime = 30 * 1000
+      const currentTime = Date.now()
+
+      const tokenExpiration = loggedInUser.accessTokenExpiration
+      console.log(tokenExpiration, currentTime)
+
+      const timeDifference = tokenExpiration - currentTime
+      if (timeDifference <= thresholdTime) {
+        console.log('Warning')
+        setShowWarning(true)
+      } else {
+        setTimeout(() => {
+          console.log('Warning')
+          setShowWarning(true)
+        }, timeDifference - thresholdTime)
+      }
+
       if(!action) {
         navigate('/')
       }
@@ -54,8 +75,6 @@ const LoginPage = ({ action }) => {
       console.log(error)
     }
   }
-
-
 
   if (user) {
     return (
@@ -116,6 +135,7 @@ const LoginPage = ({ action }) => {
             {error.error && error.error.data && error.error.data.error}
           </Alert>
         </Snackbar>}
+        <ExpirationWarningDialog open={showWarning} onClose={() => setShowWarning(false)} />
       </Container>
     )
   }
