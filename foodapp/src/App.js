@@ -15,7 +15,6 @@ import { selectCurrentUser } from './services/loginSlice'
 import { useSelector } from 'react-redux'
 import ErrorLayout from './components/ErrorLayout'
 
-
 const App = () => {
   const user = useSelector(selectCurrentUser)
   return (
@@ -24,7 +23,7 @@ const App = () => {
         <AppBar position="static">
           <Toolbar>
             <Button color="inherit" component={Link} to="/">
-              home
+              <img src="/logo.svg" alt="Logo" style={{ height: '50px' }}/>
             </Button>
             <Button color="inherit" component={Link} to="/search">
               search
