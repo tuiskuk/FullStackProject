@@ -10,7 +10,7 @@ async function resetDatabase(request, response) {
     await UserRecipe.deleteMany({})
 
     console.log('Database reset successful.')
-    response.json({ success: 'Database reset successful.' })
+    response.json({ succes: 'Database reset successful.' })
   } catch (error) {
     console.error('Database reset failed:', error)
   }

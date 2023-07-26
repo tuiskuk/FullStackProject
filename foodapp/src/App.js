@@ -31,12 +31,12 @@ const App = () => {
           </Button>
           <Button color="inherit" component={Link} to="/users">
               Discover users
-            </Button>
-            <Button color="inherit" component={Link} to="/userRecipesearch">
+          </Button>
+          <Button color="inherit" component={Link} to="/userRecipesearch">
               recipes by other users
-            </Button>
-            {user && (
-              <Button color="inherit" component={Link} to="/profile">
+          </Button>
+          {user && (
+            <Button color="inherit" component={Link} to="/profile">
                   My Profile
             </Button>
           )}
@@ -54,23 +54,23 @@ const App = () => {
       <Routes>
 
 
-          <Route element={ <PersistedLogin />}>
-            <Route path="/userRecipesearch" element={<UserSearchPage/>} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path='/register' element={<RegistrationForm/>}/>
-            <Route path='/users' element={<UsersPage/>}/>
-            <Route path='/createrecipe' element={<CreateRecipePage/>}/>
-            <Route path='/recipes/:recipeId' element={
-              <RecipeViewPage/>
-            }/>
-            <Route path='/userRecipes/:recipeId' element={
-              <UserRecipeViewPage/>
-            }/>
-            <Route path='/users/:id' element={
-              <UserViewPage/>
-            }/>
+        <Route element={ <PersistedLogin />}>
+          <Route path="/userRecipesearch" element={<UserSearchPage/>} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path='/register' element={<RegistrationForm/>}/>
+          <Route path='/users' element={<UsersPage/>}/>
+          <Route path='/createrecipe' element={<CreateRecipePage/>}/>
+          <Route path='/recipes/:recipeId' element={
+            <RecipeViewPage/>
+          }/>
+          <Route path='/userRecipes/:recipeId' element={
+            <UserRecipeViewPage/>
+          }/>
+          <Route path='/users/:id' element={
+            <UserViewPage/>
+          }/>
 
           <Route path='/profile' element={<UserProfile/>
           }/>
