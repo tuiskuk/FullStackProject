@@ -24,11 +24,11 @@ const login = async (request, response) => {
       id: user._id
     }
 
-    const accessTokenExpirationTime = 60 * 1
-
-    const accessToken = jwt.sign(userForToken, config.SECRET, {
-      expiresIn:  60 * 1,
-    })
+    const accessToken = jwt.sign(
+      userForToken,
+      config.SECRET,
+      { expiresIn:  60 * 1 }
+    )
 
     const refreshToken = jwt.sign(
       { id: user._id  },
@@ -44,9 +44,8 @@ const login = async (request, response) => {
     })
 
     console.log({ accessToken, user })
-    const accessTokenExpiration = Date.now() + accessTokenExpirationTime * 1000
 
-    response.status(200).json({ accessToken, user, accessTokenExpiration })
+    response.status(200).json({ accessToken, user })
   } catch (error) {
     // Handle any potential errors
     console.error('Login error:', error)
@@ -54,16 +53,16 @@ const login = async (request, response) => {
   }
 }
 
-const getRefreshToken = async (req, res) => {
+const getRefreshToken = async (request, response) => {
 
   // Use the longer-lived Refresh Token stored safely in a secure, httpOnly cookie
   // to grant the user a new short-lived Access Token to use to communicate with the API.
 
   // If no Refresh Token is found, require a new log in from the user.
-  if (!req.cookies?.token)
-    return res.status(401).json({ message: 'Unauthorized: please log in again' })
+  if (!request.cookies?.token)
+    return response.status(401).json({ message: 'Unauthorized: please log in again' })
 
-  const refreshToken = req.cookies.token
+  const refreshToken = request.cookies.token
 
   console.log(refreshToken)
 
@@ -76,14 +75,14 @@ const getRefreshToken = async (req, res) => {
 
       // If the Refresh Token is not valid, exit and require a new log in.
       if (err)
-        return res.status(403).json({ message: 'Forbidden: please log in again' })
+        return response.status(403).json({ message: 'Forbidden: please log in again' })
 
       // Find the user the Refresh Token was assigned to.
       const user = await User.findById(decoded.id)
 
       // If the user is not found, exit and require a new log in.
       if (!user)
-        return res.status(401).json({ message: 'Unauthorized: please log in again' })
+        return response.status(401).json({ message: 'Unauthorized: please log in again' })
 
       // Otherwise, if all is as it should be, grant the user a new short-lived
       // Access Token.
@@ -97,7 +96,20 @@ const getRefreshToken = async (req, res) => {
         { expiresIn:  60 * 1 }
       )
 
-      res.send({ accessToken })
+      const refreshToken = jwt.sign(
+        { id: user._id  },
+        config.REFRESH_TOKEN_SECRET,
+        { expiresIn: 60 * 1 }
+      )
+
+      response.cookie('token', refreshToken, {
+        httpOnly: true, // The cookie should be inaccessible to Javascript as possible, to reduce the chance of XSS.
+        secure: true, // The cookie should be retrieved only over SSL or HTTPS.
+        maxAge:  60 * 1 * 1000, // The Refresh Token has a longer life than the Access Token. Convert seconds to ms.
+        sameSite: 'None' // The cookie is cross-site
+      })
+
+      response.send({ accessToken })
     }
   )
 }

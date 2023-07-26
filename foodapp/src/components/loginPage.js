@@ -58,32 +58,11 @@ const LoginPage = ({ action }) => {
 
     try {
       const response = await login({ email, password }).unwrap()
-      console.log(response)
       const loggedInUser = response.user
-      console.log(loggedInUser.accessTokenExpiration)
+
       dispatch(setUser(loggedInUser))
       setEmail('')
       setPassword('')
-
-      console.log('Counting')
-
-      // Set the threshold time for showing the warning
-      const thresholdTime = 30 * 1000
-      const currentTime = Date.now()
-
-      const tokenExpiration = loggedInUser.accessTokenExpiration
-      console.log(tokenExpiration, currentTime)
-
-      const timeDifference = tokenExpiration - currentTime
-      if (timeDifference <= thresholdTime) {
-        console.log('Warning')
-        setShowWarning(true)
-      } else {
-        setTimeout(() => {
-          console.log('Warning')
-          setShowWarning(true)
-        }, timeDifference - thresholdTime)
-      }
 
       if(!action) {
         navigate('/')
