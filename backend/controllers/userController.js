@@ -128,24 +128,19 @@ const addFavorite = async (request, response, next) => {
   try {
     const { userId, recipeId } = request.body
 
-    const [user, recipe] = await Promise.all([
-      User.findById(userId),
-      Recipe.findOne({ recipeId }),
-    ])
+    const user = await User.findById(userId)
+
 
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
     }
 
-    if (!recipe) {
-      return response.status(404).json({ error: 'Recipe not found' })
-    }
 
     const recipe = await Recipe.findOne({ recipeId })
     const userRecipe = await UserRecipe.findById(recipeId)
     console.log(userRecipe)
     if (!recipe && !userRecipe) {
-      return res.status(404).json({ error: 'Recipe not found' })
+      return response.status(404).json({ error: 'Recipe not found' })
     }
 
     // Check if the recipe is already in the user's favorites
@@ -155,12 +150,14 @@ const addFavorite = async (request, response, next) => {
     }
 
     // Add the new favorite to the user's favorites array
-    user.favorites.push({ recipeId, label, image })
+
+    user.favorites.push( recipeId )
+
 
     // Save the updated user document
     const updatedUser = await user.save()
 
-    res.status(201).json(updatedUser)
+    response.status(201).json(updatedUser)
   } catch (error) {
     next(error)
   }
@@ -170,33 +167,25 @@ const removeFavorite = async (request, response, next) => {
   try {
     const { userId, recipeId } = request.body
 
-    const [user, recipe] = await Promise.all([
-      User.findById(userId),
-      Recipe.findOne({ recipeId }),
-    ])
+    const user = await User.findById(userId)
 
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
     }
 
-    if (!recipe) {
-      return response.status(404).json({ error: 'Recipe not found' })
-    }
-
-    // Remove the favorite from the user's favorites array
-    user.favorites.splice(favoriteIndex, 1)
     const recipe = await Recipe.findOne({ recipeId })
     const userRecipe = await UserRecipe.findById(recipeId)
 
     if (!recipe && !userRecipe) {
-      return res.status(404).json({ error: 'Recipe not found' })
+      return response.status(404).json({ error: 'Recipe not found' })
     }
 
     const existingFavorite = user.favorites.includes(recipeId) || user.favorites.includes(recipeId)
     if (!existingFavorite) {
-      return res.status(400).json({ error: 'Recipe has not been favorited' })
+      return response.status(400).json({ error: 'Recipe has not been favorited' })
     }
 
+    // Remove the favorite from the user's favorites array
     if(recipe || userRecipe){
       user.favorites = user.favorites.filter((fav) => !fav.equals(recipeId))
     }
@@ -204,7 +193,7 @@ const removeFavorite = async (request, response, next) => {
     // Save the updated user document
     const updatedUser = await user.save()
 
-    res.status(200).json(updatedUser)
+    response.status(200).json(updatedUser)
   } catch (error) {
     next(error)
   }
