@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import {
   TextField,
   Button,
@@ -12,7 +12,6 @@ import {
   DialogActions,
   Box,
   Popover,
-  Input
 } from '@mui/material'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
@@ -21,7 +20,6 @@ import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSl
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
-
 import RecipeCard from './RecipeCard'
 import UserListItem from './userListItem'
 
@@ -42,7 +40,7 @@ const UserProfile = () => {
   const user = useSelector(selectCurrentUser)
   const [ updateUser ] = useUpdateUserMutation()
   const [uploadProfilePicture] = useUploadProfilePictureMutation()
-
+  const fileInputRef = useRef(null)
   const userId = user?.id
   const { data: followingData, refetch: refetchFollowing } = useGetAllFollowingQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
@@ -60,7 +58,6 @@ const UserProfile = () => {
   const dispatch = useDispatch()
   const followingCount = following?.length
   const followersCount = followers?.length
-  console.log(user)
 
   //const [recipeId, setRecipeId] = useState('')
 
@@ -106,11 +103,6 @@ const UserProfile = () => {
     setNewProfilPicture(null)
   }
 
-  const handleFileChange = (event) => {
-    const ProfilePicture = event.target.files[0]
-    setNewProfilPicture(ProfilePicture)
-  }
-
   const handleClickFollowing = (event) => {
     setAnchorEl(event.currentTarget)
     setFollowingListVisible(true)
@@ -124,6 +116,39 @@ const UserProfile = () => {
     setFollowersListVisible(true)
   }
 
+  const handleAvatarClick = () => {
+    // You can use a file input element that is hidden
+    // and programmatically trigger a click on it.
+    fileInputRef.current.click()
+  }
+
+  const handleProfilePictureChange = async(event) => {
+    const file = event.target.files[0]
+    setNewProfilPicture(file)
+    if (file) {
+      try {
+        // Upload the profile picture and get the response
+        const response = await uploadProfilePicture({ file: file, id: user?.id })
+        const updatedProfilePicture = response.data.profileImage
+
+        // Update the user with the new profile picture
+        const updatedUser = {
+          ...user,
+          profileImage: updatedProfilePicture,
+        }
+
+        // Call the API to update the user's profile information
+        await updateUser({ id: user?.id, user: updatedUser }).unwrap()
+
+        // Update the user in the application state
+        dispatch(setUser({ user: updatedUser }))
+      } catch (error) {
+        // Handle any errors that occurred during the upload/update process
+        console.error('Error uploading profile picture:', error)
+      }
+    }
+  }
+
   // Function to handle close event of following/followers overlay
 
   return (
@@ -133,7 +158,15 @@ const UserProfile = () => {
           <Avatar
             alt="Profile Image"
             src={user?.profileImage}
-            sx={{ width: 150, height: 150, marginBottom: 2 }}
+            sx={{ width: 150, height: 150, marginBottom: 2, cursor: 'pointer' }}
+            onClick={handleAvatarClick}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleProfilePictureChange}
           />
         </Grid>
         <Grid item xs={12}>
@@ -237,14 +270,6 @@ const UserProfile = () => {
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   fullWidth
-                />
-              </Grid>
-              <Grid   container direction="column" alignItems="center" justifyContent="center">
-                <Typography variant="h6"> new profile picture</Typography>
-                <Input
-                  type="file"
-                  name="profilePicture"
-                  onChange={handleFileChange}
                 />
               </Grid>
             </Grid>

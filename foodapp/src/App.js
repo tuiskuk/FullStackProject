@@ -4,7 +4,7 @@ import HomePage from './components/HomePage'
 import RecipeViewPage from './components/RecipeViewPage'
 import UserViewPage from './components/UserViewPage'
 import LoginPage from './components/loginPage'
-import { Container, AppBar, Toolbar, Button } from '@mui/material'
+import { AppBar, Toolbar, Button, Container } from '@mui/material'
 import RegistrationForm from './components/RegistrationPage'
 import UsersPage from './components/UsersPage'
 import UserProfile from './components/UserProfilePage'
@@ -29,20 +29,20 @@ const App = () => {
               search
             </Button>
             <Button color="inherit" component={Link} to="/users">
-              Discover users
+                Discover users
             </Button>
             {user && (
               <Button color="inherit" component={Link} to="/profile">
-                  My Profile
+                    My Profile
               </Button>
             )}
             {user && (
               <Button color="inherit" component={Link} to="/createrecipe">
-                  Create recipe
+                    Create recipe
               </Button>
             )}
             <Button color="inherit" component={Link} to="/login">
-              login
+                login
             </Button>
           </Toolbar>
         </AppBar>

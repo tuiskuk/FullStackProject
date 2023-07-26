@@ -105,13 +105,14 @@ const getRefreshToken = async (req, res) => {
 const logout = async (req, res) => {
   if (!req.cookies?.token)
     return res.sendStatus(204) // The httpOnly Refresh Token doesnt exist, so the user is already "logged out".
-
   // Clear the httpOnly Refresh Token, so the user is requied to sign in the next time they use the client.
+
   res.clearCookie('token', {
     httpOnly: true,
     secure: true,
     sameSite: 'None'
   })
+
 
 
   res.status(200).send({ message: 'User logged out' })

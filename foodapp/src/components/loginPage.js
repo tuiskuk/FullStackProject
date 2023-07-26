@@ -20,6 +20,23 @@ const LoginPage = ({ action }) => {
   console.log(user)
   console.log(error)
 
+  const imageStyle = {
+    width: '100%',
+    height: '100vh',
+    backgroundImage: 'url(/images/loginPageImage.jpg)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }
+
+  const formStyle = {
+    padding: '0 20px',
+  }
+
+  const containerStyle = {
+    height: '100vh',
+    overflow: 'hidden',
+  }
+
   const handleLogOut = async() => {
     await logout()
   }
@@ -87,55 +104,75 @@ const LoginPage = ({ action }) => {
     )
   } else {
     return (
-      <Container maxWidth="sm">
-        <form onSubmit={handleLogin}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h4" align="center">
-                Log in to your account
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              {/* <Typography variant="h2">
-                Logging in enables you to add comments on recipes, like/dislike recipes, add recipes you like to the favorites list, follow users, and much more
-              </Typography> */}
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Email"
-                type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" type="submit">
-                Log in
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h5">
-                Dont have an account? <Link to="/register">Click here</Link> to sign up.
-              </Typography>
-            </Grid>
+      <Container maxWidth={action ? 'sm' : false} style={!action ? containerStyle : undefined}>
+
+        <Grid container sx={{ width: !action ? '100%' : undefined }}>
+          {/* Left column for the image */}
+          {!action && <Grid item xs={6}>
+            <div style={imageStyle}></div>
+          </Grid>}
+
+          {error.error && <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+            <Alert severity="error" onClose={handleCloseSnackbar}>
+              {error.error && error.error.data && error.error.data.error}
+            </Alert>
+          </Snackbar>}
+          <ExpirationWarningDialog open={showWarning} onClose={() => setShowWarning(false)} />
+
+          {/* Right column for the login form */}
+          <Grid item xs={action ? 12 : 6} style={{ display: 'flex', alignItems: 'center' }}>
+            <Container style={formStyle}>
+              <form onSubmit={handleLogin}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Typography variant="h4" align="center">
+                    Log in to your account
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    {/* <Typography variant="h2">
+                    Logging in enables you to add comments on recipes, like/dislike recipes, add recipes you like to the favorites list, follow users, and much more
+                  </Typography> */}
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Email"
+                      type="text"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button variant="contained" color="primary" type="submit">
+                    Log in
+                    </Button>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="h5">
+                    Dont have an account? <Link to="/register">Click here</Link> to sign up.
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </form>
+            </Container>
+
+            {error.error && <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+              <Alert severity="error" onClose={handleCloseSnackbar}>
+                {error.error && error.error.data && error.error.data.error}
+              </Alert>
+            </Snackbar>}
           </Grid>
-        </form>
-        {error.error && <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-          <Alert severity="error" onClose={handleCloseSnackbar}>
-            {error.error && error.error.data && error.error.data.error}
-          </Alert>
-        </Snackbar>}
-        <ExpirationWarningDialog open={showWarning} onClose={() => setShowWarning(false)} />
+        </Grid>
       </Container>
     )
   }
