@@ -1,7 +1,6 @@
 import LoginPage from './loginPage'
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress  } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
 import { useRefreshMutation, useSendLogoutMutation } from '../services/loginApiSlice'
-import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentAccessToken, setUser } from '../services/loginSlice'
 import { useNavigate } from 'react-router-dom'
@@ -28,12 +27,10 @@ const ExpirationWarningDialog = ({ open, onClose }) => {
   const dispatch = useDispatch()
   const accessToken = useSelector(selectCurrentAccessToken)
   const [logout] = useSendLogoutMutation()
-  const [refreshingToken, setRefreshingToken] = useState(false)
   const [refresh] = useRefreshMutation()
 
   const handleStayLoggedIn = async () => {
     console.log('Stay logged in')
-    setRefreshingToken(true)
 
     try {
       const response = await refresh()
@@ -42,13 +39,10 @@ const ExpirationWarningDialog = ({ open, onClose }) => {
 
       // Save the new access token to the Redux store
       dispatch(setUser({ ...accessToken, accessToken: newAccessToken }))
-      setRefreshingToken(false)
       onClose()
 
     } catch (error) {
       console.error('Error refreshing token:', error)
-      // Handle any errors that occur during token refresh
-      setRefreshingToken(false)
     }
   }
 
@@ -67,7 +61,7 @@ const ExpirationWarningDialog = ({ open, onClose }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleStayLoggedIn} color="primary">
-          {refreshingToken ? <CircularProgress size={20} /> : 'Stay Logged In'}
+          Stay Logged In
         </Button>
         <Button onClick={handleLogOut} color="primary">
           Log Out
