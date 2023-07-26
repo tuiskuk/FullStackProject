@@ -25,7 +25,7 @@ const login = async (request, response) => {
     }
 
     const accessToken = jwt.sign(userForToken, config.SECRET, {
-      expiresIn:  60 * 60,
+      expiresIn:  60 * 5,
     })
 
     const refreshToken = jwt.sign(
@@ -40,8 +40,6 @@ const login = async (request, response) => {
       maxAge:  60 * 60 * 1000, // The Refresh Token has a longer life than the Access Token. Convert seconds to ms.
       sameSite: 'None' // The cookie is cross-site
     })
-
-    console.log({ accessToken, user })
 
     response.status(200).json({ accessToken, user })
   } catch (error) {
@@ -102,13 +100,14 @@ const getRefreshToken = async (req, res) => {
 const logout = async (req, res) => {
   if (!req.cookies?.token)
     return res.sendStatus(204) // The httpOnly Refresh Token doesnt exist, so the user is already "logged out".
-
   // Clear the httpOnly Refresh Token, so the user is requied to sign in the next time they use the client.
+
   res.clearCookie('token', {
     httpOnly: true,
     secure: true,
     sameSite: 'None'
   })
+
 
 
   res.status(200).send({ message: 'User logged out' })

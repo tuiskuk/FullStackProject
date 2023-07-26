@@ -4,12 +4,19 @@ import { useSelector } from 'react-redux'
 import { Box, CircularProgress } from '@mui/material'
 
 
-import { useRefreshMutation } from '../services/loginApiSlice'
-import { selectCurrentAccessToken } from '../services/loginSlice'
-
+import { useRefreshMutation, useSendLogoutMutation } from '../services/loginApiSlice'
+import { selectCurrentAccessToken, selectCurrentExpTime } from '../services/loginSlice'
 const PersistedUserLogin = () => {
 
   const accessToken = useSelector(selectCurrentAccessToken)
+  const exp = useSelector(selectCurrentExpTime)
+  const [ logout ] = useSendLogoutMutation()
+  console.log((exp*1000)-Date.now())
+  //Convert from UNIX to milliseconds
+  const timeRemaining = (exp * 1000) - Date.now()
+  setTimeout(() => {
+    logout()
+  }, timeRemaining)
   const useEffectRan = useRef(false) // Flag for if the useEffect has already ran once. It runs twice in React.strictmode, which is used for development.
 
   const [refreshSuccess, setRefreshSuccess] = useState(false)

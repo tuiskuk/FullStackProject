@@ -1,5 +1,5 @@
 import { apiSlice } from './apiSlice'
-import { setAccessToken, logOut, setUser } from './loginSlice'
+import { setAccessToken, logOut, setUser, setExpTime } from './loginSlice'
 import jwtDecode from 'jwt-decode'
 
 const fetchUser = async (userId) => {
@@ -28,7 +28,9 @@ const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
     console.log(accessToken)
     dispatch(setAccessToken({ accessToken }))
 
-    const { id } = jwtDecode(accessToken)
+    const { id, exp } = jwtDecode(accessToken)
+    const wholeToken = jwtDecode(accessToken)
+    console.log(wholeToken)
     console.log(id)
     const user = await fetchUser(id)
     console.log(user)
@@ -39,6 +41,7 @@ const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
       // You can throw an error, show an error message, or handle it as needed
     } else {
       dispatch(setUser({ user }))
+      dispatch(setExpTime({ exp }))
     }
 
   } catch (e) {

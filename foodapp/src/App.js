@@ -4,7 +4,7 @@ import HomePage from './components/HomePage'
 import RecipeViewPage from './components/RecipeViewPage'
 import UserViewPage from './components/UserViewPage'
 import LoginPage from './components/loginPage'
-import { Container, AppBar, Toolbar, Button } from '@mui/material'
+import { AppBar, Toolbar, Button } from '@mui/material'
 import RegistrationForm from './components/RegistrationPage'
 import UsersPage from './components/UsersPage'
 import UserProfile from './components/UserProfilePage'
@@ -18,56 +18,55 @@ const App = () => {
   const user = useSelector(selectCurrentUser)
   return (
     <Router>
-      <Container>
-        <AppBar position="static">
-          <Toolbar>
-            <Button color="inherit" component={Link} to="/">
+
+      <AppBar position="relative">
+        <Toolbar>
+          <Button color="inherit" component={Link} to="/">
               home
-            </Button>
-            <Button color="inherit" component={Link} to="/search">
+          </Button>
+          <Button color="inherit" component={Link} to="/search">
               search
-            </Button>
-            <Button color="inherit" component={Link} to="/users">
+          </Button>
+          <Button color="inherit" component={Link} to="/users">
               Discover users
-            </Button>
-            {user && (
-              <Button color="inherit" component={Link} to="/profile">
+          </Button>
+          {user && (
+            <Button color="inherit" component={Link} to="/profile">
                   My Profile
-              </Button>
-            )}
-            {user && (
-              <Button color="inherit" component={Link} to="/createrecipe">
-                  Create recipe
-              </Button>
-            )}
-            <Button color="inherit" component={Link} to="/login">
-              login
             </Button>
-          </Toolbar>
-        </AppBar>
+          )}
+          {user && (
+            <Button color="inherit" component={Link} to="/createrecipe">
+                  Create recipe
+            </Button>
+          )}
+          <Button color="inherit" component={Link} to="/login">
+              login
+          </Button>
+        </Toolbar>
+      </AppBar>
 
-        <Routes>
+      <Routes>
 
 
-          <Route element={ <PersistedLogin />}>
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path='/register' element={<RegistrationForm/>}/>
-            <Route path='/users' element={<UsersPage/>}/>
-            <Route path='/createrecipe' element={<CreateRecipePage/>}/>
-            <Route path='/recipes/:recipeId' element={
-              <RecipeViewPage/>
-            }/>
-            <Route path='/users/:id' element={
-              <UserViewPage/>
-            }/>
+        <Route element={ <PersistedLogin />}>
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path='/register' element={<RegistrationForm/>}/>
+          <Route path='/users' element={<UsersPage/>}/>
+          <Route path='/createrecipe' element={<CreateRecipePage/>}/>
+          <Route path='/recipes/:recipeId' element={
+            <RecipeViewPage/>
+          }/>
+          <Route path='/users/:id' element={
+            <UserViewPage/>
+          }/>
 
-            <Route path='/profile' element={<UserProfile/>
-            }/>
-          </Route>
-        </Routes>
-      </Container>
+          <Route path='/profile' element={<UserProfile/>
+          }/>
+        </Route>
+      </Routes>
     </Router>)
 }
 

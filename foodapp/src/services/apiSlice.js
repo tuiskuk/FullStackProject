@@ -10,12 +10,9 @@ const baseQueryWithAccessToken = fetchBaseQuery({
     // Attach our accessToken from state to the requests' authorization header
     // before each request is sent.
     const jwt = getState().login?.accessToken
-    console.log(jwt)
 
     if (jwt)
       headers.set('authorization', `Bearer ${jwt}`)
-
-    console.log(headers)
     return headers
   }
 })
@@ -25,7 +22,6 @@ const baseQueryWithRefreshToken = async(args, api, extraOptions) => {
   // Call the previously defined baseQuery function to set the authorization header.
   // If the accessToken is still valid, this response will be returned.
   let response = await baseQueryWithAccessToken(args, api, extraOptions)
-  console.log(response)
   // 403 means our accessToken has expired and it should be refreshed.
   if (response?.error?.status === 403) {
 
