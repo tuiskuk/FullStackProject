@@ -23,7 +23,7 @@ const App = () => {
         <AppBar position="static">
           <Toolbar>
             <Button color="inherit" component={Link} to="/">
-              <img src="/logo.svg" alt="Logo" style={{ height: '50px' }}/>
+              <img src="/vectors/logo.svg" alt="Logo" style={{ height: '50px' }}/>
             </Button>
             <Button color="inherit" component={Link} to="/search">
               search

@@ -185,4 +185,18 @@ const getAllInteractions = async (request, response, next) => {
   }
 }
 
-export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions }
+const getAllInteractionRecipes = async (request, response, next) => {
+  try {
+    const recipes = await Recipe.find()
+    // If no recipes found, return empty
+    if (!recipes) {
+      return response.status(204).json()
+    }
+
+    response.status(200).json(recipes)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes }
