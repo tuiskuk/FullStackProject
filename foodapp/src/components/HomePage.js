@@ -21,12 +21,10 @@ const HomePage = () => {
   useEffect(() => {
     // Sort the recipes based on the number of likes in descending order
     if(recipesData) {
-      console.log(recipesData)
-      const [sortedRecipes] = [recipesData].sort((a, b) => b.likes.length - a.likes.length)
+      const sortedRecipes = recipesData.slice().sort((a, b) => b.likes.length - a.likes.length)
       setRecipes(sortedRecipes)
-      console.log(sortedRecipes)
     }
-  }, [])
+  }, [recipesData])
 
   const handleBannerClick = (link) => {
     navigate(link)
@@ -71,7 +69,7 @@ const HomePage = () => {
         <Grid container spacing={3} marginTop={0.2}>
           {recipes.map((recipe, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
-              <RecipeCard key={recipe.id} recipe={recipe.id} />
+              <RecipeCard key={recipe.id} recipe={recipe} />
             </Grid>
           ))}
         </Grid>

@@ -8,6 +8,8 @@ const UserSearchPage = () => {
   const [search, setSearch] = useState('')
   const { data: recipedata, isLoading /*,isSuccess*/, isError } = useGetUserRecipesQuery()
 
+  console.log(recipedata)
+
 
 
   return (

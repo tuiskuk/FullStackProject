@@ -53,8 +53,7 @@ const RecipeViewPage = () => {
   //can search also from user
   const isLiked = Boolean(interactionData?.recipe?.likes.some((user) => user === userId))
   const isDisliked = Boolean(interactionData?.recipe?.dislikes.some((user) => user === userId))
-
-  const isFavorite = Boolean(favoriteData?.favorites?.some((recip) => recip === interactionData?.recipe.id))
+  const isFavorite = Boolean(favoriteData?.favorites?.some((recip) => recip.recipeId === recipeId))
 
   const handleLike = async () => {
     console.log(recipeId)

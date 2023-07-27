@@ -34,7 +34,6 @@ const UserViewPage = () => {
   const postCount = 0
   const followers = followersData?.followers
   const following = followingData?.following
-  const favorites = targetUser?.favorites
   const followingCount = following?.length
   const followersCount = followers?.length
   const [showWarningDialog, setShowWarningDialog] = useState(false)
@@ -223,7 +222,7 @@ const UserViewPage = () => {
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'favorites' &&
-          favorites?.map((favorite, index) => (
+          targetUser?.favorites?.map((favorite, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={favorite.recipeId} recipe={favorite} />
             </Grid>
@@ -231,7 +230,7 @@ const UserViewPage = () => {
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'likes' &&
-          targetUser.likes?.map((like, index) => (
+          targetUser?.likes?.map((like, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={like.recipeId} recipe={like} />
             </Grid>
@@ -239,7 +238,7 @@ const UserViewPage = () => {
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'dislikes' &&
-          targetUser.dislikes?.map((dislike, index) => (
+          targetUser?.dislikes?.map((dislike, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={dislike.recipeId} recipe={dislike} />
             </Grid>
@@ -247,7 +246,7 @@ const UserViewPage = () => {
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'comments' &&
-          targetUser.comments?.map((comment, index) => (
+          targetUser?.comments?.map((comment, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               {comment}
             </Grid>

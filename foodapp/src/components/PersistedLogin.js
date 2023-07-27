@@ -10,6 +10,7 @@ const PersistedUserLogin = () => {
   const accessToken = useSelector(selectCurrentAccessToken)
   const exp = useSelector(selectCurrentExpTime)
   const [ logout ] = useSendLogoutMutation()
+
   console.log((exp*1000)-Date.now())
 
   useEffect(() => {

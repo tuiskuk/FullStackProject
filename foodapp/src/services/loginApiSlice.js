@@ -8,10 +8,7 @@ const fetchUser = async (userId) => {
     if (!response.ok) {
       throw new Error('Failed to fetch user data')
     }
-    console.log(response)
-    console.log(userId)
     const user = await response.json()
-    console.log(user)
     return user
   } catch (error) {
     console.log(error)

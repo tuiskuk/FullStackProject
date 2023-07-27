@@ -55,6 +55,7 @@ const UserProfile = () => {
     userId, { skip: !userId, refetchOnMountOrArgChange: true })
   console.log(userData)
   //TODO: dislikesData, LikesData, favoritesData, commentsData
+  console.log(favoritesData)
   const dispatch = useDispatch()
   const followingCount = following?.length
   const followersCount = followers?.length
