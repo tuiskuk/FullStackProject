@@ -9,7 +9,7 @@ import { UserRecipe } from '../models/useCreatedreceipe.js'
 const getUser = async (request, response, next) => {
   try {
     const { userId } = request.params
-    const user = await User.findById(userId)
+    const user = await User.findById(userId).populate('favorites')
 
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
@@ -202,7 +202,7 @@ const removeFavorite = async (request, response, next) => {
 const getAllFavorites = async (request, response, next) => {
   try {
     const { userId } = request.query
-    const user = await User.findById(userId)
+    const user = await User.findById(userId).populate('favorites')
 
     if (!user) {
       return response.status(404).json({ error: 'User not found' })

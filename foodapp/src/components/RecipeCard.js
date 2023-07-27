@@ -4,21 +4,18 @@ import { useGetRecipeQuery } from '../services/apiSlice'
 import { useGetUserRecipeQuery } from '../services/userRecipeApiSlice'
 
 const RecipeCard = ({ recipe }) => {
-  let recipe_id = ''
   let favoriteRecipe = null
   let isLoading = false
   let isFetching = false
   //console.log(recipe)
-
-  console.log(recipe)
+  const recipe_id =  recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.recipeId ? recipe.recipeId : recipe.id
 
   try {
-    recipe_id =  recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.id
-  } catch (e) {
-    const query = recipe.uri ? useGetRecipeQuery(recipe.recipeId) : useGetUserRecipeQuery(recipe.id)
+    const query = !recipe.uri && recipe.recipeId ? useGetRecipeQuery(recipe.id) : !recipe.uri && useGetUserRecipeQuery(recipe_id)
     favoriteRecipe = query.data
     isLoading = query.isLoading
     isFetching = query.isFetching
+  } catch (e) {
     console.log('card error', e)
   }
 
@@ -42,13 +39,13 @@ const RecipeCard = ({ recipe }) => {
       {isLoading || isFetching ? (
         <CircularProgress /> // Render the loading spinner when loading is true
       ) : (
-        <Link to={ recipe.uri ? `/recipes/${recipe_id || recipe.recipeId}` : `/userRecipes/${recipe_id}`} onClick={handleRecipeClick}>
+        <Link to={ (recipe.uri || recipe.recipeId) ? `/recipes/${recipe_id}` : `/userRecipes/${recipe_id}`} onClick={handleRecipeClick}>
           <Card sx={{ maxWidth: 200 }}>
             <CardActionArea>
               <CardMedia
                 component="img"
-                src={displayedRecipe.images?.SMALL?.url || displayedRecipe?.image || displayedRecipe.images[0] }
-                alt={displayedRecipe.label}
+                src={displayedRecipe?.images?.SMALL?.url || displayedRecipe?.image || displayedRecipe?.images[0]}
+                alt={displayedRecipe?.label}
                 height={200}
                 width={200}
                 onError={(e) => {

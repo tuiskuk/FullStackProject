@@ -16,8 +16,6 @@ const LoginPage = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const user = useSelector(selectCurrentUser)
-  console.log(user)
-  console.log(error)
 
   const imageStyle = {
     width: '100%',

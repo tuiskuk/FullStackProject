@@ -52,6 +52,7 @@ const UserProfile = () => {
   const { data: favoritesData } = useGetAllFavoritesQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
   //TODO: dislikesData, LikesData, favoritesData, commentsData
+  console.log(favoritesData)
   const dispatch = useDispatch()
   const followingCount = following?.length
   const followersCount = followers?.length

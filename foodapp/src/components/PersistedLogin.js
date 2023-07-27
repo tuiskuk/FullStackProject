@@ -11,7 +11,6 @@ const PersistedUserLogin = () => {
   const accessToken = useSelector(selectCurrentAccessToken)
   const exp = useSelector(selectCurrentExpTime)
   const [ logout ] = useSendLogoutMutation()
-  console.log((exp*1000)-Date.now())
   //Convert from UNIX to milliseconds
   const timeRemaining = (exp * 1000) - Date.now()
   setTimeout(() => {

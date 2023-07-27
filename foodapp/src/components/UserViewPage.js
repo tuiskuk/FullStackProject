@@ -33,6 +33,7 @@ const UserViewPage = () => {
   const followers = followersData?.followers
   const following = followingData?.following
   const favorites = targetUser?.favorites
+  console.log(favorites)
   const followingCount = following?.length
   const followersCount = followers?.length
 
