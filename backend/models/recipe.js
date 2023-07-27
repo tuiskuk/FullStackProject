@@ -7,11 +7,11 @@ const recipeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  image: {
+  label: {
     type: String,
     required: true,
   },
-  label: {
+  image: {
     type: String,
     required: true,
   },
