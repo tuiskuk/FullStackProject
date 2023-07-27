@@ -1,23 +1,29 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Box, CircularProgress } from '@mui/material'
-
-
 import { useRefreshMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { selectCurrentAccessToken, selectCurrentExpTime } from '../services/loginSlice'
-const PersistedUserLogin = () => {
 
+const PersistedUserLogin = () => {
+  const navigate = useNavigate()
   const accessToken = useSelector(selectCurrentAccessToken)
   const exp = useSelector(selectCurrentExpTime)
   const [ logout ] = useSendLogoutMutation()
-  //Convert from UNIX to milliseconds
-  const timeRemaining = (exp * 1000) - Date.now()
-  setTimeout(() => {
-    logout()
-  }, timeRemaining)
-  const useEffectRan = useRef(false) // Flag for if the useEffect has already ran once. It runs twice in React.strictmode, which is used for development.
 
+  console.log((exp*1000)-Date.now())
+
+  useEffect(() => {
+    const timeRemaining = (exp * 1000) - Date.now()
+    const timeout = setTimeout(() => {
+      logout()
+      navigate('/')
+    }, timeRemaining)
+
+    return () => clearTimeout(timeout)
+  }, [exp])
+
+  const useEffectRan = useRef(false) // Flag for if the useEffect has already ran once. It runs twice in React.strictmode, which is used for development.
   const [refreshSuccess, setRefreshSuccess] = useState(false)
 
   const [refresh, {

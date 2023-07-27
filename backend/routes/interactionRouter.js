@@ -2,6 +2,7 @@ import express from 'express'
 import interactionController from '../controllers/interactionController.js'
 const interactionRouter = express.Router()
 
+interactionRouter.get('/all', interactionController.getAllInteractionRecipes)
 interactionRouter.get('/', interactionController.getAllInteractions)
 interactionRouter.post('/', interactionController.createInteraction)
 interactionRouter.post('/likes', interactionController.addLikeInteraction)

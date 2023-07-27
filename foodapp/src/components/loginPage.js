@@ -5,14 +5,15 @@ import { useNavigate } from 'react-router-dom'
 import { useLoginMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import {  selectCurrentUser, setUser } from '../services/loginSlice'
+import { ExpirationWarningDialog } from './WarningDialog'
 
-
-const LoginPage = () => {
+const LoginPage = ({ action }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [ login, error ] = useLoginMutation()
   const [logout] = useSendLogoutMutation()
+  const [ showWarning, setShowWarning ] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const user = useSelector(selectCurrentUser)
@@ -50,25 +51,24 @@ const LoginPage = () => {
     }
   }, [error])
 
-
   const handleLogin = async (event) => {
     event.preventDefault()
 
-    try{
+    try {
       const response = await login({ email, password }).unwrap()
-      console.log(response)
       const loggedInUser = response.user
-      console.log(loggedInUser)
+
       dispatch(setUser(loggedInUser))
       setEmail('')
       setPassword('')
-      navigate('/')
+
+      if(!action) {
+        navigate('/')
+      }
     } catch (error) {
       console.log(error)
     }
   }
-
-
 
   if (user) {
     return (
@@ -81,15 +81,23 @@ const LoginPage = () => {
     )
   } else {
     return (
-      <Container style={containerStyle}>
+      <Container maxWidth={action ? 'sm' : false} style={!action ? containerStyle : undefined}>
 
-        <Grid container sx={{ width: '100%' }}>
+        <Grid container sx={{ width: !action ? '100%' : undefined }}>
           {/* Left column for the image */}
-          <Grid item xs={6}>
+          {!action && <Grid item xs={6}>
             <div style={imageStyle}></div>
-          </Grid>
+          </Grid>}
+
+          {error.error && <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+            <Alert severity="error" onClose={handleCloseSnackbar}>
+              {error.error && error.error.data && error.error.data.error}
+            </Alert>
+          </Snackbar>}
+          <ExpirationWarningDialog open={showWarning} onClose={() => setShowWarning(false)} />
+
           {/* Right column for the login form */}
-          <Grid item xs={6} style={{ display: 'flex', alignItems: 'center' }}>
+          <Grid item xs={action ? 12 : 6} style={{ display: 'flex', alignItems: 'center' }}>
             <Container style={formStyle}>
               <form onSubmit={handleLogin}>
                 <Grid container spacing={2}>

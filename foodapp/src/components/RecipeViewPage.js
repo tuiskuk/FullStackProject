@@ -14,6 +14,7 @@ import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation,
   useAddDislikeInteractionMutation, useRemoveDislikeInteractionMutation,
   useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
 
+import { WarningDialog } from './WarningDialog'
 import { useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
@@ -27,6 +28,7 @@ const RecipeViewPage = () => {
   const label = recipe.label
   const image = recipe.image
   const [multiplier, setMultiplier] = useState(recipe.yield || 1)
+  const [showWarningDialog, setShowWarningDialog] = useState(false)
 
   useEffect(() => {
     const savedRecipe = sessionStorage.getItem('recipe')
@@ -51,10 +53,14 @@ const RecipeViewPage = () => {
   //can search also from user
   const isLiked = Boolean(interactionData?.recipe?.likes.some((user) => user === userId))
   const isDisliked = Boolean(interactionData?.recipe?.dislikes.some((user) => user === userId))
+  const isFavorite = Boolean(favoriteData?.favorites?.some((recip) => recip.recipeId === recipeId))
 
-  const isFavorite = Boolean(favoriteData?.favorites?.some((recip) => recip === interactionData?.recipe.id))
   const handleLike = async () => {
     console.log(recipeId)
+    if(!user) {
+      setShowWarningDialog(true)
+      return
+    }
 
     if(!interactionData){
       try {
@@ -93,6 +99,10 @@ const RecipeViewPage = () => {
 
   const handleDislike = async () => {
     console.log(recipeId)
+    if(!user) {
+      setShowWarningDialog(true)
+      return
+    }
 
     if(!interactionData){
       try {
@@ -131,6 +141,11 @@ const RecipeViewPage = () => {
 
   const handleFavorite = async () => {
     console.log(recipeId)
+    if(!user) {
+      setShowWarningDialog(true)
+      return
+    }
+
     if (!isFavorite) {
       if(!interactionData){
         try {
@@ -200,7 +215,7 @@ const RecipeViewPage = () => {
                     <Typography variant="subtitle1">Dish: {recipe.dishType?.join(', ')}</Typography>
                   </Grid>
                 </Grid>
-                {user && <Grid item xs={4}>
+                {<Grid item xs={4}>
                   <Grid container direction="column" alignItems="flex-end">
                     <Grid item>
                       <IconButton onClick={handleFavorite} aria-label="Favorite">
@@ -337,6 +352,7 @@ const RecipeViewPage = () => {
       )}
 
       <CommentSection recipeId={recipeId} userId={userId} interactionData={interactionData} label={label} image={image} />
+      <WarningDialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)} user={user} />
     </Grid>
   )
 }

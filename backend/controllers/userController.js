@@ -3,13 +3,12 @@ import bcrypt from 'bcrypt'
 import { sendUserConfirmationEmail, errorCreator } from '../utils/helperFunctions.js'
 import mongoose from 'mongoose'
 import { Recipe } from '../models/recipe.js'
-import { UserRecipe } from '../models/useCreatedreceipe.js'
-
+//import { UserRecipe } from '../models/useCreatedreceipe.js'
 
 const getUser = async (request, response, next) => {
   try {
     const { userId } = request.params
-    const user = await User.findById(userId).populate('favorites')
+    const user = await User.findById(userId).populate('favorites').populate('likes').populate('dislikes')
 
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
@@ -128,31 +127,27 @@ const addFavorite = async (request, response, next) => {
   try {
     const { userId, recipeId } = request.body
 
-    const user = await User.findById(userId)
-
+    const [user, recipe] = await Promise.all([
+      User.findById(userId),
+      Recipe.findOne({ recipeId }),
+    ])
 
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
     }
 
-
-    const recipe = await Recipe.findOne({ recipeId })
-    const userRecipe = await UserRecipe.findById(recipeId)
-    console.log(userRecipe)
-    if (!recipe && !userRecipe) {
+    if (!recipe) {
       return response.status(404).json({ error: 'Recipe not found' })
     }
 
     // Check if the recipe is already in the user's favorites
-    const existingFavorite = user.favorites.includes(recipeId) || user.favorites.includes(recipeId)
+    const existingFavorite = user.favorites.includes(recipe._id)
     if (existingFavorite) {
       return response.status(400).json({ error: 'Recipe already favorited' })
     }
 
     // Add the new favorite to the user's favorites array
-
-    user.favorites.push( recipeId )
-
+    user.favorites.push( recipe._id )
 
     // Save the updated user document
     const updatedUser = await user.save()
@@ -167,28 +162,26 @@ const removeFavorite = async (request, response, next) => {
   try {
     const { userId, recipeId } = request.body
 
-    const user = await User.findById(userId)
+    const [user, recipe] = await Promise.all([
+      User.findById(userId),
+      Recipe.findOne({ recipeId }),
+    ])
 
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
     }
 
-    const recipe = await Recipe.findOne({ recipeId })
-    const userRecipe = await UserRecipe.findById(recipeId)
-
-    if (!recipe && !userRecipe) {
+    if (!recipe) {
       return response.status(404).json({ error: 'Recipe not found' })
     }
 
-    const existingFavorite = user.favorites.includes(recipeId) || user.favorites.includes(recipeId)
+    const existingFavorite = user.favorites.includes(recipe._id)
     if (!existingFavorite) {
       return response.status(400).json({ error: 'Recipe has not been favorited' })
     }
 
     // Remove the favorite from the user's favorites array
-    if(recipe || userRecipe){
-      user.favorites = user.favorites.filter((fav) => !fav.equals(recipeId))
-    }
+    user.favorites = user.favorites.filter((fav) => !fav.equals(recipe._id))
 
     // Save the updated user document
     const updatedUser = await user.save()

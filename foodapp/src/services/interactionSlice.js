@@ -57,6 +57,14 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       },
       invalidatesTags: ['Interactions'],
     }),
+    getAllInteractionRecipes: builder.query({
+      query: () => {
+        return {
+          url: '/interactions/all',
+        }
+      },
+      providedTags: ['Interactions'],
+    })
   })
 })
 
@@ -66,5 +74,6 @@ export const {
   useAddDislikeInteractionMutation,
   useRemoveDislikeInteractionMutation,
   useGetAllInteractionsQuery,
-  useCreateInteractionMutation
+  useCreateInteractionMutation,
+  useGetAllInteractionRecipesQuery
 } = interactionApiSlice
