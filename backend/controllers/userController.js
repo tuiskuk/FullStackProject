@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt'
 import { sendUserConfirmationEmail, errorCreator } from '../utils/helperFunctions.js'
 import mongoose from 'mongoose'
 import { Recipe } from '../models/recipe.js'
-//import { UserRecipe } from '../models/useCreatedreceipe.js'
 
 const getUser = async (request, response, next) => {
   try {

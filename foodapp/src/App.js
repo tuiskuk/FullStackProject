@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import SearchPage from './components/SearchPage'
 import HomePage from './components/HomePage'
-import RecipeViewPage from './components/RecipeViewPage'
 import UserViewPage from './components/UserViewPage'
 import LoginPage from './components/loginPage'
 import { AppBar, Toolbar, Button, Container } from '@mui/material'
@@ -10,7 +9,7 @@ import UsersPage from './components/UsersPage'
 import UserProfile from './components/UserProfilePage'
 import CreateRecipePage from './components/createRecipe'
 import UserSearchPage from './components/UserRecipeSearch'
-import UserRecipeViewPage from './components/UserRecipeViewPage'
+import RecipeViewPage from './components/RecipeViewPage'
 //import RequireLogin from './components/RequireLogin'
 import PersistedLogin from './components/PersistedLogin'
 import { selectCurrentUser } from './services/loginSlice'
@@ -62,6 +61,9 @@ const App = () => {
 
         <ErrorLayout>
           <Routes>
+
+
+
             <Route element={ <PersistedLogin />}>
               <Route path="/userRecipesearch" element={<UserSearchPage/>} />
               <Route path="/search" element={<SearchPage />} />
@@ -72,9 +74,6 @@ const App = () => {
               <Route path='/createrecipe' element={<CreateRecipePage/>}/>
               <Route path='/recipes/:recipeId' element={
                 <RecipeViewPage/>
-              }/>
-              <Route path='/userRecipes/:recipeId' element={
-                <UserRecipeViewPage/>
               }/>
               <Route path='/users/:id' element={
                 <UserViewPage/>
