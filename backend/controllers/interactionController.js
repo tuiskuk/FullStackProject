@@ -3,8 +3,20 @@ import { User } from '../models/user.js'
 import mongoose from 'mongoose'
 
 const createInteraction = async (request, response, next) => {
+  console.log('create interaction')
   try {
-    const { recipeId, label, image } = request.body
+    const {
+      recipeId,
+      label,
+      image,
+      images,
+      healthLabels,
+      ingredients,
+      creator,
+      instructions,
+      totalTime } = request.body
+
+    console.log(recipeId)
 
     //Check that recipe do not already exist
     const searchRecipe = await Recipe.findOne({ recipeId })
@@ -12,7 +24,13 @@ const createInteraction = async (request, response, next) => {
       return response.status(400).json({ error: 'Recipe already exist' })
     }
 
-    const recipe = new Recipe({ recipeId, label, image, likes: [], dislikes: [], comments: [] })
+    const recipe = new Recipe({ recipeId, label, image, ingredients, creator, images, healthLabels, instructions, totalTime, likes: [], dislikes: [], comments: [] })
+    if(!recipe.recipeId){
+      recipe.recipeId = recipe._id
+    }
+
+    console.log(recipe)
+
     const savedRecipe = await recipe.save()
 
     response.status(201).json({ message: 'Recipe created successfully', savedRecipe })
@@ -53,7 +71,7 @@ const addLikeInteraction = async (request, response, next) => {
     await recipe.save()
     await currentUser.save()
 
-    response.status(201).json({ message: 'Like added' })
+    response.status(201).json(recipe)
   } catch (error) {
     next(error)
   }
@@ -89,7 +107,7 @@ const removeLikeInteraction = async (request, response, next) => {
     await recipe.save()
     await currentUser.save()
 
-    response.status(201).json({ message: 'Like removed' })
+    response.status(201).json(recipe)
   } catch (error) {
     next(error)
   }
@@ -127,7 +145,7 @@ const addDislikeInteraction = async (request, response, next) => {
     await recipe.save()
     await currentUser.save()
 
-    response.status(201).json({ message: 'Dislike added' })
+    response.status(201).json(recipe)
   } catch (error) {
     next(error)
   }
@@ -163,7 +181,8 @@ const removeDislikeInteraction = async (request, response, next) => {
     await recipe.save()
     await currentUser.save()
 
-    response.status(201).json({ message: 'Dislike removed' })
+    console.log(recipe)
+    response.status(201).json(recipe)
   } catch (error) {
     next(error)
   }
@@ -172,7 +191,9 @@ const removeDislikeInteraction = async (request, response, next) => {
 const getAllInteractions = async (request, response, next) => {
   try {
     const recipeId = request.query.recipeId
+    console.log(recipeId)
     const recipe = await Recipe.findOne({ recipeId })
+    console.log(recipe)
 
     // If recipe is not found, return empty
     if (!recipe) {
@@ -199,4 +220,34 @@ const getAllInteractionRecipes = async (request, response, next) => {
   }
 }
 
-export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes }
+
+const getUserCreatedInteractions = async (request, response, next) => {
+  try {
+    const recipesCreatedByUsrs = await Recipe.find({ creator: { $ne: null } })
+
+    response.status(200).json({ recipesCreatedByUsrs })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const addImageToRecipe = async (recipeId, imageUrl, next) => {
+  try {
+    const recipe = await Recipe.findById(recipeId)
+    if (!recipe) {
+      throw new Error('Recipe not found')
+    }
+
+    // Add the new image URL to the images array
+    recipe.images.push(imageUrl)
+
+    // Save the updated recipe
+    const updatedRecipe = await recipe.save()
+
+    return updatedRecipe
+  } catch (error) {
+    next(error)
+  }
+}
+
+export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getUserCreatedInteractions, addImageToRecipe }

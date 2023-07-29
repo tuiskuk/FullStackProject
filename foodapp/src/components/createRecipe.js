@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useCreateRecipeMutation } from '../services/userRecipeApiSlice'
+import { useCreateInteractionMutation } from '../services/interactionSlice'
 import { useUploadRecipePictureMutation } from '../services/pictureHandlerApiSlice'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
@@ -18,7 +18,7 @@ const CreateRecipePage = () => {
   const [cuisineType, setCuisineType] = useState('')
   const [dishType, setDishType] = useState('')
   const [label, setLabel] = useState('')
-  const [createRecipe, { data, isLoading ,isSuccess, isError }] = useCreateRecipeMutation()
+  const [createInteraction, { data, isLoading ,isSuccess, isError }] = useCreateInteractionMutation()
   const [uploadRecipePicture] = useUploadRecipePictureMutation()
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const user = useSelector(selectCurrentUser)
@@ -124,7 +124,7 @@ const CreateRecipePage = () => {
     }
 
     try{
-      const response = await createRecipe(recipe)
+      const response = await createInteraction(recipe)
       console.log(response)
       await uploadRecipePicture({ files, id: response.data.id })
       console.log(data)
