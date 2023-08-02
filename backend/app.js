@@ -4,7 +4,6 @@ import recipesRouter from './routes/recipesRouter.js'
 import userRouter from './routes/userRouter.js'
 import loginRouter from './routes/loginRouter.js'
 import confirmEmailRouter from './routes/confirmEmailRouter.js'
-import userCreatedrecipesRouter from './routes/userCreatedrecipesRouter.js'
 import interactionRouter from './routes/interactionRouter.js'
 import commentRouter from './routes/commentRouter.js'
 import pictureRouter from './routes/pictureRouter.js'
@@ -50,7 +49,6 @@ app.use(cookieParser())
 app.use(middleware.requestLogger)
 app.use('/api/register',confirmEmailRouter)
 app.use('/api/recipes', recipesRouter)
-app.use('/api/userrecipes', userCreatedrecipesRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/interactions', interactionRouter)
