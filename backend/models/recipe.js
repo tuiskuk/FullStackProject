@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 const recipeSchema = new mongoose.Schema({
   recipeId: {
     type: String,
+    required: true,
   },
   label: {
     type: String,
@@ -13,25 +14,6 @@ const recipeSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true,
-  },
-  images: {
-    type: Array,
-    default: [],
-  },
-  ingredients: {
-    type: Array,
-    default: [],
-  },
-  healthLabels: {
-    type: Array,
-    default: [],
-  },
-  creator: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  instructions: {
-    type: String,
   },
   likes: [
     {

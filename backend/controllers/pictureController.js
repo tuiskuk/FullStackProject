@@ -1,5 +1,5 @@
 import { User } from '../models/user.js'
-import interactionController from './interactionController.js'
+import userCreatedrecipesController from './userCreatedrecipesController.js'
 import { imageDeleter } from '../utils/helperFunctions.js'
 
 
@@ -39,7 +39,7 @@ const uploadRecipePicture = async (request, response, next) => {
     const uploadPromises = uploadedFiles.map(async (file) => {
       const { filename } = file
       const imagePath = 'http://localhost:3001/images/recipePictures/' + filename
-      await interactionController.addImageToRecipe(recipeId, imagePath)
+      await userCreatedrecipesController.addImageToRecipe(recipeId, imagePath)
     })
 
     // Wait for all promises to resolve

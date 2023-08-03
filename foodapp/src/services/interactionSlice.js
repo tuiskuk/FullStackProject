@@ -47,14 +47,6 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       },
       providesTags: ['Interactions']
     }),
-    getAllUserCreatedInteractions: builder.query({
-      query: () => {
-        return {
-          url: '/interactions/userCreated',
-        }
-      },
-      providesTags: ['Interactions']
-    }),
     createInteraction: builder.mutation({
       query: ({ recipeId, label, image }) => {
         return ({
@@ -83,6 +75,5 @@ export const {
   useRemoveDislikeInteractionMutation,
   useGetAllInteractionsQuery,
   useCreateInteractionMutation,
-  useGetAllInteractionRecipesQuery,
-  useGetAllUserCreatedInteractionsQuery,
+  useGetAllInteractionRecipesQuery
 } = interactionApiSlice

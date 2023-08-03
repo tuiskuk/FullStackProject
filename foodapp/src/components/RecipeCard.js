@@ -1,36 +1,31 @@
 import { Card, CardMedia, CardContent, Typography, CardActionArea, CircularProgress  } from '@mui/material'
 import { Link } from 'react-router-dom'
-import { useGetRecipeQuery } from '../services/apiSlice'
+//import { useGetRecipeQuery } from '../services/apiSlice'
+//import { useGetUserRecipeQuery } from '../services/userRecipeApiSlice'
 
 const RecipeCard = ({ recipe }) => {
-  let recipe_id = ''
   let favoriteRecipe = null
   let isLoading = false
   let isFetching = false
-
-  console.log(recipe)
-
+  const recipe_id =  recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.recipeId ? recipe.recipeId : recipe.id
+  /*
   try {
-    recipe_id =  recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.id
-    console.log(recipe_id)
-  } catch (e) {
-    const query = useGetRecipeQuery(recipe.recipeId)
+    const query = !recipe.uri && recipe.recipeId ? useGetRecipeQuery(recipe.id) : !recipe.uri && useGetUserRecipeQuery(recipe_id)
     favoriteRecipe = query.data
     console.log(query)
     console.log(favoriteRecipe)
     isLoading = query.isLoading
     isFetching = query.isFetching
+  } catch (e) {
     console.log('card error', e)
   }
-
-  let displayedRecipe = favoriteRecipe?.recipe || recipe
+  */
+  const displayedRecipe = favoriteRecipe?.recipe || recipe
 
   const handleRecipeClick = () => {
     try {
       //for userCreated recipes store recipe to redux state
-      const updatedRecipe = recipe.id ? recipe : { ...recipe, id: recipe_id }
-      displayedRecipe = updatedRecipe
-      console.log(displayedRecipe)
+      console.log(recipe)
       console.log('recipe card')
       // Save the recipe to sessionStorage
       sessionStorage.setItem('recipe', JSON.stringify(displayedRecipe))
@@ -44,7 +39,7 @@ const RecipeCard = ({ recipe }) => {
       {isLoading || isFetching ? (
         <CircularProgress /> // Render the loading spinner when loading is true
       ) : (
-        <Link to={`/recipes/${recipe_id}`} onClick={handleRecipeClick}>
+        <Link to={ (recipe.uri || recipe.recipeId) ? `/recipes/${recipe_id}` : `/userRecipes/${recipe_id}`} onClick={handleRecipeClick}>
           <Card sx={{ maxWidth: 200 }}>
             <CardActionArea>
               <CardMedia
