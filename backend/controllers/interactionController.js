@@ -4,7 +4,10 @@ import mongoose from 'mongoose'
 
 const createInteraction = async (request, response, next) => {
   try {
-    const { recipeId, label, image } = request.body
+    //yield is handled like it is because yield is illegal name
+    const { recipeId, label, image, images, recipeYield, url,
+      ingredients, totalNutrients, creator , instructions
+    }  = request.body
 
     //Check that recipe do not already exist
     const searchRecipe = await Recipe.findOne({ recipeId })
@@ -12,7 +15,14 @@ const createInteraction = async (request, response, next) => {
       return response.status(400).json({ error: 'Recipe already exist' })
     }
 
-    const recipe = new Recipe({ recipeId, label, image, likes: [], dislikes: [], comments: [] })
+    const recipe = new Recipe({ recipeId, label, image, images, yield: recipeYield, url,
+      ingredients, totalNutrients, creator,  instructions, likes: [], dislikes: [], comments: [] })
+
+    //
+    if(creator){
+      recipe.recipeId = recipe._id
+    }
+
     const savedRecipe = await recipe.save()
 
     response.status(201).json({ message: 'Recipe created successfully', savedRecipe })
@@ -172,7 +182,7 @@ const removeDislikeInteraction = async (request, response, next) => {
 const getAllInteractions = async (request, response, next) => {
   try {
     const recipeId = request.query.recipeId
-    const recipe = await Recipe.findOne({ recipeId })
+    const recipe = await Recipe.findOne({ recipeId }).populate('creator')
 
     // If recipe is not found, return empty
     if (!recipe) {
@@ -187,7 +197,7 @@ const getAllInteractions = async (request, response, next) => {
 
 const getAllInteractionRecipes = async (request, response, next) => {
   try {
-    const recipes = await Recipe.find()
+    const recipes = await Recipe.find().populate('creator')
     // If no recipes found, return empty
     if (!recipes) {
       return response.status(204).json()
@@ -199,4 +209,19 @@ const getAllInteractionRecipes = async (request, response, next) => {
   }
 }
 
-export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes }
+const getAllUserCreatedInteractions = async (request, response, next) => {
+  try {
+    const recipes = await Recipe.find({ creator: { $ne: null } }).populate('creator')
+    // If no recipes found, return empty
+    if (!recipes) {
+      return response.status(204).json()
+    }
+
+    response.status(200).json(recipes)
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions }

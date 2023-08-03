@@ -10,7 +10,6 @@ import UsersPage from './components/UsersPage'
 import UserProfile from './components/UserProfilePage'
 import CreateRecipePage from './components/createRecipe'
 import UserSearchPage from './components/UserRecipeSearch'
-import UserRecipeViewPage from './components/UserRecipeViewPage'
 //import RequireLogin from './components/RequireLogin'
 import PersistedLogin from './components/PersistedLogin'
 import { selectCurrentUser } from './services/loginSlice'
@@ -73,9 +72,7 @@ const App = () => {
               <Route path='/recipes/:recipeId' element={
                 <RecipeViewPage/>
               }/>
-              <Route path='/userRecipes/:recipeId' element={
-                <UserRecipeViewPage/>
-              }/>
+
               <Route path='/users/:id' element={
                 <UserViewPage/>
               }/>

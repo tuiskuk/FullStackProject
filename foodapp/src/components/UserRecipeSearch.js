@@ -1,12 +1,12 @@
 import { Container, Typography, OutlinedInput, CircularProgress, Grid } from '@mui/material'
 import { useState } from 'react'
-import { useGetUserRecipesQuery } from '../services/userRecipeApiSlice'
+import { useGetAllUserCreatedInteractionsQuery } from '../services/interactionSlice'
 import RecipeCard from './RecipeCard'
 
 
 const UserSearchPage = () => {
   const [search, setSearch] = useState('')
-  const { data: recipedata, isLoading /*,isSuccess*/, isError } = useGetUserRecipesQuery()
+  const { data: recipedata, isLoading /*,isSuccess*/, isError } = useGetAllUserCreatedInteractionsQuery()
 
   console.log(recipedata)
 

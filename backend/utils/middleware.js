@@ -15,7 +15,7 @@ const requestLogger = (request, response, next) => {
 
 
 const errorHandler = (error, request, response) => {
-  console.log(error.message)
+  console.log(error)
   console.log('error function entered')
 
   if(request.isUnknownEndpoint){
