@@ -1,7 +1,26 @@
 import { User } from '../models/user.js'
-import interactionController from './interactionController.js'
+import { Recipe } from '../models/recipe.js'
 import { imageDeleter } from '../utils/helperFunctions.js'
 
+
+const addImageToRecipe = async (recipeId, imageUrl, next) => {
+  try {
+    const recipe = await Recipe.findById(recipeId)
+    if (!recipe) {
+      throw new Error('Recipe not found')
+    }
+
+    // Add the new image URL to the images array
+    recipe.images.push(imageUrl)
+
+    // Save the updated recipe
+    const updatedRecipe = await recipe.save()
+
+    return updatedRecipe
+  } catch (error) {
+    next(error)
+  }
+}
 
 const uploadProfilePicture = async (request, response, next) => {
 
@@ -39,7 +58,7 @@ const uploadRecipePicture = async (request, response, next) => {
     const uploadPromises = uploadedFiles.map(async (file) => {
       const { filename } = file
       const imagePath = 'http://localhost:3001/images/recipePictures/' + filename
-      await interactionController.addImageToRecipe(recipeId, imagePath)
+      await addImageToRecipe(recipeId, imagePath)
     })
 
     // Wait for all promises to resolve
@@ -48,6 +67,8 @@ const uploadRecipePicture = async (request, response, next) => {
     next(error)
   }
 }
+
+
 
 export default {
   uploadProfilePicture, uploadRecipePicture

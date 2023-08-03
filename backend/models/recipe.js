@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 const recipeSchema = new mongoose.Schema({
   recipeId: {
     type: String,
+    required: true,
   },
   label: {
     type: String,
@@ -12,26 +13,34 @@ const recipeSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    required: true,
+    default: null,
   },
   images: {
     type: Array,
     default: [],
   },
+  yield: {
+    type: Number,
+    default: 4,
+  },
   ingredients: {
     type: Array,
     default: [],
   },
-  healthLabels: {
-    type: Array,
-    default: [],
+  totalNutrients: {
+    type: Object,
+    default: null,
+  },
+  instructions: {
+    type: String,
+  },
+  url: {           //has to be saved since we want these from main page to be clickable
+    type: String,
+    default: null  //(there coulb be possibility to get these from api in home page as well)
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-  },
-  instructions: {
-    type: String,
   },
   likes: [
     {

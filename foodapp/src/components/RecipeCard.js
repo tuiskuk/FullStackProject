@@ -2,13 +2,12 @@ import { Card, CardMedia, CardContent, Typography, CardActionArea, CircularProgr
 import { Link } from 'react-router-dom'
 import { useGetRecipeQuery } from '../services/apiSlice'
 
+
 const RecipeCard = ({ recipe }) => {
   let recipe_id = ''
   let favoriteRecipe = null
   let isLoading = false
   let isFetching = false
-
-  console.log(recipe)
 
   try {
     recipe_id =  recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.id
@@ -23,14 +22,11 @@ const RecipeCard = ({ recipe }) => {
     console.log('card error', e)
   }
 
-  let displayedRecipe = favoriteRecipe?.recipe || recipe
+
+  const displayedRecipe = favoriteRecipe?.recipe || recipe
 
   const handleRecipeClick = () => {
     try {
-      //for userCreated recipes store recipe to redux state
-      const updatedRecipe = recipe.id ? recipe : { ...recipe, id: recipe_id }
-      displayedRecipe = updatedRecipe
-      console.log(displayedRecipe)
       console.log('recipe card')
       // Save the recipe to sessionStorage
       sessionStorage.setItem('recipe', JSON.stringify(displayedRecipe))
@@ -44,7 +40,7 @@ const RecipeCard = ({ recipe }) => {
       {isLoading || isFetching ? (
         <CircularProgress /> // Render the loading spinner when loading is true
       ) : (
-        <Link to={`/recipes/${recipe_id}`} onClick={handleRecipeClick}>
+        <Link to={ `/recipes/${recipe_id}` } onClick={handleRecipeClick}>
           <Card sx={{ maxWidth: 200 }}>
             <CardActionArea>
               <CardMedia

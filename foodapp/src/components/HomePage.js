@@ -29,6 +29,7 @@ const HomePage = () => {
   const handleBannerClick = (link) => {
     navigate(link)
   }
+  console.log(recipesData)
 
   return (
     <div>

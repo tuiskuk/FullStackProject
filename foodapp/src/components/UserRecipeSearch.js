@@ -1,20 +1,15 @@
 import { Container, Typography, OutlinedInput, CircularProgress, Grid } from '@mui/material'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useGetAllUserCreatedInteractionsQuery } from '../services/interactionSlice'
 import RecipeCard from './RecipeCard'
 
 
 const UserSearchPage = () => {
   const [search, setSearch] = useState('')
-  const { data: recipedata, isLoading, isError } = useGetAllUserCreatedInteractionsQuery()
+  const { data: recipedata, isLoading /*,isSuccess*/, isError } = useGetAllUserCreatedInteractionsQuery()
 
-  useEffect(() => {
-    console.log(recipedata)
-  },[recipedata])
+  console.log(recipedata)
 
-  if(!recipedata){
-    return <div>Loading...</div>
-  }
 
 
   return (
@@ -32,7 +27,7 @@ const UserSearchPage = () => {
         alignItems="center"
       >
         {isLoading ? <CircularProgress/> : isError ? <h3>error occured while trying to get recipes</h3>
-          : recipedata.recipesCreatedByUsrs.map((recipe) =>  <RecipeCard key={recipe.id} recipe={recipe} />) }
+          : recipedata.map((recipe) =>  <RecipeCard key={recipe.id} recipe={recipe} />) }
       </Grid>
     </Container>
   )

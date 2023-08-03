@@ -3,8 +3,8 @@ import interactionController from '../controllers/interactionController.js'
 const interactionRouter = express.Router()
 
 interactionRouter.get('/all', interactionController.getAllInteractionRecipes)
+interactionRouter.get('/all/userCreated',interactionController.getAllUserCreatedInteractions)
 interactionRouter.get('/', interactionController.getAllInteractions)
-interactionRouter.get('/userCreated',interactionController.getUserCreatedInteractions)
 interactionRouter.post('/', interactionController.createInteraction)
 interactionRouter.post('/likes', interactionController.addLikeInteraction)
 interactionRouter.delete('/likes', interactionController.removeLikeInteraction)
