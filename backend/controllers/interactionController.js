@@ -190,9 +190,11 @@ const removeDislikeInteraction = async (request, response, next) => {
 
 const getAllInteractions = async (request, response, next) => {
   try {
-    const recipeId = request.query.recipeId
+    const { recipeId } = request.query
+    console.log(request)
+    console.log(request.query)
     console.log(recipeId)
-    const recipe = await Recipe.findOne({ recipeId })
+    const recipe = await Recipe.findById(recipeId)
     console.log(recipe)
 
     // If recipe is not found, return empty

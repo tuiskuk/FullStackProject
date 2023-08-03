@@ -522,7 +522,7 @@ const RecipeViewPage = () => {
                 .slice(0,6).map(filtername => <RoundedButton key={filtername} backgroundColor={'#f19b1c'} healtlabel={filtername} />)}
               <br/>
               <br/>
-              {recipe?.mealType.map(filtername => <RoundedButton key={filtername} backgroundColor={'#00ff00'} healtlabel={filtername} />)}
+              {recipe?.mealType?.map(filtername => <RoundedButton key={filtername} backgroundColor={'#00ff00'} healtlabel={filtername} />)}
             </Box>
           </Grid>
           <Grid item>

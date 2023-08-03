@@ -102,6 +102,7 @@ const getRecipe = async (request, response, next) => {
       return response.status(404).json({ error: 'Recipe not found' })
     }
     const recipeId = foundRecipe.recipeId
+    console.log(recipeId)
 
     const url = `https://api.edamam.com/api/recipes/v2/${recipeId}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
     console.log(url)

@@ -209,16 +209,16 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
                 <Grid item xs={10}>
                   <Grid container alignItems="center" spacing={2}>
                     <Grid item>
-                      <Avatar src={comment.user.profileImage || `https://eu.ui-avatars.com/api/?name=${comment.user.username}&size=200`} alt={comment.user.name} />
+                      <Avatar src={comment?.user?.profileImage || `https://eu.ui-avatars.com/api/?name=${comment?.user?.username}&size=200`} alt={comment?.user?.name} />
                     </Grid>
                     <Grid item>
                       <Link to={`/users/${comment.user?.id}`} style={{
                         textDecoration: 'none', color: 'black',
                       }}><Typography variant="body1" fontWeight="bold">
-                          {comment.user.name}
+                          {comment.user?.name}
                         </Typography></Link>
                       <Typography variant="body2" color="textSecondary">
-                        @{comment.user.username} - {formattedDate}
+                        @{comment.user?.username} - {formattedDate}
                       </Typography>
                       <Typography variant="body1">
                         {comment.text}
@@ -226,7 +226,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
                     </Grid>
                   </Grid>
                 </Grid>
-                {comment.user.id === userId && (
+                {comment.user?.id === userId && (
                   <Grid item>
                     <IconButton onClick={() => toggleEdit()} aria-label="Edit">
                       <EditIcon />
