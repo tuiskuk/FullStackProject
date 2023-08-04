@@ -1,4 +1,4 @@
-import LoginPage from './loginPage'
+import LoginPage from '../pages/loginPage'
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
 import { useRefreshMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { useDispatch, useSelector } from 'react-redux'

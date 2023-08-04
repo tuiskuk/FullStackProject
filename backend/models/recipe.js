@@ -23,6 +23,10 @@ const recipeSchema = new mongoose.Schema({
     type: Number,
     default: 4,
   },
+  totalTime: {
+    type: Number,
+    default: null
+  },
   ingredients: {
     type: Array,
     default: [],
@@ -34,13 +38,10 @@ const recipeSchema = new mongoose.Schema({
   instructions: {
     type: String,
   },
-  url: {           //has to be saved since we want these from main page to be clickable
-    type: String,
-    default: null  //(there coulb be possibility to get these from api in home page as well)
-  },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    default: null
   },
   likes: [
     {

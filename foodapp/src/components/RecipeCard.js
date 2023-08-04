@@ -1,29 +1,44 @@
 import { Card, CardMedia, CardContent, Typography, CardActionArea, CircularProgress  } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useGetRecipeQuery } from '../services/apiSlice'
+import { useEffect, useState } from 'react'
 
 
 const RecipeCard = ({ recipe }) => {
-  let recipe_id = ''
+  let recipe_id  = recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.recipeId
   let favoriteRecipe = null
-  let isLoading = false
-  let isFetching = false
+  const [displayedRecipe,setDisplayedRecipe] = useState(null)
 
-  try {
-    recipe_id =  recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.id
-    console.log(recipe_id)
-  } catch (e) {
-    const query = useGetRecipeQuery(recipe.recipeId)
-    favoriteRecipe = query.data
-    console.log(query)
-    console.log(favoriteRecipe)
-    isLoading = query.isLoading
-    isFetching = query.isFetching
-    console.log('card error', e)
-  }
+  const { data: dataFromApi, isFetching, isLoading } = useGetRecipeQuery(recipe.id)
+
+  //inside useEffect to make sure that dataFromApi is defined
+  useEffect(() => {
+    try {
+
+      //modify recipe only if it is not created by user
+      //and does not contain api information
+      if(!recipe?.creator && !recipe?.url){
+        //we need to make sure that properties instruktions, totalTime
+        //and so on are will be set in recipeViewPages state
+        const wholeRecipe = {
+          ...dataFromApi?.recipe,
+        }
+        recipe = wholeRecipe
+        console.log(recipe)
+      }
+
+    } catch (e) {recipe
+      favoriteRecipe = dataFromApi.data
+      console.log(dataFromApi)
+      console.log(favoriteRecipe)
+      console.log('card error', e)
+    }
+
+    setDisplayedRecipe(favoriteRecipe || recipe)
+    console.log(displayedRecipe)
+  }, [recipe ,dataFromApi])
 
 
-  const displayedRecipe = favoriteRecipe?.recipe || recipe
 
   const handleRecipeClick = () => {
     try {
@@ -48,8 +63,8 @@ const RecipeCard = ({ recipe }) => {
             <CardActionArea>
               <CardMedia
                 component="img"
-                src={displayedRecipe?.images?.SMALL?.url || displayedRecipe?.image || displayedRecipe?.images[0]}
-                alt={displayedRecipe?.label}
+                src={recipe?.images?.SMALL?.url || recipe?.image || recipe?.images[0]}
+                alt={recipe?.label || 'moi'}
                 height={200}
                 width={200}
                 onError={(e) => {
@@ -58,7 +73,7 @@ const RecipeCard = ({ recipe }) => {
                 }}
               />
               <CardContent sx={{ height: 80 }}>
-                <Typography variant="h6">{displayedRecipe.label}</Typography>
+                <Typography variant="h6">{recipe?.label}</Typography>
               </CardContent>
             </CardActionArea>
           </Card>

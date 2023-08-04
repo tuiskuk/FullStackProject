@@ -1,4 +1,4 @@
-import RecipeCard from './RecipeCard'
+import RecipeCard from '../components/RecipeCard'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
