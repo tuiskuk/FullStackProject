@@ -2,9 +2,9 @@ import RecipeCard from '../components/RecipeCard'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
-import { Container, Button, FormControl, Select, MenuItem,
+import { Button, FormControl, Select, MenuItem,
   InputLabel, Checkbox, ListItemText, CircularProgress,
-  OutlinedInput, Box, Chip, Typography, InputAdornment } from '@mui/material'
+  OutlinedInput, Box, Chip, Typography, InputAdornment, Grid } from '@mui/material'
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
@@ -136,17 +136,22 @@ const SearchPage = () => {
   }
 
   return (
-    <Container>
-      <FormControl fullWidth variant="outlined" sx={{ m: 0.5 }} >
-        <h2>Search page</h2>
-        <OutlinedInput
-          placeholder='Search recipes'
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
-      </FormControl>
+    <Grid container spacing={2} paddingTop={1}>
+      <Grid item xs={12}>
+        <Typography variant="h5" fontWeight="bold" paddingLeft={1}>
+            Search Recipes Here!
+        </Typography>
+        <FormControl fullWidth variant="outlined" >
+          <OutlinedInput
+            placeholder='Search recipes'
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </FormControl>
+      </Grid>
 
-      <div>
+
+      <Grid item xs={12}>
         <h3>Spesifications</h3>
 
         <FormControl sx={{ m: 0.5, width: 250 }}>
@@ -210,9 +215,9 @@ const SearchPage = () => {
             ))}
           </Select>
         </FormControl>
-      </div>
+      </Grid>
 
-      <div>
+      <Grid item xs={12}>
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
           <RangeInputComponent
             value={time || ''}
@@ -266,9 +271,9 @@ const SearchPage = () => {
             clear={clear}
           />
         </FormControl>
-      </div>
+      </Grid>
 
-      <div>
+      <Grid item xs={12}>
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
           <Button variant="contained" onClick={toggelShow} >
             {showNutrients ? 'Hide Nutrient Filters' : 'Show Nutrients Filters'}
@@ -299,30 +304,34 @@ const SearchPage = () => {
         <Button variant="contained" onClick={clearFilters} sx={{ m: 0.5, width: 250 }}>
           Clear
         </Button>
-      </div>
+      </Grid>
 
-      <h2>Check recommended recipes or feel free to search recipes yourself</h2>
-      {isLoading || isFetching ? (
-        <CircularProgress /> // Render the loading spinner when loading is true
-      ) : recipes.length !== 0 ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe.uri} recipe={recipe} />
-          ))}
-        </div>
-      ) : (
-        <h3>No recipes found</h3>
-      )}
-
-      <div>
-        <br />
+      <Grid item xs={12}>
+        <Typography variant="h5" fontWeight="bold" paddingLeft={1}>
+          Check recommended recipes or feel free to search recipes yourself
+        </Typography>
+        {isLoading || isFetching ? (
+          <CircularProgress /> // Render the loading spinner when loading is true
+        ) : recipes.length !== 0 ? (
+          <Grid container spacing={2} marginTop={1} justifyContent="space-around" >
+            {recipes.map((recipe, index) => (
+              <Grid item key={index}>
+                <RecipeCard key={recipe.uri} recipe={recipe} />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <h3>No recipes found</h3>
+        )}
+      </Grid>
+      <Grid item xs={12} sx={{ textAlign: 'center' }} >
         {nextPageLink && (
           <Button variant="contained" onClick={goToNextPage} sx={{ m: 0.5, width: 250 }}>
             Load more
           </Button>
         )}
-      </div>
-    </Container>
+      </Grid>
+    </Grid>
   )
 }
 

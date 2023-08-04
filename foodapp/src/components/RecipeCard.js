@@ -55,8 +55,11 @@ const RecipeCard = ({ recipe }) => {
       {isLoading || isFetching ? (
         <CircularProgress /> // Render the loading spinner when loading is true
       ) : (
-        <Link to={ `/recipes/${recipe_id}` } onClick={handleRecipeClick}>
-          <Card sx={{ maxWidth: 200 }}>
+        <Link to={ `/recipes/${recipe_id}` } onClick={handleRecipeClick} >
+          <Card sx={{ maxWidth: 200, transition: 'transform 0.3s ease-in-out',
+            '&:hover': {
+              transform: 'scale(1.03)',
+            }, }}>
             <CardActionArea>
               <CardMedia
                 component="img"

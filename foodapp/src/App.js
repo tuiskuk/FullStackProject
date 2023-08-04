@@ -13,8 +13,7 @@ import UserSearchPage from './pages/UserRecipeSearch'
 import PersistedLogin from './components/PersistedLogin'
 import ErrorLayout from './components/ErrorLayout'
 import NavigationBar from './components/NavigationBar'
-
-
+import Footer from './components/Footer'
 
 const App = () => {
   return (
@@ -44,6 +43,7 @@ const App = () => {
             </Route>
           </Routes>
         </ErrorLayout>
+        <Footer/>
       </Container>
     </Router>)
 }
