@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux'
 import RecipeCard from '../components/RecipeCard'
 import { useGetUsersQuery } from '../services/userApiSlice'
 import { selectCurrentUser } from '../services/loginSlice'
-import UserCard from './UserCard'
+import UserCard from '../components/UserCard'
 
 const HomePage = () => {
   const [recipes, setRecipes] = useState([])
