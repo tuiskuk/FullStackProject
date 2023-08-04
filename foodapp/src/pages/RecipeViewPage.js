@@ -11,13 +11,13 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
-import CommentSection from './CommentSectionComponent'
+import CommentSection from '../components/CommentSectionComponent'
 import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation,
   useAddDislikeInteractionMutation, useRemoveDislikeInteractionMutation,
   useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
 
-import { WarningDialog } from './WarningDialog'
+import { WarningDialog } from '../components/WarningDialog'
 import { useNavigate, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
@@ -46,6 +46,7 @@ const RecipeViewPage = () => {
     { recipeId }, { skip: !recipeId, refetchOnMountOrArgChange: true })
 
 
+  console.log(interactionData)
   console.log(recipe)
 
 
@@ -107,10 +108,6 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
   const label = recipe.label
   const image = recipe.image
-  const ingredients = recipe.ingredients
-  const totalNutrients = recipe.totalNutrients
-  const url = recipe.url
-  const recipeYield = recipe.yield
 
   const [ addLikeInteraction ] = useAddLikeInteractionMutation()
   const [ removeLikeInteraction ] = useRemoveLikeInteractionMutation()
@@ -122,6 +119,9 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
   const { data: favoriteData, refetch } = useGetAllFavoritesQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
+
+
+  console.log(favoriteData)
 
 
   const creatorNameParts = recipe?.creator?.name
@@ -157,7 +157,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
     if(!interactionData){
       try {
-        await createInteraction({ recipeId, label, image, url, ingredients, totalNutrients, recipeYield })
+        await createInteraction({ recipeId, label, image })
         console.log('create')
       } catch (error) {
         setDisableIconButton(false)
@@ -206,7 +206,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
     if(!interactionData){
       try {
-        await createInteraction({ recipeId, label, image, url, ingredients, totalNutrients, recipeYield })
+        await createInteraction({ recipeId, label, image })
         console.log('create')
       } catch (error) {
         setDisableIconButton(false)
@@ -256,7 +256,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
     if (!isFavorite) {
       if(!interactionData){
         try {
-          await createInteraction({ recipeId, label, image, url, ingredients, totalNutrients, recipeYield })
+          await createInteraction({ recipeId, label, image })
           console.log('create')
         } catch (error) {
           setDisableIconButton(false)
