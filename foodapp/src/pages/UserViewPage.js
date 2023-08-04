@@ -5,9 +5,9 @@ import { useFollowMutation, useUnfollowMutation, useGetAllFollowingQuery, useGet
 import { selectCurrentUser, setUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useState } from 'react'
-import RecipeCard from './RecipeCard'
-import UserListItem from './userListItem'
-import { WarningDialog } from './WarningDialog'
+import RecipeCard from '../components/RecipeCard'
+import UserListItem from '../components/userListItem'
+import { WarningDialog } from '../components/WarningDialog'
 
 
 const UserViewPage = () => {

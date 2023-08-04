@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Paper, CircularProgress, Grid } from '@mui/material'
 import { useGetAllInteractionRecipesQuery } from '../services/interactionSlice'
 import { useState, useEffect } from 'react'
-import RecipeCard from './RecipeCard'
+import RecipeCard from '../components/RecipeCard'
 
 const HomePage = () => {
   const [recipes, setRecipes] = useState([])

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useLoginMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import {  selectCurrentUser, setUser } from '../services/loginSlice'
-import { ExpirationWarningDialog } from './WarningDialog'
+import { ExpirationWarningDialog } from '../components/WarningDialog'
 
 const LoginPage = ({ action }) => {
   const [email, setEmail] = useState('')
