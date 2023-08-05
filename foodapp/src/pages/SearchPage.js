@@ -4,7 +4,9 @@ import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
 import { Button, FormControl, Select, MenuItem,
   InputLabel, Checkbox, ListItemText, CircularProgress,
-  OutlinedInput, Box, Chip, Typography, InputAdornment, Grid } from '@mui/material'
+  OutlinedInput, Box, Chip, Typography, InputAdornment, Grid, Paper, IconButton, AppBar, Toolbar, Menu } from '@mui/material'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
@@ -135,21 +137,204 @@ const SearchPage = () => {
     setExcludedChipArray(updatedExcludedArray)
   }
 
+  const handleDeleteMealTypeChip = (index) => {
+    const updatedMealOptions = [...mealTypeOptions]
+    updatedMealOptions.splice(index, 1)
+    setMealTypeOptions(updatedMealOptions)
+  }
+
+  const handleDeleteAllergyChip = (index) => {
+    const updatedAllergies = [...filterOptions]
+    updatedAllergies.splice(index, 1)
+    setFilterOptions(updatedAllergies)
+  }
+  const [anchorMeals, setAnchorMeals] = useState(null)
+  const [anchorAllergies, setAnchorAllergies] = useState(null)
+  const handleMealsClick = (event) => {
+    setAnchorMeals(event.currentTarget)
+  }
+
+  const handleAllergiesClick = (event) => {
+    setAnchorAllergies(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorMeals(null)
+    setAnchorAllergies(null)
+  }
+
   return (
     <Grid container spacing={2} paddingTop={1}>
       <Grid item xs={12}>
-        <Typography variant="h5" fontWeight="bold" paddingLeft={1}>
-            Search Recipes Here!
-        </Typography>
-        <FormControl fullWidth variant="outlined" >
-          <OutlinedInput
-            placeholder='Search recipes'
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
+        <Paper sx={{
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+        }}>
+          <img
+            src='/images/searchBanner.png'
+            style={{
+              width: '100%',
+              height: 'auto',
+            }}
           />
-        </FormControl>
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              bottom: '50%',
+              left: '10%',
+              right: '10%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold" color="white">
+                Search Recipes!
+            </Typography>
+            <FormControl fullWidth variant="outlined" >
+              <OutlinedInput
+                placeholder='Search recipes'
+                value={search}
+                style={{ backgroundColor: 'white' }}
+                onChange={(event) => setSearch(event.target.value)}
+                onKeyPress={(event) => {
+                  if (event.key === 'Enter') {
+                    searchRecipes()
+                  }
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={searchRecipes}
+                    >
+                      <img
+                        src="/vectors/magnifyingGlass.svg"
+                        alt="Search"
+                        style={{
+                          cursor: 'pointer',
+                          width: '30px',
+                          height: '30px',
+                        }}
+                      />
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </div>
+        </Paper>
       </Grid>
 
+      {( mealTypeOptions.length !== 0 || filterOptions.length !== 0 ) &&
+        <Grid item xs={12}>
+          <Paper sx={{ backgroundColor: 'white', padding: '16px' }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              {mealTypeOptions.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteMealTypeChip(value)}
+                  sx={{
+                    backgroundColor: '#c8e6c9', // Light green color
+                    '&:hover': {
+                      backgroundColor: '#a5d6a7', // Lighter green color on hover
+                    },
+                  }}/>
+              ))}
+              {filterOptions.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteAllergyChip(value)}
+                  sx={{
+                    backgroundColor: '#90caf9', // Light green color
+                    '&:hover': {
+                      backgroundColor: '#64b5f6', // Lighter green color on hover
+                    },
+                  }}/>
+              ))}
+            </Box>
+          </Paper>
+        </Grid>}
+
+      {excludedChipArray.length !== 0 &&
+        <Grid item xs={12}>
+          <Paper sx={{ backgroundColor: 'white', padding: '16px' }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              {excludedChipArray.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteChip(value)}
+                  sx={{
+                    backgroundColor: '#ef9a9a', // Light green color
+                    '&:hover': {
+                      backgroundColor: '#e57373', // Lighter green color on hover
+                    },
+                  }}/>
+              ))}
+            </Box>
+          </Paper>
+        </Grid>}
+
+      <Grid item xs={12}>
+        <AppBar position="static">
+          <Toolbar>
+            <Button onClick={handleMealsClick} color="inherit">
+              Meals
+              {anchorMeals ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+            </Button>
+            <Menu
+              anchorEl={anchorMeals}
+              open={Boolean(anchorMeals)}
+              onClose={handleClose}
+            >
+              {/* Items for Meals */}
+              <MenuItem onClick={handleClose}>Breakfast</MenuItem>
+              <MenuItem onClick={handleClose}>Lunch</MenuItem>
+              <MenuItem onClick={handleClose}>Dinner</MenuItem>
+            </Menu>
+            <Button onClick={handleAllergiesClick} color="inherit">
+              Allergies
+              {anchorAllergies  ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+            </Button>
+            <Menu
+              anchorEl={anchorAllergies}
+              open={Boolean(anchorAllergies)}
+              onClose={handleClose}
+            >
+              {/* Items for Allergies */}
+              <MenuItem onClick={handleClose}>Dairy</MenuItem>
+              <MenuItem onClick={handleClose}>Nuts</MenuItem>
+              <MenuItem onClick={handleClose}>Gluten</MenuItem>
+            </Menu>
+            <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+              <OutlinedInput
+                placeholder="Set excluded foods"
+                value={excludedChip}
+                onChange={(event) => setExcludedChip(event.target.value)}
+                sx={{
+                  backgroundColor: 'white',
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleAddExcludedFood}
+                    >
+                      Add
+                    </Button>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </Toolbar>
+        </AppBar>
+      </Grid>
 
       <Grid item xs={12}>
         <h3>Spesifications</h3>
@@ -226,30 +411,6 @@ const SearchPage = () => {
             onChange={setTime}
             clear={clear}
           />
-        </FormControl>
-
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <Box display='flex' flexWrap='wrap' gap={0.5}>
-            {excludedChipArray.map((value, index) => (
-              <Chip key={index} label={value} onDelete={() => handleDeleteChip(index)}/>
-            ))}
-            <OutlinedInput
-              placeholder="Set excluded foods"
-              value={excludedChip}
-              onChange={(event) => setExcludedChip(event.target.value)}
-              endAdornment={
-                <InputAdornment position="end">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleAddExcludedFood}
-                  >
-                    Add
-                  </Button>
-                </InputAdornment>
-              }
-            />
-          </Box>
         </FormControl>
 
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
