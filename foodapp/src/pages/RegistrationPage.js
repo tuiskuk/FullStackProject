@@ -48,7 +48,7 @@ const RegistrationForm = () => {
 
   const containerStyle = {
     height: '100vh',
-    overflow: 'hidden',
+    overflow: 'auto',
   }
 
 
@@ -111,15 +111,15 @@ const RegistrationForm = () => {
 
 
   return (
-    <Container maxWidth="lg" style={ containerStyle }>
+    <Container maxWidth="lg" style={ containerStyle }  >
 
-      <Grid container justifyContent="center" spacing={2} sx={{ width: '100%' }}>
+      <Grid container justifyContent="center" spacing={2} >
 
         {!isScreenSmall && <Grid item xs={6}>
           <div style={imageStyle}></div>
         </Grid> }
 
-        <Grid item xs={!isScreenSmall ? 6 : 10}>
+        <Grid item xs={!isScreenSmall ? 6 : 10}  >
           <Snackbar
             open={isSuccess}
             autoHideDuration={5000}
