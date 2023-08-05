@@ -2,7 +2,7 @@ import React from 'react'
 import { Carousel } from 'react-responsive-carousel'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { useNavigate } from 'react-router-dom'
-import { Paper, CircularProgress, Grid, Typography } from '@mui/material'
+import { useMediaQuery, Paper, CircularProgress, Grid, Typography } from '@mui/material'
 import { useGetAllInteractionRecipesQuery } from '../services/interactionSlice'
 import { useState, useEffect } from 'react'
 
@@ -19,6 +19,9 @@ const HomePage = () => {
   const { data: usersData, isLoading: isLoadingUsers, isFetching: isFetchingUsers } = useGetUsersQuery()
   const currentUser = useSelector(selectCurrentUser)
   const navigate = useNavigate()
+  const isScreenSmall = useMediaQuery('(max-width: 900px)')
+
+
   const banners = [
     {
       image: '/images/banner1.png',
@@ -53,6 +56,11 @@ const HomePage = () => {
   console.log(users)
   return (
     <Grid container spacing={2} paddingTop={1}>
+
+      <Grid item xs={7}>
+        <h2 style={isScreenSmall ? { marginLeft: '25%' } : {}}>Home Page</h2>
+      </Grid>
+
       <Grid item xs={12}>
         <Carousel
           autoPlay={true}
