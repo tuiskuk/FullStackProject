@@ -2,9 +2,10 @@ import RecipeCard from '../components/RecipeCard'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
 import { healthFilterOptions, nutrients, mealTypes } from '../data'
-import { Button, FormControl, Select, MenuItem,
-  InputLabel, Checkbox, ListItemText, CircularProgress,
-  OutlinedInput, Box, Chip, Typography, InputAdornment, Grid } from '@mui/material'
+import { Button, FormControl, Select, MenuItem, Checkbox, ListItemText, CircularProgress,
+  OutlinedInput, Box, Chip, Typography, InputAdornment, Grid, Paper, IconButton, AppBar, Toolbar, Autocomplete, TextField,
+  Dialog, DialogTitle, DialogContent } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
@@ -135,86 +136,250 @@ const SearchPage = () => {
     setExcludedChipArray(updatedExcludedArray)
   }
 
+  const handleDeleteMealTypeChip = (index) => {
+    const updatedMealOptions = [...mealTypeOptions]
+    updatedMealOptions.splice(index, 1)
+    setMealTypeOptions(updatedMealOptions)
+  }
+
+  const handleDeleteAllergyChip = (index) => {
+    const updatedAllergies = [...filterOptions]
+    updatedAllergies.splice(index, 1)
+    setFilterOptions(updatedAllergies)
+  }
+
+  const handleOptionClick = (option) => {
+    setSelectedNutrient(option)
+    setDialogOpen(true)
+  }
+
+  console.log(nutrients)
+  const [selectedNutrient, setSelectedNutrient] = useState(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+
   return (
-    <Grid container spacing={2} paddingTop={1}>
+    <Grid container spacing={1} paddingTop={1}>
       <Grid item xs={12}>
-        <Typography variant="h5" fontWeight="bold" paddingLeft={1}>
-            Search Recipes Here!
-        </Typography>
-        <FormControl fullWidth variant="outlined" >
-          <OutlinedInput
-            placeholder='Search recipes'
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
+        <Paper sx={{
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+        }}>
+          <img
+            src='/images/searchBanner.png'
+            style={{
+              width: '100%',
+              height: 'auto',
+              minHeight: '280px',
+              objectFit: 'cover'
+            }}
           />
-        </FormControl>
+          <div
+            style={{
+              position: 'absolute',
+              top: '20%',
+              bottom: 'auto',
+              left: '10%',
+              right: '10%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold" color="white">
+                Search Recipes!
+            </Typography>
+            <FormControl fullWidth variant="outlined" style={{ marginBottom: '16px' }}>
+              <OutlinedInput
+                placeholder='Search recipes'
+                value={search}
+                style={{ backgroundColor: 'white' }}
+                onChange={(event) => setSearch(event.target.value)}
+                onKeyPress={(event) => {
+                  if (event.key === 'Enter') {
+                    searchRecipes()
+                  }
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={searchRecipes}
+                    >
+                      <img
+                        src="/vectors/magnifyingGlass.svg"
+                        alt="Search"
+                        style={{
+                          cursor: 'pointer',
+                          width: '30px',
+                          height: '30px',
+                        }}
+                      />
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center', maxHeight: '105px', overflowY: 'auto' }}>
+              {mealTypeOptions.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteMealTypeChip(value)}
+                  sx={{
+                    backgroundColor: '#c8e6c9',
+                    '&:hover': {
+                      backgroundColor: '#a5d6a7',
+                    },
+                  }}/>
+              ))}
+              {filterOptions.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteAllergyChip(value)}
+                  sx={{
+                    backgroundColor: '#90caf9',
+                    '&:hover': {
+                      backgroundColor: '#64b5f6',
+                    },
+                  }}/>
+              ))}
+              {excludedChipArray.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteChip(value)}
+                  sx={{
+                    backgroundColor: '#ef9a9a',
+                    '&:hover': {
+                      backgroundColor: '#e57373',
+                    },
+                  }}/>
+              ))}
+            </Box>
+          </div>
+        </Paper>
       </Grid>
 
-
       <Grid item xs={12}>
-        <h3>Spesifications</h3>
-
-        <FormControl sx={{ m: 0.5, width: 250 }}>
-          <InputLabel>Meal type</InputLabel>
-          <Select
-            multiple
-            value={mealTypeOptions}
-            onChange={(event) => setMealTypeOptions(event.target.value)}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value}/>
-                ))}
-              </Box>
-            )}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 400,
-                  width: 200
+        <AppBar position="static" >
+          <Toolbar style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <Select
+              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              multiple
+              displayEmpty
+              value={mealTypeOptions}
+              onChange={(event) => setMealTypeOptions(event.target.value)}
+              renderValue={(selected) => {
+                if (selected) {
+                  return <Typography>Meal Types</Typography>
+                }else {
+                  return <Typography>Meal Types</Typography>
                 }
-              }
-            }}
-          >
-            {mealTypes.map((option) => (
-              <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
-                <Checkbox size='small' checked={mealTypeOptions.includes(option)} />
-                <ListItemText primary={option}/>
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl sx={{ m: 0.5, width: 250 }}>
-          <InputLabel>Filter allergies/diets</InputLabel>
-          <Select
-            multiple
-            value={filterOptions}
-            onChange={(event) => setFilterOptions(event.target.value)}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value}/>
-                ))}
-              </Box>
-            )}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 400,
-                  width: 200
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 400,
+                    width: 200
+                  }
                 }
-              }
-            }}
-          >
-            {healthFilterOptions.map((option) => (
-              <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
-                <Checkbox size='small' checked={filterOptions.includes(option)} />
-                <ListItemText primary={option}/>
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              }}
+            >
+              {mealTypes.map((option) => (
+                <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
+                  <Checkbox size='small' checked={mealTypeOptions.includes(option)} />
+                  <ListItemText primary={option}/>
+                </MenuItem>
+              ))}
+            </Select>
+            <Select
+              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              multiple
+              displayEmpty
+              value={filterOptions}
+              onChange={(event) => setFilterOptions(event.target.value)}
+              renderValue={(selected) => {
+                if (selected) {
+                  return <Typography>Allergies/Diets</Typography>
+                }else {
+                  return <Typography>Allergies/Diets</Typography>
+                }
+
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 400,
+                    width: 200
+                  }
+                }
+              }}
+            >
+              {healthFilterOptions.map((option) => (
+                <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
+                  <Checkbox size='small' checked={filterOptions.includes(option)} />
+                  <ListItemText primary={option}/>
+                </MenuItem>
+              ))}
+            </Select>
+            <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+              <OutlinedInput
+                placeholder="Set excluded foods"
+                value={excludedChip}
+                onChange={(event) => setExcludedChip(event.target.value)}
+                onKeyPress={(event) => {
+                  if (event.key === 'Enter') {
+                    handleAddExcludedFood()
+                  }
+                }}
+                sx={{
+                  backgroundColor: 'white',
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleAddExcludedFood}
+                    >
+                      <AddIcon/>
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+            <Autocomplete
+              multiple
+              options={nutrients}
+              disableCloseOnSelect
+              sx={{
+                backgroundColor: 'white',
+                '& .MuiChip-root': {
+                  display: 'none',
+                },
+              }}
+              getOptionLabel={(option) => option.user}
+              renderOption={(props, option, { selected }) => (
+                <li
+                  {...props}
+                  onClick={() => handleOptionClick(option)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <Checkbox
+                    size='small'
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option.user}
+                </li>
+              )}
+              style={{ width: 500 }}
+              renderInput={(params) => (
+                <TextField {...params} placeholder="Filter spesific nutrient" />
+              )}
+            />
+          </Toolbar>
+        </AppBar>
       </Grid>
 
       <Grid item xs={12}>
@@ -226,30 +391,6 @@ const SearchPage = () => {
             onChange={setTime}
             clear={clear}
           />
-        </FormControl>
-
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <Box display='flex' flexWrap='wrap' gap={0.5}>
-            {excludedChipArray.map((value, index) => (
-              <Chip key={index} label={value} onDelete={() => handleDeleteChip(index)}/>
-            ))}
-            <OutlinedInput
-              placeholder="Set excluded foods"
-              value={excludedChip}
-              onChange={(event) => setExcludedChip(event.target.value)}
-              endAdornment={
-                <InputAdornment position="end">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleAddExcludedFood}
-                  >
-                    Add
-                  </Button>
-                </InputAdornment>
-              }
-            />
-          </Box>
         </FormControl>
 
         <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
@@ -331,6 +472,7 @@ const SearchPage = () => {
           </Button>
         )}
       </Grid>
+      {dialogOpen && <NutrientDialog open={dialogOpen} onClose={setDialogOpen(false)} nutrient={selectedNutrient}/>}
     </Grid>
   )
 }
@@ -469,6 +611,17 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, cle
         </FormControl>
       </Box>
     </Box>
+  )
+}
+
+const NutrientDialog = (open, onClose, nutrient) => {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Set Nutrient Details</DialogTitle>
+      <DialogContent>
+        <RangeInputComponent nameBackend={nutrient.backend} />
+      </DialogContent>
+    </Dialog>
   )
 }
 

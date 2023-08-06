@@ -52,7 +52,8 @@ const getRecipes = async (request, response, next) => {
       const excluded = excludedFilters.split(',').map((filter) => filter.trim())
       excludedString = `&excluded=${excluded.join('&excluded=')}`
     }
-
+    console.log(excludedFilters)
+    console.log(excludedString)
     let filterString = ''
     if (healthFilters.length > 0) {
       const filters = healthFilters.split(',').map((filter) => filter.trim())
