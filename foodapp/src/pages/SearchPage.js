@@ -309,9 +309,18 @@ const SearchPage = () => {
 
       <Grid item xs={12}>
         <AppBar position="static" >
-          <Toolbar style={{ justifyContent: 'space-around', flexWrap: 'wrap' }}>
+          <Toolbar style={{ justifyContent: 'space-around', flexWrap: 'wrap', margin: 0 }}>
             <Select
-              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              variant="outlined"
+              sx={{
+                boxShadow: 'none',
+                '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }}
               multiple
               displayEmpty
               value={mealTypeOptions}
@@ -340,14 +349,22 @@ const SearchPage = () => {
               ))}
             </Select>
             <Select
-              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              sx={{
+                boxShadow: 'none',
+                '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }}
               multiple
               displayEmpty
               value={filterOptions}
               onChange={(event) => setFilterOptions(event.target.value)}
               renderValue={(selected) => {
                 if (selected) {
-                  return <Typography>Allergies/Diets</Typography>
+                  return <Typography >Allergies/Diets</Typography>
                 }else {
                   return <Typography>Allergies/Diets</Typography>
                 }
@@ -370,7 +387,15 @@ const SearchPage = () => {
               ))}
             </Select>
             <Select
-              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              sx={{
+                boxShadow: 'none',
+                '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }}
               multiple
               displayEmpty
               value={cuisineTypes}
@@ -400,7 +425,15 @@ const SearchPage = () => {
               ))}
             </Select>
             <Select
-              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              sx={{
+                boxShadow: 'none',
+                '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }}
               multiple
               displayEmpty
               value={dishTypes}
@@ -441,6 +474,7 @@ const SearchPage = () => {
                 }}
                 sx={{
                   backgroundColor: 'white',
+                  paddingRight: 1
                 }}
                 endAdornment={
                   <InputAdornment position="end">
@@ -462,7 +496,9 @@ const SearchPage = () => {
                 '& .MuiChip-root': {
                   display: 'none',
                 },
-                m: 0.5, width: 250
+                m: 0.5,
+                width: 250,
+                borderRadius: '4px'
               }}
               getOptionLabel={(option) => option.user}
               renderOption={(props, option) => (
@@ -560,18 +596,18 @@ const SearchPage = () => {
         ))}
       </Grid>
 
-      <Grid item xs={12}>
-        <Button variant="contained" onClick={searchRecipes} sx={{ m: 0.5, width: 250 }}>
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Button variant="contained" onClick={searchRecipes} sx={{ m: 0.5, minWidth: 200 }}>
           Search
         </Button>
 
-        <Button variant="contained" onClick={clearFilters} sx={{ m: 0.5, width: 250 }}>
+        <Button variant="contained" onClick={clearFilters} sx={{ m: 0.5, minWidth: 200 }}>
           Clear Options
         </Button>
       </Grid>
 
-      <Grid item xs={12}>
-        <Typography variant="h5" fontWeight="bold" paddingLeft={1}>
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Typography variant="h5" fontWeight="bold">
           Check recommended recipes or feel free to search recipes yourself
         </Typography>
         {isLoading || isFetching ? (
@@ -579,7 +615,7 @@ const SearchPage = () => {
         ) : recipes.length !== 0 ? (
           <Grid container spacing={2} marginTop={1} justifyContent="space-around" >
             {recipes.map((recipe, index) => (
-              <Grid item key={index}>
+              <Grid item key={index}  >
                 <RecipeCard key={recipe.uri} recipe={recipe} />
               </Grid>
             ))}
@@ -590,19 +626,20 @@ const SearchPage = () => {
       </Grid>
       <Grid item xs={12} sx={{ textAlign: 'center' }} >
         {nextPageLink && (
-          <Button variant="contained" onClick={goToNextPage} sx={{ m: 0.5, width: 250 }}>
+          <Button variant="contained" onClick={goToNextPage} sx={{ m: 0.5, width: 200 }}>
             Load more
           </Button>
         )}
       </Grid>
-      {( dialogOpen && selectedNutrient ) && <NutrientDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        nutrient={selectedNutrient}
-        nutrientInputs={nutrientInputs}
-        handleNutrientInputChange={handleNutrientInputChange}
-        clear={clear}
-      />}
+      {( dialogOpen && selectedNutrient ) &&
+        <NutrientDialog
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+          nutrient={selectedNutrient}
+          nutrientInputs={nutrientInputs}
+          handleNutrientInputChange={handleNutrientInputChange}
+          clear={clear}
+        />}
     </Grid>
   )
 }
@@ -789,9 +826,9 @@ const NutrientDialog = ({ open, onClose, nutrient, nutrientInputs, handleNutrien
   }, [update, onClose, open])
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Set Nutrient Details</DialogTitle>
-      <DialogContent>
+    <Dialog open={open} onClose={onClose} maxWidth='xs' >
+      <DialogTitle style={{ textAlign: 'center', padding: 8, paddingBottom: 0 }}>Set Nutrient Details</DialogTitle>
+      <DialogContent sx={{ m: 0.5, minWidth: 200, padding: 1 }}>
         <RangeInputComponent
           value={nutrientInputs[nutrient.backend] || ''}
           nameBackend={nutrient.backend}
@@ -799,15 +836,20 @@ const NutrientDialog = ({ open, onClose, nutrient, nutrientInputs, handleNutrien
           unit={nutrient.unit}
           onChange={handleNutrientInputChange}
           clear={clear}
-          update={update}/>
+          update={update}
+        />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
+      <DialogActions style={{ justifyContent: 'space-between', padding: '1rem', paddingTop: 0 }}>
+        <Button
+          variant="contained"
+          style={{ backgroundColor: '#f44336' }}
+          onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={() => {
-          setUpdate(true)
-        }} color="primary">
+        <Button
+          variant="contained"
+          style={{ backgroundColor: '#4caf50' }}
+          onClick={() => setUpdate(true)}>
           Confirm
         </Button>
       </DialogActions>

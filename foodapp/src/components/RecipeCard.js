@@ -48,7 +48,7 @@ const RecipeCard = ({ recipe }) => {
   }
 
   return (
-    <Link to={ `/recipes/${recipe_id}` } onClick={handleRecipeClick}>
+    <Link to={ `/recipes/${recipe_id}` } onClick={handleRecipeClick} sx={{ maxWidth: 200 }}>
       <Card sx={{ maxWidth: 200 }}>
         <CardActionArea>
           <CardMedia

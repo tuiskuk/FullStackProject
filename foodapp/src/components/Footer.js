@@ -3,37 +3,50 @@ import { Grid, Link, Typography } from '@mui/material'
 
 const Footer = () => {
   return (
-    <Grid container spacing={2} paddingBottom={2} sx={{ backgroundColor: '#FFA726', margin: '0 auto', maxWidth: '100%', mt: '15px' }}>
-      <Grid item xs={12}>
-        <Typography variant="h5" fontWeight="bold" align="center">
-          Full stack open project
-        </Typography>
+    <Grid container padding={2} marginTop={2} sx={{ backgroundColor: '#FFA726' }}>
+      <Grid item xs={12} paddingBottom={2}>
+        <Grid container justifyContent="center" alignItems="center" spacing={2}>
+          <Grid item>
+            <Typography variant="h5" fontWeight="bold">
+                Dishcovery
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Link href="https://www.edamam.com/" target="_blank" rel="noopener noreferrer">
+              <img src="/vectors/Edamam_Badge_Transparent.svg" style={{ height: '40px' }} alt="Edamam Badge" />
+            </Link>
+          </Grid>
+        </Grid>
       </Grid>
-
-      <Grid item xs={12}>
-        <Grid container spacing={3}>
-          <Grid item xs={3} align="center" display="flex" flexDirection="column">
-            <Typography variant="h7" fontWeight="bold">
-              About the project
+      <Grid item xs={12} >
+        <Grid container justifyContent="space-around" spacing={2}>
+          <Grid item align="center" display="flex" flexDirection="column">
+            <Typography variant="h7" fontWeight="bold" paddingBottom={1}>
+              Dishcovery
             </Typography>
-            <Link href="#" color="inherit">Github</Link>
+            <Link href="/" color="inherit">HomePage</Link>
+            <Link href="/search" color="inherit">Search</Link>
+            <Link href="/users" color="inherit">Discovery users</Link>
+            <Link href="/search" color="inherit">Search</Link>
+            <Link href="/userRecipesearch" color="inherit">Recipes By Users</Link>
           </Grid>
-          <Grid item xs={3} align="center" display="flex" flexDirection="column">
-            <Typography variant="h7" fontWeight="bold">
-              About us
+          <Grid item align="center" display="flex" flexDirection="column">
+            <Typography variant="h7" fontWeight="bold" paddingBottom={1}>
+              About The Project
             </Typography>
-            <Link href="#" color="inherit">Writing</Link>
+            <Link href="https://www.edamam.com/" target="_blank" rel="noopener noreferrer" color="inherit">Recipe Api</Link>
           </Grid>
-          <Grid item xs={3} align="center" display="flex" flexDirection="column">
-            <Typography variant="h7" fontWeight="bold">
-              Contact Us
+          <Grid item align="center" display="flex" flexDirection="column">
+            <Typography variant="h7" fontWeight="bold" paddingBottom={1}>
+              GitHub Repositories
             </Typography>
-            <Link href="#" color="inherit">Santeri Ora</Link>
-            <Link href="#" color="inherit">Otso Tikkane</Link>
-            <Link href="#" color="inherit">Tuisku Kaikuvuo</Link>
+            <Link href="https://github.com/tuiskuk/FullStackProject" target="_blank" rel="noopener noreferrer" color="inherit">Project</Link>
+            <Link href="https://github.com/Zantemann" target="_blank" rel="noopener noreferrer" color="inherit">Santeri Ora</Link>
+            <Link href="https://github.com/tuiskuk" target="_blank" rel="noopener noreferrer" color="inherit">Otso Tikkane</Link>
+            <Link href="https://github.com/Potso12" target="_blank" rel="noopener noreferrer" color="inherit">Tuisku Kaikuvuo</Link>
           </Grid>
-          <Grid item xs={3} align="center" display="flex" flexDirection="column">
-            <Typography variant="h7" fontWeight="bold">
+          <Grid item align="center" display="flex" flexDirection="column">
+            <Typography variant="h7" fontWeight="bold" paddingBottom={1}>
               Something
             </Typography>
           </Grid>
