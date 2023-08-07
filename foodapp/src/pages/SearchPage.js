@@ -1,11 +1,12 @@
 import RecipeCard from '../components/RecipeCard'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
-import { healthFilterOptions, nutrients, mealTypes } from '../data'
+import { healthFilterOptions, nutrients, mealTypes, cuisineOptions, dishOptions } from '../data'
 import { Button, FormControl, Select, MenuItem, Checkbox, ListItemText, CircularProgress,
   OutlinedInput, Box, Chip, Typography, InputAdornment, Grid, Paper, IconButton, AppBar, Toolbar, Autocomplete, TextField,
-  Dialog, DialogTitle, DialogContent } from '@mui/material'
+  Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import CancelIcon from '@mui/icons-material/Cancel'
 
 const SearchPage = () => {
   const [recipes, setRecipes] = useState([])
@@ -27,6 +28,12 @@ const SearchPage = () => {
   const [filterOptions, setFilterOptions] = useState(JSON.parse(localStorage.getItem('filterOptions')) || [])
   const [filterOptionTerms, setFilterOptionTerms] = useState([])
 
+  const [cuisineTypes, setCuisineTypes] = useState(JSON.parse(localStorage.getItem('cuisineTypes')) || [])
+  const [cuisineTypeTerms, setCuisineTypeTerms] = useState([])
+
+  const [dishTypes, setDishTypes] = useState(JSON.parse(localStorage.getItem('dishTypes')) || [])
+  const [dishTypeTerms, setDishTypeTerms] = useState([])
+
   const [nutrientInputs, setNutrientInputs] = useState(JSON.parse(localStorage.getItem('nutrientInputs')) || [])
   const [nutrientInputsTerms, setNutrientInputsTerms] = useState([])
 
@@ -36,13 +43,17 @@ const SearchPage = () => {
   const [mealTypeOptions, setMealTypeOptions] = useState(JSON.parse(localStorage.getItem('mealTypeOptions')) || [])
   const [mealTypeOptionTerms, setMealTypeOptionTerms] = useState([])
 
-  const [showNutrients, setShowNutrients] = useState(false)
   const [clear, setClear] = useState(false)
+
+  const [selectedNutrient, setSelectedNutrient] = useState({})
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
     searchTerm: searchTerm || 'recommended',
     filterOptionTerms: filterOptionTerms || [],
+    cuisineTypeTerms: cuisineTypeTerms || [],
+    dishTypeTerms: dishTypeTerms || [],
     timeTerm: timeTerm || '',
     caloriesTerm: caloriesTerm || '',
     nutrientInputsTerms: nutrientInputsTerms || [],
@@ -62,6 +73,8 @@ const SearchPage = () => {
     localStorage.setItem('calories', calories)
     localStorage.setItem('excludedChips', JSON.stringify(excludedChipArray))
     localStorage.setItem('filterOptions', JSON.stringify(filterOptions))
+    localStorage.setItem('cuisineTypes', JSON.stringify(cuisineTypes))
+    localStorage.setItem('dishTypes', JSON.stringify(dishTypes))
     localStorage.setItem('search', search)
     localStorage.setItem('nutrientInputs', JSON.stringify(nutrientInputs))
     localStorage.setItem('ingridientsNumber', ingridientsNumber)
@@ -69,6 +82,8 @@ const SearchPage = () => {
     setExcludedChipArrayTerms(excludedChipArray)
     setSearchTerm(search)
     setFilterOptionTerms(filterOptions)
+    setCuisineTypeTerms(cuisineTypes)
+    setDishTypeTerms(dishTypes)
     setTimeTerm(time)
     setCaloriesTerm(calories)
     setNutrientInputsTerms(nutrientInputs)
@@ -86,6 +101,8 @@ const SearchPage = () => {
     setSearch('')
     setExcludedChipArray([])
     setFilterOptions([])
+    setCuisineTypes([])
+    setDishTypes([])
     setTime('')
     setCalories('')
     setNutrientInputs([])
@@ -119,10 +136,6 @@ const SearchPage = () => {
     }
   }
 
-  const toggelShow = () => {
-    setShowNutrients(!showNutrients)
-  }
-
   const handleAddExcludedFood = () => {
     if (excludedChip.trim()) {
       setExcludedChipArray([...excludedChipArray, excludedChip.trim()])
@@ -148,14 +161,22 @@ const SearchPage = () => {
     setFilterOptions(updatedAllergies)
   }
 
+  const handleDeleteCuisineChip = (index) => {
+    const updatedCuisines = [...cuisineTypes]
+    updatedCuisines.splice(index, 1)
+    setCuisineTypes(updatedCuisines)
+  }
+  const handleDeleteDishChip = (index) => {
+    const updatedDishes = [...dishTypes]
+    updatedDishes.splice(index, 1)
+    setDishTypes(updatedDishes)
+  }
   const handleOptionClick = (option) => {
+    console.log(option)
     setSelectedNutrient(option)
     setDialogOpen(true)
+    console.log(selectedNutrient)
   }
-
-  console.log(nutrients)
-  const [selectedNutrient, setSelectedNutrient] = useState(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
     <Grid container spacing={1} paddingTop={1}>
@@ -245,6 +266,30 @@ const SearchPage = () => {
                     },
                   }}/>
               ))}
+              {cuisineTypes.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteCuisineChip(value)}
+                  sx={{
+                    backgroundColor: '#f9cb9c',
+                    '&:hover': {
+                      backgroundColor: '#f9b24e',
+                    },
+                  }}/>
+              ))}
+              {dishTypes.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteDishChip(value)}
+                  sx={{
+                    backgroundColor: '#b39ddb',
+                    '&:hover': {
+                      backgroundColor: '#7e57c2',
+                    },
+                  }}/>
+              ))}
               {excludedChipArray.map((value) => (
                 <Chip
                   key={value}
@@ -264,9 +309,18 @@ const SearchPage = () => {
 
       <Grid item xs={12}>
         <AppBar position="static" >
-          <Toolbar style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <Toolbar style={{ justifyContent: 'space-around', flexWrap: 'wrap', margin: 0 }}>
             <Select
-              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              variant="outlined"
+              sx={{
+                boxShadow: 'none',
+                '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }}
               multiple
               displayEmpty
               value={mealTypeOptions}
@@ -274,7 +328,7 @@ const SearchPage = () => {
               renderValue={(selected) => {
                 if (selected) {
                   return <Typography>Meal Types</Typography>
-                }else {
+                } else {
                   return <Typography>Meal Types</Typography>
                 }
               }}
@@ -295,14 +349,22 @@ const SearchPage = () => {
               ))}
             </Select>
             <Select
-              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              sx={{
+                boxShadow: 'none',
+                '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }}
               multiple
               displayEmpty
               value={filterOptions}
               onChange={(event) => setFilterOptions(event.target.value)}
               renderValue={(selected) => {
                 if (selected) {
-                  return <Typography>Allergies/Diets</Typography>
+                  return <Typography >Allergies/Diets</Typography>
                 }else {
                   return <Typography>Allergies/Diets</Typography>
                 }
@@ -324,6 +386,82 @@ const SearchPage = () => {
                 </MenuItem>
               ))}
             </Select>
+            <Select
+              sx={{
+                boxShadow: 'none',
+                '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }}
+              multiple
+              displayEmpty
+              value={cuisineTypes}
+              onChange={(event) => setCuisineTypes(event.target.value)}
+              renderValue={(selected) => {
+                if (selected) {
+                  return <Typography>Cuisine</Typography>
+                } else {
+                  return <Typography>Cuisine</Typography>
+                }
+
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 400,
+                    width: 200
+                  }
+                }
+              }}
+            >
+              {cuisineOptions.map((option) => (
+                <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
+                  <Checkbox size='small' checked={cuisineTypes.includes(option)} />
+                  <ListItemText primary={option}/>
+                </MenuItem>
+              ))}
+            </Select>
+            <Select
+              sx={{
+                boxShadow: 'none',
+                '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }}
+              multiple
+              displayEmpty
+              value={dishTypes}
+              onChange={(event) => setDishTypes(event.target.value)}
+              renderValue={(selected) => {
+                if (selected) {
+                  return <Typography>Dish</Typography>
+                } else {
+                  return <Typography>Dish</Typography>
+                }
+
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 400,
+                    width: 200
+                  }
+                }
+              }}
+            >
+              {dishOptions.map((option) => (
+                <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
+                  <Checkbox size='small' checked={dishTypes.includes(option)} />
+                  <ListItemText primary={option}/>
+                </MenuItem>
+              ))}
+            </Select>
             <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
               <OutlinedInput
                 placeholder="Set excluded foods"
@@ -336,6 +474,7 @@ const SearchPage = () => {
                 }}
                 sx={{
                   backgroundColor: 'white',
+                  paddingRight: 1
                 }}
                 endAdornment={
                   <InputAdornment position="end">
@@ -357,23 +496,45 @@ const SearchPage = () => {
                 '& .MuiChip-root': {
                   display: 'none',
                 },
+                m: 0.5,
+                width: 250,
+                borderRadius: '4px'
               }}
               getOptionLabel={(option) => option.user}
-              renderOption={(props, option, { selected }) => (
+              renderOption={(props, option) => (
                 <li
                   {...props}
-                  onClick={() => handleOptionClick(option)}
+                  onClick={() => {
+                    handleOptionClick(option)
+                  }}
                   style={{ cursor: 'pointer' }}
                 >
-                  <Checkbox
-                    size='small'
-                    style={{ marginRight: 8 }}
-                    checked={selected}
-                  />
+                  {nutrientInputs[option.backend] ? (
+                    <IconButton
+                      size="small"
+                      style={{ marginRight: 8 }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleNutrientInputChange(option.backend, '') // Clear the nutrient value
+                      }}
+                    >
+                      <CancelIcon />
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      size="small"
+                      style={{ marginRight: 8 }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleOptionClick(option)
+                      }}
+                    >
+                      <AddIcon />
+                    </IconButton>
+                  )}
                   {option.user}
                 </li>
               )}
-              style={{ width: 500 }}
               renderInput={(params) => (
                 <TextField {...params} placeholder="Filter spesific nutrient" />
               )}
@@ -382,73 +543,71 @@ const SearchPage = () => {
         </AppBar>
       </Grid>
 
-      <Grid item xs={12}>
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', overflowX: 'auto' }}>
+        <FormControl  sx={{ m: 0.5, minWidth: 200 }}>
           <RangeInputComponent
             value={time || ''}
             nameUser={'Time'}
             unit={'min'}
             onChange={setTime}
             clear={clear}
+            updateUi={true}
           />
         </FormControl>
 
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+        <FormControl sx={{ m: 0.5, minWidth: 200 }}>
           <RangeInputComponent
             value={calories || ''}
             nameUser={'Calories'}
             unit={'kcal'}
             onChange={setCalories}
             clear={clear}
+            updateUi={true}
           />
         </FormControl>
 
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+        <FormControl sx={{ m: 0.5, minWidth: 200 }}>
           <RangeInputComponent
             value={ingridientsNumber || ''}
             nameUser={'Number of incridients'}
             unit={'pcs'}
             onChange={setIngridientsNumber}
             clear={clear}
+            updateUi={true}
           />
         </FormControl>
       </Grid>
 
-      <Grid item xs={12}>
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
-          <Button variant="contained" onClick={toggelShow} >
-            {showNutrients ? 'Hide Nutrient Filters' : 'Show Nutrients Filters'}
-          </Button>
-        </FormControl>
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', overflowX: 'auto' }}>
+        {nutrients.map((nutrient) => (
+          nutrientInputs[nutrient.backend] && (
+            <FormControl key={nutrient.backend} sx={{ m: 0.5, minWidth: 200 }}>
+              <RangeInputComponent
+                value={nutrientInputs[nutrient.backend]}
+                nameBackend={nutrient.backend}
+                nameUser={nutrient.user}
+                unit={nutrient.unit}
+                onChange={handleNutrientInputChange}
+                clear={clear}
+                updateUi={true}
+                deleted={true}
+              />
+            </FormControl>)
+        ))}
+      </Grid>
 
-        {showNutrients && (
-          <div>
-            {nutrients.map((nutrient) => (
-              <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
-                <RangeInputComponent
-                  value={nutrientInputs[nutrient.backend] || ''}
-                  nameBackend={nutrient.backend}
-                  nameUser={nutrient.user}
-                  unit={nutrient.unit}
-                  onChange={handleNutrientInputChange}
-                  clear={clear}
-                />
-              </FormControl>
-            ))}
-          </div>
-        )}
-
-        <Button variant="contained" onClick={searchRecipes} sx={{ m: 0.5, width: 250 }}>
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Button variant="contained" onClick={searchRecipes} sx={{ m: 0.5, minWidth: 200 }}>
           Search
         </Button>
 
-        <Button variant="contained" onClick={clearFilters} sx={{ m: 0.5, width: 250 }}>
-          Clear
+        <Button variant="contained" onClick={clearFilters} sx={{ m: 0.5, minWidth: 200 }}>
+          Clear Options
         </Button>
       </Grid>
 
-      <Grid item xs={12}>
-        <Typography variant="h5" fontWeight="bold" paddingLeft={1}>
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Typography variant="h5" fontWeight="bold">
           Check recommended recipes or feel free to search recipes yourself
         </Typography>
         {isLoading || isFetching ? (
@@ -456,7 +615,7 @@ const SearchPage = () => {
         ) : recipes.length !== 0 ? (
           <Grid container spacing={2} marginTop={1} justifyContent="space-around" >
             {recipes.map((recipe, index) => (
-              <Grid item key={index}>
+              <Grid item key={index}  >
                 <RecipeCard key={recipe.uri} recipe={recipe} />
               </Grid>
             ))}
@@ -467,32 +626,63 @@ const SearchPage = () => {
       </Grid>
       <Grid item xs={12} sx={{ textAlign: 'center' }} >
         {nextPageLink && (
-          <Button variant="contained" onClick={goToNextPage} sx={{ m: 0.5, width: 250 }}>
+          <Button variant="contained" onClick={goToNextPage} sx={{ m: 0.5, width: 200 }}>
             Load more
           </Button>
         )}
       </Grid>
-      {dialogOpen && <NutrientDialog open={dialogOpen} onClose={setDialogOpen(false)} nutrient={selectedNutrient}/>}
+      {( dialogOpen && selectedNutrient ) &&
+        <NutrientDialog
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+          nutrient={selectedNutrient}
+          nutrientInputs={nutrientInputs}
+          handleNutrientInputChange={handleNutrientInputChange}
+          clear={clear}
+        />}
     </Grid>
   )
 }
 
-const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, clear }) => {
+const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, clear, update, updateUi, deleted }) => {
   const [minValue, setMinValue] = useState('')
   const [maxValue, setMaxValue] = useState('')
+  const [edited, setEdited] = useState(false)
 
   useEffect(() => {
-    console.log(value)
-    analyze()
+    if(value){
+      analyze()
+    }
   }, [])
+
+  useEffect(() => {
+    if (updateUi && value) {
+      analyze()
+    }
+  }, [value])
+
+  useEffect(() => {
+    if (update) {
+      handleParse()
+    }
+  }, [minValue, maxValue, update])
+
+  useEffect(() => {
+    console.log(minValue, maxValue)
+    if(updateUi && edited) {
+      handleParse()
+    }
+  }, [minValue, maxValue])
+
+  useEffect(() => {
+    if(updateUi) {
+      setEdited(true)
+    }
+  }, [minValue, maxValue])
 
   useEffect(() => {
     analyze()
   }, [clear])
-
-  useEffect(() => {
-    handleParse()
-  }, [minValue, maxValue])
 
   const handleMinValueChange = (event) => {
     const valueMin = event.target.value
@@ -571,8 +761,9 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, cle
     <Box border={1}
       borderColor="grey.400"
       borderRadius="4px"
-      p={1}
-      mb={1}
+      paddingX={1}
+      paddingBottom={1}
+      paddingTop={deleted ? 0 : 1}
       alignItems="center"
       bgcolor="white"
       boxShadow="0px 2px 4px rgba(0, 0, 0, 0.1)">
@@ -585,7 +776,16 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, cle
         justifyContent="space-between"
       >
         <Typography variant="body1">{nameUser}</Typography>
-        <Typography variant="body1">{unit}</Typography>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {deleted && (
+            <IconButton
+              onClick={() => onChange(nameBackend, '')}
+              size="small"
+            >
+              <CancelIcon />
+            </IconButton>)}
+          <Typography variant="body1">{unit}</Typography>
+        </div>
       </Box>
       <Box display="flex" alignItems="center">
         <FormControl variant="outlined" >
@@ -614,13 +814,45 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, cle
   )
 }
 
-const NutrientDialog = (open, onClose, nutrient) => {
+const NutrientDialog = ({ open, onClose, nutrient, nutrientInputs, handleNutrientInputChange, clear }) => {
+  const [update, setUpdate] = useState(false)
+  console.log(nutrient)
+
+  useEffect(() => {
+    if (update && open) {
+      onClose()
+      setUpdate(false) // Reset the update state after closing
+    }
+  }, [update, onClose, open])
+
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Set Nutrient Details</DialogTitle>
-      <DialogContent>
-        <RangeInputComponent nameBackend={nutrient.backend} />
+    <Dialog open={open} onClose={onClose} maxWidth='xs' >
+      <DialogTitle style={{ textAlign: 'center', padding: 8, paddingBottom: 0 }}>Set Nutrient Details</DialogTitle>
+      <DialogContent sx={{ m: 0.5, minWidth: 200, padding: 1 }}>
+        <RangeInputComponent
+          value={nutrientInputs[nutrient.backend] || ''}
+          nameBackend={nutrient.backend}
+          nameUser={nutrient.user}
+          unit={nutrient.unit}
+          onChange={handleNutrientInputChange}
+          clear={clear}
+          update={update}
+        />
       </DialogContent>
+      <DialogActions style={{ justifyContent: 'space-between', padding: '1rem', paddingTop: 0 }}>
+        <Button
+          variant="contained"
+          style={{ backgroundColor: '#f44336' }}
+          onClick={onClose}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          style={{ backgroundColor: '#4caf50' }}
+          onClick={() => setUpdate(true)}>
+          Confirm
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }
