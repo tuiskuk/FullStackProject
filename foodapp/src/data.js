@@ -42,8 +42,61 @@ export const mealTypes = [
   'Breakfest',
   'Dinner',
   'Lunch',
+  'Dinner',
   'Snack',
   'Teatime'
+]
+
+export const cuisineOptions = [
+  'American',
+  'Asian',
+  'British',
+  'Caribbean',
+  'Central Europe',
+  'Chinese',
+  'Eastern Europe',
+  'French',
+  'Greek',
+  'Indian',
+  'Italian',
+  'Japanese',
+  'Korean',
+  'Kosher',
+  'Mediterranean',
+  'Mexican',
+  'Middle Eastern',
+  'Nordic',
+  'South American',
+  'South East Asian',
+  'World'
+]
+
+export const dishTypes = [
+  'alcohol cocktail',
+  'biscuits and cookies',
+  'bread',
+  'cereals',
+  'condiments and sauces',
+  'desserts',
+  'drinks',
+  'egg',
+  'ice cream and custard',
+  'main course',
+  'pancake',
+  'pasta',
+  'pastry',
+  'pies and tarts',
+  'pizza',
+  'preps',
+  'preserve',
+  'salad',
+  'sandwiches',
+  'seafood',
+  'side dish',
+  'soup',
+  'special occasions',
+  'starter',
+  'sweets'
 ]
 
 export const nutrients = [

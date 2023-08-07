@@ -68,11 +68,12 @@ export const apiSlice = createApi({
   ],
   endpoints: builder => ({
     getAllRecipes: builder.query({
-      query: ({ searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms }) => {
-        console.log('searchTerm:', searchTerm, filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms)
+      query: ({ searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms }) => {
+        console.log('searchTerm:', searchTerm, filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms)
         return {
           url: '/recipes',
-          params: { search: searchTerm, healthFilters: filterOptionTerms, time: timeTerm, calories: caloriesTerm, nutrients: JSON.stringify(nutrientInputsTerms), ingr: ingridientsNumberTerm, mealTypeOptions: mealTypeOptionTerms, excludedFilters: excludedChipArrayTerms },
+          params: { search: searchTerm, healthFilters: filterOptionTerms, time: timeTerm, calories: caloriesTerm, nutrients: JSON.stringify(nutrientInputsTerms),
+            ingr: ingridientsNumberTerm, mealTypeOptions: mealTypeOptionTerms, excludedFilters: excludedChipArrayTerms, cuisineTypeOptions: cuisineTypeTerms },
         }
       },
     }),
