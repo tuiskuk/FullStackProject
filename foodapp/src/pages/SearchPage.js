@@ -1,7 +1,7 @@
 import RecipeCard from '../components/RecipeCard'
 import { useState, useEffect } from 'react'
 import { useGetAllRecipesQuery, useGetNextPageQuery } from '../services/apiSlice'
-import { healthFilterOptions, nutrients, mealTypes, cuisineOptions } from '../data'
+import { healthFilterOptions, nutrients, mealTypes, cuisineOptions, dishOptions } from '../data'
 import { Button, FormControl, Select, MenuItem, Checkbox, ListItemText, CircularProgress,
   OutlinedInput, Box, Chip, Typography, InputAdornment, Grid, Paper, IconButton, AppBar, Toolbar, Autocomplete, TextField,
   Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
@@ -31,6 +31,9 @@ const SearchPage = () => {
   const [cuisineTypes, setCuisineTypes] = useState(JSON.parse(localStorage.getItem('cuisineTypes')) || [])
   const [cuisineTypeTerms, setCuisineTypeTerms] = useState([])
 
+  const [dishTypes, setDishTypes] = useState(JSON.parse(localStorage.getItem('dishTypes')) || [])
+  const [dishTypeTerms, setDishTypeTerms] = useState([])
+
   const [nutrientInputs, setNutrientInputs] = useState(JSON.parse(localStorage.getItem('nutrientInputs')) || [])
   const [nutrientInputsTerms, setNutrientInputsTerms] = useState([])
 
@@ -50,6 +53,7 @@ const SearchPage = () => {
     searchTerm: searchTerm || 'recommended',
     filterOptionTerms: filterOptionTerms || [],
     cuisineTypeTerms: cuisineTypeTerms || [],
+    dishTypeTerms: dishTypeTerms || [],
     timeTerm: timeTerm || '',
     caloriesTerm: caloriesTerm || '',
     nutrientInputsTerms: nutrientInputsTerms || [],
@@ -70,6 +74,7 @@ const SearchPage = () => {
     localStorage.setItem('excludedChips', JSON.stringify(excludedChipArray))
     localStorage.setItem('filterOptions', JSON.stringify(filterOptions))
     localStorage.setItem('cuisineTypes', JSON.stringify(cuisineTypes))
+    localStorage.setItem('dishTypes', JSON.stringify(dishTypes))
     localStorage.setItem('search', search)
     localStorage.setItem('nutrientInputs', JSON.stringify(nutrientInputs))
     localStorage.setItem('ingridientsNumber', ingridientsNumber)
@@ -78,6 +83,7 @@ const SearchPage = () => {
     setSearchTerm(search)
     setFilterOptionTerms(filterOptions)
     setCuisineTypeTerms(cuisineTypes)
+    setDishTypeTerms(dishTypes)
     setTimeTerm(time)
     setCaloriesTerm(calories)
     setNutrientInputsTerms(nutrientInputs)
@@ -96,6 +102,7 @@ const SearchPage = () => {
     setExcludedChipArray([])
     setFilterOptions([])
     setCuisineTypes([])
+    setDishTypes([])
     setTime('')
     setCalories('')
     setNutrientInputs([])
@@ -159,7 +166,11 @@ const SearchPage = () => {
     updatedCuisines.splice(index, 1)
     setCuisineTypes(updatedCuisines)
   }
-
+  const handleDeleteDishChip = (index) => {
+    const updatedDishes = [...dishTypes]
+    updatedDishes.splice(index, 1)
+    setDishTypes(updatedDishes)
+  }
   const handleOptionClick = (option) => {
     console.log(option)
     setSelectedNutrient(option)
@@ -267,6 +278,18 @@ const SearchPage = () => {
                     },
                   }}/>
               ))}
+              {dishTypes.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  onDelete={() => handleDeleteDishChip(value)}
+                  sx={{
+                    backgroundColor: '#b39ddb',
+                    '&:hover': {
+                      backgroundColor: '#7e57c2',
+                    },
+                  }}/>
+              ))}
               {excludedChipArray.map((value) => (
                 <Chip
                   key={value}
@@ -286,7 +309,7 @@ const SearchPage = () => {
 
       <Grid item xs={12}>
         <AppBar position="static" >
-          <Toolbar style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <Toolbar style={{ justifyContent: 'space-around', flexWrap: 'wrap' }}>
             <Select
               sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
               multiple
@@ -376,6 +399,36 @@ const SearchPage = () => {
                 </MenuItem>
               ))}
             </Select>
+            <Select
+              sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 } }}
+              multiple
+              displayEmpty
+              value={dishTypes}
+              onChange={(event) => setDishTypes(event.target.value)}
+              renderValue={(selected) => {
+                if (selected) {
+                  return <Typography>Dish</Typography>
+                } else {
+                  return <Typography>Dish</Typography>
+                }
+
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 400,
+                    width: 200
+                  }
+                }
+              }}
+            >
+              {dishOptions.map((option) => (
+                <MenuItem key={option} value={option} sx={{ backgroundColor: 'white' }}>
+                  <Checkbox size='small' checked={dishTypes.includes(option)} />
+                  <ListItemText primary={option}/>
+                </MenuItem>
+              ))}
+            </Select>
             <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
               <OutlinedInput
                 placeholder="Set excluded foods"
@@ -409,6 +462,7 @@ const SearchPage = () => {
                 '& .MuiChip-root': {
                   display: 'none',
                 },
+                m: 0.5, width: 250
               }}
               getOptionLabel={(option) => option.user}
               renderOption={(props, option) => (
@@ -445,7 +499,6 @@ const SearchPage = () => {
                   {option.user}
                 </li>
               )}
-              style={{ width: 500 }}
               renderInput={(params) => (
                 <TextField {...params} placeholder="Filter spesific nutrient" />
               )}
@@ -454,8 +507,8 @@ const SearchPage = () => {
         </AppBar>
       </Grid>
 
-      <Grid item xs={12}>
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', overflowX: 'auto' }}>
+        <FormControl  sx={{ m: 0.5, minWidth: 200 }}>
           <RangeInputComponent
             value={time || ''}
             nameUser={'Time'}
@@ -466,7 +519,7 @@ const SearchPage = () => {
           />
         </FormControl>
 
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+        <FormControl sx={{ m: 0.5, minWidth: 200 }}>
           <RangeInputComponent
             value={calories || ''}
             nameUser={'Calories'}
@@ -477,7 +530,7 @@ const SearchPage = () => {
           />
         </FormControl>
 
-        <FormControl variant="outlined" sx={{ m: 0.5, width: 250 }}>
+        <FormControl sx={{ m: 0.5, minWidth: 200 }}>
           <RangeInputComponent
             value={ingridientsNumber || ''}
             nameUser={'Number of incridients'}
@@ -489,10 +542,10 @@ const SearchPage = () => {
         </FormControl>
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', overflowX: 'auto' }}>
         {nutrients.map((nutrient) => (
           nutrientInputs[nutrient.backend] && (
-            <FormControl key={nutrient.backend} sx={{ m: 0.5, width: 250 }} variant="outlined">
+            <FormControl key={nutrient.backend} sx={{ m: 0.5, minWidth: 200 }}>
               <RangeInputComponent
                 value={nutrientInputs[nutrient.backend]}
                 nameBackend={nutrient.backend}
@@ -555,20 +608,15 @@ const SearchPage = () => {
 }
 
 const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, clear, update, updateUi, deleted }) => {
-  //If updateUi is true can set min and max to empty, just one of them and other will leave 1
   const [minValue, setMinValue] = useState('')
   const [maxValue, setMaxValue] = useState('')
+  const [edited, setEdited] = useState(false)
 
   useEffect(() => {
-    console.log(value)
     if(value){
       analyze()
     }
   }, [])
-
-  useEffect(() => {
-    analyze()
-  }, [clear])
 
   useEffect(() => {
     if (updateUi && value) {
@@ -578,18 +626,26 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, cle
 
   useEffect(() => {
     if (update) {
-      console.log('update')
       handleParse()
     }
   }, [minValue, maxValue, update])
 
   useEffect(() => {
     console.log(minValue, maxValue)
-    if(updateUi && (minValue || maxValue)) {
-      console.log('moi')
+    if(updateUi && edited) {
       handleParse()
     }
   }, [minValue, maxValue])
+
+  useEffect(() => {
+    if(updateUi) {
+      setEdited(true)
+    }
+  }, [minValue, maxValue])
+
+  useEffect(() => {
+    analyze()
+  }, [clear])
 
   const handleMinValueChange = (event) => {
     const valueMin = event.target.value
@@ -668,8 +724,9 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, cle
     <Box border={1}
       borderColor="grey.400"
       borderRadius="4px"
-      p={1}
-      mb={1}
+      paddingX={1}
+      paddingBottom={1}
+      paddingTop={deleted ? 0 : 1}
       alignItems="center"
       bgcolor="white"
       boxShadow="0px 2px 4px rgba(0, 0, 0, 0.1)">

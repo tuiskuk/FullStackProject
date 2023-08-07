@@ -8,7 +8,8 @@ const getRecipes = async (request, response, next) => {
 
   try {
     const { search: searchTerm, calories, time, ingr, nutrients,
-      healthFilters = [], mealTypeOptions = [], excludedFilters = [], cuisineTypeOptions = []  } = request.query
+      healthFilters = [], mealTypeOptions = [], excludedFilters = [],
+      cuisineTypeOptions = [], dishOptions = []  } = request.query
 
     // parseing nutrients to return format MIN+, MIN-MAX, MAX (string)
     let nutrientsData = []
@@ -63,7 +64,19 @@ const getRecipes = async (request, response, next) => {
     let cuisineString = ''
     if (cuisineTypeOptions.length > 0) {
       const filters = cuisineTypeOptions.split(',').map((filter) => filter.trim())
-      cuisineString = `&cuisineType=${filters.join('&cuisineType=')}`
+      const formattedCuisineTypes = filters.map((cuisineType) =>
+        encodeURIComponent(cuisineType)
+      )
+      cuisineString = `&cuisineType=${formattedCuisineTypes.join('&cuisineType=')}`
+    }
+
+    let dishString = ''
+    if (dishOptions.length > 0) {
+      const filters = dishOptions.split(',').map((filter) => filter.trim())
+      const formattedDishTypes = filters.map((dishType) =>
+        encodeURIComponent(dishType)
+      )
+      dishString = `&dishType=${formattedDishTypes.join('&dishType=')}`
     }
 
     let mealTypesString = ''
@@ -72,7 +85,7 @@ const getRecipes = async (request, response, next) => {
       mealTypesString = `&mealType=${options.join('&mealType=')}`
     }
 
-    const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}${mealTypesString}${nutrientString}${excludedString}${cuisineString}`.trim('')
+    const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}${mealTypesString}${nutrientString}${excludedString}${cuisineString}${dishString}`.trim('')
     console.log(url)
     const apiResponse = await axios.get(url)
 
