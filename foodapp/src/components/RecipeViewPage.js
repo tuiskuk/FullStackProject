@@ -31,6 +31,7 @@ const RecipeViewPage = () => {
   const userId = user?.id
   const [showRecipeGrid, setShowRecipeGrid] = useState(true)
   const isScreenSmall = useMediaQuery('(max-width: 1180px)')
+  console.log(recipeId)
 
 
   useEffect(() => {
@@ -47,6 +48,7 @@ const RecipeViewPage = () => {
 
 
   console.log(recipe)
+  console.log(interactionData)
 
 
 

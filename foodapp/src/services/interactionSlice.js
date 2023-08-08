@@ -40,6 +40,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
     }),
     getAllInteractions: builder.query({
       query: ({ recipeId }) => {
+        console.log(recipeId)
         return {
           url: '/interactions',
           params: { recipeId },

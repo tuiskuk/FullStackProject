@@ -182,8 +182,9 @@ const removeDislikeInteraction = async (request, response, next) => {
 const getAllInteractions = async (request, response, next) => {
   try {
     const recipeId = request.query.recipeId
-    const recipe = await Recipe.findOne({ recipeId }).populate('creator')
-
+    console.log(recipeId)
+    const recipe = await Recipe.findById(recipeId).populate('creator')
+    console.log(recipe)
     // If recipe is not found, return empty
     if (!recipe) {
       return response.status(204).json({ recipe })
