@@ -1,7 +1,7 @@
 import { Container, Typography, OutlinedInput, CircularProgress, Grid } from '@mui/material'
 import { useState } from 'react'
 import { useGetAllUserCreatedInteractionsQuery } from '../services/interactionSlice'
-import RecipeCard from './RecipeCard'
+import RecipeCard from '../components/RecipeCard'
 
 
 const UserSearchPage = () => {

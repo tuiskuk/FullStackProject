@@ -20,8 +20,8 @@ import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSl
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
-import RecipeCard from './RecipeCard'
-import UserListItem from './userListItem'
+import RecipeCard from '../components/RecipeCard'
+import UserListItem from '../components/userListItem'
 
 
 

@@ -1,13 +1,11 @@
-//commented filters have problems to search
-
 export const healthFilterOptions = [
   'alcohol-cocktail',
   'alcohol-free',
   'celery-free',
-  //'Crustcean-Free',
+  'crustcean-free',
   'dairy-free',
   'egg-free',
-  //'DASH',
+  'DASH',
   'fish-free',
   'fodmap-free',
   'gluten-free',
@@ -15,13 +13,13 @@ export const healthFilterOptions = [
   'keto-friendly',
   'kidney-friendly',
   'kosher',
-  //'Low Potassium',
-  //'Low Sugar',
+  'low-potassium',
+  'low-sugar',
   'lupine-free',
-  //'Mediterranean',
+  'Mediterranean',
   'mollusk-free	',
   'mustard-free',
-  //'No oil added	',
+  'no-oil-added	',
   'paleo',
   'peanut-free',
   'pescatarian',
@@ -39,11 +37,64 @@ export const healthFilterOptions = [
 ]
 
 export const mealTypes = [
-  'Breakfest',
-  'Dinner',
+  'Breakfast',
+  'Brunch',
   'Lunch',
+  'Dinner',
   'Snack',
   'Teatime'
+]
+
+export const cuisineOptions = [
+  'American',
+  'Asian',
+  'British',
+  'Caribbean',
+  'Central Europe',
+  'Chinese',
+  'Eastern Europe',
+  'French',
+  'Greek',
+  'Indian',
+  'Italian',
+  'Japanese',
+  'Korean',
+  'Kosher',
+  'Mediterranean',
+  'Mexican',
+  'Middle Eastern',
+  'Nordic',
+  'South American',
+  'South East Asian',
+  'World'
+]
+
+export const dishOptions = [
+  'alcohol cocktail',
+  'biscuits and cookies',
+  'bread',
+  'cereals',
+  'condiments and sauces',
+  'desserts',
+  'drinks',
+  'egg',
+  'ice cream and custard',
+  'main course',
+  'pancake',
+  'pasta',
+  'pastry',
+  'pies and tarts',
+  'pizza',
+  'preps',
+  'preserve',
+  'salad',
+  'sandwiches',
+  'seafood',
+  'side dish',
+  'soup',
+  'special occasions',
+  'starter',
+  'sweets'
 ]
 
 export const nutrients = [

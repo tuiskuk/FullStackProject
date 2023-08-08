@@ -1,10 +1,10 @@
-import LoginPage from './loginPage'
+import LoginPage from '../pages/loginPage'
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
 import { useRefreshMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentAccessToken, setUser } from '../services/loginSlice'
 import { useNavigate } from 'react-router-dom'
-
+import { useState } from 'react'
 
 const WarningDialog = ({ open, onClose, user }) => {
   return (
@@ -22,12 +22,13 @@ const WarningDialog = ({ open, onClose, user }) => {
   )
 }
 
-const ExpirationWarningDialog = ({ open, onClose }) => {
+const ExpirationWarningDialog = ({ loggedOut, open, onClose }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const accessToken = useSelector(selectCurrentAccessToken)
   const [logout] = useSendLogoutMutation()
   const [refresh] = useRefreshMutation()
+  const [showWarningDialog, setShowWarningDialog] = useState(false)
 
   const handleStayLoggedIn = async () => {
     console.log('Stay logged in')
@@ -46,28 +47,65 @@ const ExpirationWarningDialog = ({ open, onClose }) => {
     }
   }
 
+  const logIn = () => {
+    setShowWarningDialog(true)
+    onClose()
+  }
+
   const handleLogOut = () => {
-    console.log('Log out')
     navigate('/')
     logout()
     onClose()
   }
 
+  const handleClose = () => {
+    navigate('/')
+    onClose()
+  }
+
+  const handleLogInClose = () => {
+    setShowWarningDialog(false)
+    onClose()
+  }
+
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Session Expiration Warning</DialogTitle>
-      <DialogContent>
-        <p>Your session is about to expire. Please choose an option:</p>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleStayLoggedIn} color="primary">
-          Stay Logged In
-        </Button>
-        <Button onClick={handleLogOut} color="primary">
-          Log Out
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <>
+      {!loggedOut ? (
+        <Dialog open={open} onClose={onClose}>
+          <DialogTitle>Session Expiration Warning</DialogTitle>
+          <DialogContent>
+            <p>Your session is about to expire. Please choose an option:</p>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleStayLoggedIn} color="primary">
+              Stay Logged In
+            </Button>
+            <Button onClick={handleLogOut} color="primary">
+              Log Out
+            </Button>
+          </DialogActions>
+        </Dialog>
+      ) : (
+        <Dialog open={open} onClose={onClose}>
+          <DialogTitle>Logged out</DialogTitle>
+          <DialogContent>
+            <p>Session expired, please log in again</p>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={logIn} color="primary">
+              Log In
+            </Button>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      {showWarningDialog && (
+        <WarningDialog user={true} open={showWarningDialog} onClose={handleLogInClose} />
+      )}
+    </>
   )
 }
 

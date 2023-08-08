@@ -48,12 +48,12 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       providesTags: ['Interactions']
     }),
     createInteraction: builder.mutation({
-      query: ({ recipeId, label, image, url, ingredients, totalNutrients, recipeYield }) => {
+      query: ({ recipeId, label, image, url, ingredients, totalNutrients, recipeYield , totalTime }) => {
         console.log(url)
         return {
           url: '/interactions',
           method: 'POST',
-          body: { recipeId, label, image, url, ingredients, totalNutrients, recipeYield },
+          body: { recipeId, label, image, url, ingredients, totalNutrients, recipeYield, totalTime },
         }
       },
       invalidatesTags: ['Interactions'],
