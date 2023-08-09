@@ -6,6 +6,6 @@ const pictureRouter = express.Router()
 
 
 pictureRouter.post('/uploadProfilePic/:userId',middleware.uploadProfilePicture.single('profilePicture') , pictureController.uploadProfilePicture)
-pictureRouter.post('/uploadRecipePic/:recipeId',middleware.uploadRecipePicture.array('recipePicture') , pictureController.uploadRecipePicture)
+pictureRouter.post('/uploadRecipePic/:id',middleware.uploadRecipePicture.array('recipePicture') , pictureController.uploadRecipePicture)
 
 export default pictureRouter

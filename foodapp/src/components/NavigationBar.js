@@ -29,8 +29,8 @@ const NavigationBar = () => {
 
     return (
       <>
-        <IconButton onClick={handleMenuOpen} sx={{ position: 'absolute', top: 10, left: 10 }}>
-          <MenuIcon sx={{ fontSize: '34px', color: '#000' }} />
+        <IconButton onClick={handleMenuOpen} sx={{ position: 'fixed', top: 10, left: 10, color: '#FFA726' }}>
+          <MenuIcon sx={{ fontSize: '44px' }} />
         </IconButton>
         <Menu
           anchorEl={anchorEl}
