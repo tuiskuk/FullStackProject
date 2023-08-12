@@ -35,6 +35,7 @@ const HomePage = () => {
       const sortedRecipes = recipesData.slice().sort((a, b) => b.likes.length - a.likes.length)
       setRecipes(sortedRecipes)
     }
+    console.log(isScreenSmall)
   }, [recipesData])
 
   useEffect(() => {
@@ -57,9 +58,9 @@ const HomePage = () => {
   return (
     <Grid container spacing={2} paddingTop={1}>
 
-      <Grid item xs={7}>
+      { /*<Grid item xs={7}>
         <h2 style={isScreenSmall ? { marginLeft: '25%' } : {}}>Home Page</h2>
-      </Grid>
+      </Grid>*/ }
 
       <Grid item xs={12}>
         <Carousel

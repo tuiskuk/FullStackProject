@@ -18,7 +18,7 @@ const RecipeCard = ({ recipe }) => {
       //and does not contain api information
       if(!recipe?.creator && !recipe?.url){
         //we need to make sure that properties instruktions, totalTime
-        //and so on are will be set in sessionStorage and in recipeViewPages state
+        //and so on will be set in sessionStorage and in recipeViewPages state
         recipe = dataFromApi?.recipe
       }
 

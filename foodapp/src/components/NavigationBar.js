@@ -4,7 +4,7 @@ import { Avatar ,Menu, IconButton, useMediaQuery, AppBar, Toolbar, Button, MenuI
 import { Link } from 'react-router-dom'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useState } from 'react'
-//import LogOutDialog from './LogOutDialog'
+import LogOutDialog from './LogOutDialog'
 import { useSendLogoutMutation } from '../services/loginApiSlice'
 
 const NavigationBar = () => {
@@ -29,8 +29,8 @@ const NavigationBar = () => {
 
     return (
       <>
-        <IconButton onClick={handleMenuOpen} sx={{ position: 'absolute', top: 10, left: 10 }}>
-          <MenuIcon sx={{ fontSize: '34px', color: '#000' }} />
+        <IconButton onClick={handleMenuOpen} sx={{ position: 'fixed', top: 10, left: 10, color: '#FFA726' }}>
+          <MenuIcon sx={{ fontSize: '44px' }} />
         </IconButton>
         <Menu
           anchorEl={anchorEl}
@@ -98,7 +98,7 @@ const LoginNavigationBarItem = (user) => {
   const secondName = user?.user?.name?.split(' ')[1]
 
   const [anchorEl, setAnchorEl] = useState(null)
-  //const [showLogOutDialog, setShowLogOutDialog] = useState(false)
+  const [showLogOutDialog, setShowLogOutDialog] = useState(false)
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget)
@@ -123,11 +123,11 @@ const LoginNavigationBarItem = (user) => {
           <MenuItem component={Link} to="/profile">
             My Profile
           </MenuItem>
-          {/*<MenuItem onClick={() => setShowLogOutDialog(true)} >
+          <MenuItem onClick={() => setShowLogOutDialog(true)} >
             log out
-        </MenuItem>*/}
+          </MenuItem>
         </Menu>
-        {/* <LogOutDialog open={showLogOutDialog} onClose={() => setShowLogOutDialog(false)}/>*/}
+        <LogOutDialog open={showLogOutDialog} onClose={() => setShowLogOutDialog(false)}/>
       </>
 
     )

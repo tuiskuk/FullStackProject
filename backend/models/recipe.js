@@ -5,7 +5,7 @@ import mongoose from 'mongoose'
 const recipeSchema = new mongoose.Schema({
   recipeId: {
     type: String,
-    required: true,
+    //required: true, cannot be required here since user created recipes
   },
   label: {
     type: String,
@@ -31,12 +31,24 @@ const recipeSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
-  totalNutrients: {
-    type: Object,
-    default: null,
-  },
   instructions: {
     type: String,
+  },
+  mealType: {
+    type: Array,
+    default: [],
+  },
+  dishType: {
+    type: Array,
+    default: [],
+  },
+  cuisineType: {
+    type: Array,
+    default: [],
+  },
+  healthLabels: {
+    type: Array,
+    default: [],
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
