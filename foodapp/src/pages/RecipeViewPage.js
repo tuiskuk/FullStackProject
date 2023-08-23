@@ -106,8 +106,8 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [disableIconButton, setDisableIconButton] = useState(false)
 
-  const label = recipe.label
-  const image = recipe.image
+  const label = recipe?.label
+  const image = recipe?.image
 
   const [ addLikeInteraction ] = useAddLikeInteractionMutation()
   const [ removeLikeInteraction ] = useRemoveLikeInteractionMutation()
@@ -417,8 +417,8 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
                   }}
                   onClick={handleFavorite}
                 >
-                  {isFavorite ? <BookmarkAddIcon sx={{ height: '55px', width: '55px' }}/>
-                    : <BookmarkAddedIcon sx={{ height: '55px', width: '55px' }}/>  }
+                  {isFavorite ? <BookmarkAddedIcon sx={{ height: '55px', width: '55px' }}/>
+                    : < BookmarkAddIcon sx={{ height: '55px', width: '55px' }}/>  }
                 </IconButton>
               </Tooltip>
             </Grid>

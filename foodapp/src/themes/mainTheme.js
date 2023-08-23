@@ -3,14 +3,17 @@ import { createTheme } from '@mui/material/styles'
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#FFA726', // Warm orange color for primary elements
+      main: '#FFA726',
+      darker: '#D98B00', // Slightly darker shade for variety
     },
     secondary: {
-      main: '#FFC107', // Bright yellow color for secondary elements
+      main: '#FFC107',
+      darker: '#E0A800', // Slightly darker shade for variety
     },
     background: {
-      default: '#FEEAE6', // Light warm pink color for the default background
-      paper: '#FFF3E0', // Pale warm orange color for paper surfaces
+      default: '#FEEAE6',
+      paper: '#FFF3E0',
+      neutral: '#F5F5F5', // Added a neutral background color
     },
   },
   typography: {
@@ -18,17 +21,17 @@ const theme = createTheme({
     h1: {
       fontSize: '3rem',
       fontWeight: 700,
-      color: '#FF8F00', // Warm orange color for heading text
+      color: '#FFA726',
     },
     h2: {
       fontSize: '2.5rem',
       fontWeight: 600,
-      color: '#FF8F00',
+      color: '#FFA726',
     },
     h3: {
       fontSize: '2rem',
       fontWeight: 600,
-      color: '#FF8F00',
+      color: '#FFA726',
     },
     // Add more custom typography styles as needed
   },

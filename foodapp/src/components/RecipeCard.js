@@ -1,7 +1,8 @@
 import { Card, CardMedia, CardContent, Typography, CardActionArea  } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useGetRecipeQuery } from '../services/apiSlice'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import './RecipeCard.css'
 
 
 const RecipeCard = ({ recipe }) => {
@@ -10,6 +11,27 @@ const RecipeCard = ({ recipe }) => {
   const [displayedRecipe,setDisplayedRecipe] = useState(null)
 
   const { data: dataFromApi } = useGetRecipeQuery(recipe.id)
+
+  const textRef = useRef(null)
+
+  const handleMouseEnter = () => {
+    if (textRef.current) {
+      const textHeight = textRef.current.clientHeight
+      const underline = textRef.current.querySelector('.underline')
+      if (underline) {
+        underline.style.height = `${textHeight}px`
+      }
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (textRef.current) {
+      const underline = textRef.current.querySelector('.underline')
+      if (underline) {
+        underline.style.height = '0'
+      }
+    }
+  }
 
   //inside useEffect to make sure that dataFromApi and recipe are defined
   useEffect(() => {
@@ -20,6 +42,7 @@ const RecipeCard = ({ recipe }) => {
         //we need to make sure that properties instruktions, totalTime
         //and so on are will be set in sessionStorage and in recipeViewPages state
         recipe = dataFromApi?.recipe
+        console.log(recipe)
       }
 
       setDisplayedRecipe(recipe)
@@ -48,22 +71,83 @@ const RecipeCard = ({ recipe }) => {
   }
 
   return (
-    <Link to={ `/recipes/${recipe_id}` } onClick={handleRecipeClick} sx={{ maxWidth: 200 }}>
-      <Card sx={{ maxWidth: 200 }}>
-        <CardActionArea>
+    <Link
+      to={`/recipes/${recipe_id}`}
+      onClick={handleRecipeClick}
+      style={{ textDecoration: 'none' }}
+    >
+      <Card
+        sx={{
+          maxWidth: 200,
+          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+          transition: 'transform 0.2s',
+          '&:hover': { transform: 'scale(1.03)' },
+        }}
+      >
+        <CardActionArea onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
           <CardMedia
             component="img"
-            src={displayedRecipe?.images?.SMALL?.url || displayedRecipe?.image || displayedRecipe?.images[0]}
+            src={
+              displayedRecipe?.images?.SMALL?.url ||
+              displayedRecipe?.image ||
+              displayedRecipe?.images[0]
+            }
             alt={displayedRecipe?.label}
             height={200}
             width={200}
+            style={{ objectFit: 'cover' }}
             onError={(e) => {
-              console.log(e)
-              e.target.src = 'https://placehold.co/200?text=Photo+Not+Found'
+              e.target.src = 'https://via.placeholder.com/200?text=No+Image'
             }}
           />
-          <CardContent sx={{ height: 80 }}>
-            <Typography variant="h6">{recipe?.label}</Typography>
+          <CardContent
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center',
+              minHeight: 80,
+              padding: '8px',
+              position: 'relative', // Added for positioning pseudo-element
+            }}
+          >
+            <span className="recipe-label" ref={textRef}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 'bold',
+                  fontSize: '1.2rem',
+                  marginBottom: 1,
+                  overflow: 'hidden',
+                  whiteSpace: 'normal',
+                  display: '-webkit-box',
+                  '-webkit-line-clamp': 2,
+                  '-webkit-box-orient': 'vertical',
+                  position: 'relative', // Added for positioning pseudo-element
+                }}
+              >
+                {displayedRecipe?.label}
+                <span className="underline"></span>
+              </Typography>
+            </span>
+            <div className="tags">
+              {displayedRecipe?.dishType?.map((dish, index) => (
+                <span key={index} className="tag">
+                  {dish}
+                </span>
+              ))}
+              {displayedRecipe?.cuisineType?.map((cuisine, index) => (
+                <span key={index} className="tag">
+                  {cuisine}
+                </span>
+              ))}
+              {displayedRecipe?.mealType?.map((meal, index) => (
+                <span key={index} className="tag">
+                  {meal}
+                </span>
+              ))}
+            </div>
           </CardContent>
         </CardActionArea>
       </Card>

@@ -114,9 +114,11 @@ const getLink = async (request, response, next) => {
 const getRecipe = async (request, response, next) => {
   try {
     const { id } = request.query
+    console.log(request.query)
     console.log(id)
 
     const foundRecipe = await Recipe.findById(id)
+    console.log(foundRecipe)
 
     if (!foundRecipe) {
       return response.status(404).json({ error: 'Recipe not found' })

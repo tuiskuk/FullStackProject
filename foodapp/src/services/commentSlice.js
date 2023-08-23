@@ -26,10 +26,10 @@ export const commentSlice = apiSlice.injectEndpoints({
       providesTags: ['Comments']
     }),
     addReply: builder.mutation({
-      query: ({ commentId, userId, text }) => ({
+      query: ({ recipeId, commentId, userId, text }) => ({
         url: '/comments/comment/reply',
         method: 'POST',
-        body: { commentId, userId, text },
+        body: { recipeId, commentId, userId, text },
       }),
       providesTags: ['Comments']
     }),

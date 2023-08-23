@@ -12,6 +12,8 @@ import {
   DialogActions,
   Box,
   Popover,
+  Card,
+  CardContent
 } from '@mui/material'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
@@ -20,14 +22,17 @@ import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSl
 import { setUser } from '../services/loginSlice'
 import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
+import { Link, useNavigate } from 'react-router-dom'
 import RecipeCard from '../components/RecipeCard'
 import UserListItem from '../components/userListItem'
+import formatFinnishDate from '../helpers/formatFinnishDate'
 
 
 
 const UserProfile = () => {
   const [profileDescription, setProfileDescription] = useState('')
   const [anchorEl, setAnchorEl] = useState(null)
+  const navigate = useNavigate()
   const [followingListVisible, setFollowingListVisible] = useState(false)
   const [anchorElFollowers, setAnchorElFollowers] = useState(null)
   const [followersListVisible, setFollowersListVisible] = useState(false)
@@ -42,6 +47,10 @@ const UserProfile = () => {
   const [uploadProfilePicture] = useUploadProfilePictureMutation()
   const fileInputRef = useRef(null)
   const userId = user?.id
+  useEffect(() => {
+    if(!user) navigate('/login')
+  }, [user])
+
   const { data: followingData, refetch: refetchFollowing } = useGetAllFollowingQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
   const { data: followersData, refetch: refetchFollowers } = useGetAllFollowersQuery(
@@ -200,10 +209,10 @@ const UserProfile = () => {
             disablePortal
           >
             <Box p={2} minWidth={200}>
-              {followers ? (
+              {followers?.length > 0 ? (
                 followers.map((user) => <UserListItem key={user.id} user={user} />)
               ) : (
-                <Typography>Loading...</Typography>
+                <Typography>No followers.</Typography>
               )}
             </Box>
           </Popover>
@@ -231,10 +240,10 @@ const UserProfile = () => {
             disablePortal
           >
             <Box p={2} minWidth={200}>
-              {following ? (
+              {following?.length > 0 ? (
                 following.map((user) => <UserListItem key={user.id} user={user} />)
               ) : (
-                <Typography>Loading...</Typography>
+                <Typography>Not following anyone.</Typography>
               )}
             </Box>
           </Popover>
@@ -351,11 +360,38 @@ const UserProfile = () => {
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'comments' &&
-          userData?.comments?.map((comment, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              {comment}
-            </Grid>
-          ))}
+        user?.comments?.map((comment) => (
+          <Grid item xs={12} key={comment._id}>
+            <Card variant="outlined">
+              <CardContent>
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Avatar
+                      src={user.profileImage || `https://eu.ui-avatars.com/api/?name=${user.username}&size=200`}
+                      alt={user.name}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="body1" fontWeight="bold">
+                      {user.name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {formatFinnishDate(comment.createdAt)}
+                    </Typography>
+                    <Typography variant="body1">
+                      {comment.text}
+                    </Typography>
+                    <Link to={`/recipes/${comment.recipeId}`} style={{ textDecoration: 'none', color: 'gray' }}>
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        Check out this recipe
+                      </Typography>
+                    </Link>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
     </Container>
   )

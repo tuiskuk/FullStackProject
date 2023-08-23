@@ -2,7 +2,7 @@ import React from 'react'
 import { Carousel } from 'react-responsive-carousel'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { useNavigate } from 'react-router-dom'
-import { useMediaQuery, Paper, CircularProgress, Grid, Typography } from '@mui/material'
+import { Paper, CircularProgress, Grid, Typography } from '@mui/material'
 import { useGetAllInteractionRecipesQuery } from '../services/interactionSlice'
 import { useState, useEffect } from 'react'
 
@@ -14,12 +14,11 @@ import UserCard from '../components/UserCard'
 
 const HomePage = () => {
   const [recipes, setRecipes] = useState([])
-  const [users, setUsers] = useState([])
   const { data: recipesData, isLoading, isFetching } = useGetAllInteractionRecipesQuery()
   const { data: usersData, isLoading: isLoadingUsers, isFetching: isFetchingUsers } = useGetUsersQuery()
   const currentUser = useSelector(selectCurrentUser)
   const navigate = useNavigate()
-  const isScreenSmall = useMediaQuery('(max-width: 900px)')
+  //const isScreenSmall = useMediaQuery('(max-width: 900px)')
 
 
   const banners = [
@@ -37,29 +36,21 @@ const HomePage = () => {
     }
   }, [recipesData])
 
-  useEffect(() => {
-    // Sort users based on the number of followers in descending order
-
-    if(usersData) {
-      console.log(usersData)
+  const sortedUsersData = React.useMemo(() => {
+    if (usersData) {
       const userList = Object.values(usersData.entities)
-      console.log(userList)
       const sortedUsers = userList.sort((a, b) => b.followers.length - a.followers.length)
-      setUsers(sortedUsers)
+      return sortedUsers
     }
+    return []
   }, [usersData])
 
   const handleBannerClick = (link) => {
     navigate(link)
   }
   console.log(recipesData)
-  console.log(users)
   return (
     <Grid container spacing={2} paddingTop={1}>
-
-      <Grid item xs={7}>
-        <h2 style={isScreenSmall ? { marginLeft: '25%' } : {}}>Home Page</h2>
-      </Grid>
 
       <Grid item xs={12}>
         <Carousel
@@ -125,8 +116,8 @@ const HomePage = () => {
             <CircularProgress /> // Render the loading spinner when loading is true
           ) : recipes.length !== 0 ? (
             <Grid container spacing={3} marginTop={0.2}>
-              {users.slice(0, 5).map((user, index) => (
-                <Grid item xs={12} sm={6} md={2} key={index}>
+              {sortedUsersData.slice(0, 5).map((user, index) => (
+                <Grid item xs={12} sm={6} md={4} lg={2.5} xl={2} key={index}>
                   <UserCard user={user} currentUser={currentUser}/>
                 </Grid>
               ))}

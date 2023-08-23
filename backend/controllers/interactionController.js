@@ -42,6 +42,7 @@ const addLikeInteraction = async (request, response, next) => {
       User.findById(userIdObject),
       Recipe.findOne({ recipeId }),
     ])
+    console.log(recipe)
 
     if (!currentUser) {
       return response.status(404).json({ error: 'UserId not found' })
@@ -184,10 +185,8 @@ const removeDislikeInteraction = async (request, response, next) => {
 const getAllInteractions = async (request, response, next) => {
   try {
     const { recipeId } = request.query
-    console.log(request)
-    console.log(request.query)
     console.log(recipeId)
-    const recipe = await Recipe.findById(recipeId)
+    const recipe = await Recipe.findOne({ recipeId })
     console.log(recipe)
 
     // If recipe is not found, return empty

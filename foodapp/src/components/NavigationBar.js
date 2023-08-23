@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '../services/loginSlice'
-import { Avatar ,Menu, IconButton, useMediaQuery, AppBar, Toolbar, Button, MenuItem } from '@mui/material'
+import { Avatar ,Menu, IconButton, useMediaQuery, AppBar, Toolbar, Button, MenuItem, Grid } from '@mui/material'
 import { Link } from 'react-router-dom'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useState } from 'react'
@@ -29,7 +29,7 @@ const NavigationBar = () => {
 
     return (
       <>
-        <IconButton onClick={handleMenuOpen} sx={{ position: 'absolute', top: 10, left: 10 }}>
+        <IconButton onClick={handleMenuOpen} sx={{ position: 'absolute', top: 10, left: 10, zIndex: 100, }}>
           <MenuIcon sx={{ fontSize: '34px', color: '#000' }} />
         </IconButton>
         <Menu
@@ -86,13 +86,15 @@ const NavigationBar = () => {
               Create recipe
             </Button>
           )}
-          <LoginNavigationBarItem user={user} />
+          <Grid style={{ marginLeft: 'auto' }}>
+            <LoginNavigationBarItem user={user} logout={logout} />
+          </Grid>
         </Toolbar>
       </AppBar>
     )
 }
 
-const LoginNavigationBarItem = (user) => {
+const LoginNavigationBarItem = ({ user, logout }) => {
 
   const fisrstname = user?.user?.name?.split(' ')[0]
   const secondName = user?.user?.name?.split(' ')[1]
@@ -108,12 +110,12 @@ const LoginNavigationBarItem = (user) => {
     setAnchorEl(null)
   }
   console.log(user)
-  if(user.user){
+  if(user){
     return(
       <>
-        <Avatar onClick={handleMenuOpen} src={ user?.user?.profileImage ||
+        <Avatar onClick={handleMenuOpen} src={ user?.profileImage ||
             `https://eu.ui-avatars.com/api/?name=${fisrstname}+${secondName}&size=200` }
-        sx={{ width: 70, height: 70 }}/>
+        sx={{ width: 70, height: 70, cursor: 'pointer' }}/>
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -123,11 +125,10 @@ const LoginNavigationBarItem = (user) => {
           <MenuItem component={Link} to="/profile">
             My Profile
           </MenuItem>
-          {/*<MenuItem onClick={() => setShowLogOutDialog(true)} >
-            log out
-        </MenuItem>*/}
+          <MenuItem onClick={() => logout()}>
+          Log out
+          </MenuItem>
         </Menu>
-        {/* <LogOutDialog open={showLogOutDialog} onClose={() => setShowLogOutDialog(false)}/>*/}
       </>
 
     )
