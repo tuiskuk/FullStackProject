@@ -1,4 +1,4 @@
-import { useMediaQuery, Tooltip, TextField, Link, Box ,Avatar, Container, Grid, IconButton, ImageListItem ,ImageListItemBar, Typography, InputAdornment } from '@mui/material'
+import { useMediaQuery, Tooltip, TextField, Link, Box ,Avatar, Container, Grid, IconButton, ImageListItem ,ImageListItemBar, Typography, InputAdornment, Card } from '@mui/material'
 import { useEffect, useState } from 'react'
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd'
 import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded'
@@ -8,7 +8,6 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
 import CommentSection from '../components/CommentSectionComponent'
@@ -22,6 +21,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import Fraction from 'fraction.js'
+import InstructionsSection from '../components/InstructionsSection'
 
 const RecipeViewPage = () => {
   const { recipeId } = useParams()
@@ -30,7 +30,7 @@ const RecipeViewPage = () => {
   const user = useSelector(selectCurrentUser)
   const userId = user?.id
   const [showRecipeGrid, setShowRecipeGrid] = useState(true)
-  const isScreenSmall = useMediaQuery('(max-width: 1180px)')
+  const isScreenSmall = useMediaQuery('(max-width: 800px)')
 
 
   useEffect(() => {
@@ -285,6 +285,8 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
     setDisableIconButton(false)
   }
 
+  console.log(recipe)
+
   return(
     <Grid item xs={ isScreenSmall ? 12 : 6 } >
 
@@ -314,30 +316,33 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
               alt={'...loading'} ></img>
             <ImageListItemBar
               title={
-                <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h4" sx={{ color: 'white' }}>
                   {recipe?.label}
                 </Typography>
               }
               actionIcon={
-                <>
-                  <IconButton onClick={handleToLeftImage}
-                    key={'lefticon'}
-                    sx={{ color: 'white', marginRight: 'auto' }}>
-                    <ArrowBackIosNewIcon/>
-                  </IconButton>
-                  <IconButton onClick={handleToRightImage}
-                    key={'righticon'}
-                    sx={{ color: 'white',  marginLeft: 'auto' }}>
-                    <ArrowForwardIosIcon/>
-                  </IconButton>
-                </>}
+                recipe?.images?.length > 1 && (
+                  <>
+                    {currentImageIndex > 0 && (
+                      <IconButton onClick={handleToLeftImage} key="lefticon" sx={{ color: 'white', marginRight: 'auto' }}>
+                        <ArrowBackIosNewIcon />
+                      </IconButton>
+                    )}
+                    {currentImageIndex < recipe.images.length - 1 && (
+                      <IconButton onClick={handleToRightImage} key="righticon" sx={{ color: 'white', marginLeft: 'auto' }}>
+                        <ArrowForwardIosIcon />
+                      </IconButton>
+                    )}
+                  </>
+                )
+              }
             />
           </ImageListItem>
         </Grid>
 
         <Grid item sx={{ width: '100%' }}>
           <Grid container
-            spacing={2}
+            spacing={1}
             direction="row"
             justifyContent="space-around"
             alignItems="center">
@@ -364,14 +369,13 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
             {!isScreenSmall && <Grid item>
               {recipe?.creator ? (
-                <>
-                  <h1>how did you</h1>
-                  <h1>like my recipe?</h1>
-                </> ) :
-                (<>
-                  <h1>Dishcovery user did not </h1>
-                  <h1>do this recipe, rate it</h1>
-                </> )}
+
+
+                <Typography variant='h5'>How did you <br/> like my recipe?</Typography>
+              ) :
+                (
+                  <Typography variant='h5'>Dishcovery user did not <br/> create this recipe, please rate it!</Typography>
+                )}
             </Grid>}
 
             <Grid item >
@@ -425,40 +429,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
           </Grid>
         </Grid>
 
-        <Grid item xs={6}>
-          <Grid container
-            spacing={2}
-            direction="row"
-            justifyContent="flex-start"
-            alignItems="center">
-            <Grid item>
-              <Typography variant="h2">Instructions</Typography>
-            </Grid>
-            <Grid item>
-              <IconButton>
-                <AccessTimeIcon></AccessTimeIcon>
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <Typography variant="h4">{recipe?.totalTime} min</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item>
-          {recipe?.instructions ? ( <Typography variant="h6">{recipe?.instructions}</Typography>
-          ) : (
-            <>
-              <Typography variant="h6">Since this recipe is not done by Dishcovery user we can not
-              give you instructions directly. instructions can be found in link bellow</Typography>
-              <Typography>
-                <a href={recipe?.url} target="_blank" rel="noopener noreferrer">
-                  {recipe?.label}
-                </a>
-              </Typography>
-            </>
-          )}
-        </Grid>
+        <InstructionsSection recipe={recipe}/>
       </Grid>
     </Grid>
   )}
@@ -537,9 +508,6 @@ const InfoGrid = ({ recipe, isScreenSmall, setShowRecipeGrid }) => {
       <Grid container direction="column" alignItems="flex-start">
         <Grid container direction="row" justifyContent="space-around" alignItems="flex-start">
           <Grid item>
-            <Typography variant="h4">Ingredients</Typography>
-          </Grid>
-          <Grid item>
             <Grid container direction="column" justifyContent="center" alignItems="center">
               <Grid item>
                 <Typography variant="h5">Adjust serving size</Typography>
@@ -575,75 +543,131 @@ const InfoGrid = ({ recipe, isScreenSmall, setShowRecipeGrid }) => {
         </Grid>
       </Grid>
 
-      <Grid item>
-        <Box sx={{
-          marginLeft: '30px',
-          height: '350px',
-          width: isScreenSmall ? '100%' : '500px',
-          position: 'relative',
-        }}>
-          {recipe?.ingredients?.slice((pageIndex) * 10,(( pageIndex + 1) * 10)).map((ingredient, index) => (
-            <Typography key={index}>{`${convertToFraction(handleMultiply(ingredient.quantity))} ${ingredient.text.replace(pattern, '')}`}</Typography>
+      <Grid item mt={2}>
+        <Card
+          sx={{
+            marginLeft: '30px',
+            height: '350px',
+            width: '100%', // Adjust the width as needed
+            position: 'relative',
+            backgroundColor: '#FFF3E0', // Background color
+            borderRadius: '10px', // Rounded corners
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+            padding: '20px', // Add some padding for spacing
+          }}
+        >
+          <Grid item mb={1}>
+            <Typography variant="h4">Ingredients</Typography>
+          </Grid>
+          {recipe?.ingredients?.slice(
+            pageIndex * 10,
+            (pageIndex + 1) * 10
+          ).map((ingredient, index) => (
+            <Typography
+              key={index}
+              variant="body1"
+              sx={{ marginBottom: '8px' }}
+            >
+              {`${convertToFraction(
+                handleMultiply(ingredient.quantity)
+              )} ${ingredient.text.replace(pattern, '')}`}
+            </Typography>
           ))}
-          <IconButton sx={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '10px', }}
-          onClick={handleForwardButtonChange}
-          disabled={(pageIndex + 1) * 10 >= recipe?.ingredients?.length}
+          {recipe.totalWeight && (<Typography
+            key={recipe.totalWeight}
+            variant="body1"
+            sx={{
+              marginBottom: '8px',
+              fontWeight: 'bold', // Make the "Total weight" text bold
+            }}
+          >
+            Total weight {roundValue(handleMultiply(recipe.totalWeight))} grams
+          </Typography>)}
+          <IconButton
+            sx={{
+              position: 'absolute',
+              bottom: '10px',
+              right: '10px',
+            }}
+            onClick={handleForwardButtonChange}
+            disabled={(pageIndex + 1) * 10 >= recipe?.ingredients?.length}
           >
             <ArrowForwardIcon />
           </IconButton>
-          <IconButton sx={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '45px',
-          }}
-          disabled={pageIndex === 0}
-          onClick={handleBackButtonChange}
+          <IconButton
+            sx={{
+              position: 'absolute',
+              bottom: '10px',
+              right: '45px',
+            }}
+            disabled={pageIndex === 0}
+            onClick={handleBackButtonChange}
           >
             <ArrowBackIcon />
           </IconButton>
-        </Box>
+        </Card>
       </Grid>
 
-      {recipe?.totalNutrients && <Grid item>
-        <Box sx={{
-          marginLeft: '30px',
-          height: '500px',
-          width: isScreenSmall ? '100%' : '500px',
-          position: 'relative',
-        }}>
-
-          <Typography variant="h5">Nutritional Information ({multiplier} servings):</Typography>
-          <h1></h1>
-          {Object.entries(recipe?.totalNutrients)
-            .slice((nutrientsPageIndex) * 15,(( nutrientsPageIndex + 1) * 15)).map(([key, nutrient]) => (
-              <Typography key={key}>
-                {nutrient.label}: {roundValue(handleMultiply(nutrient.quantity))}
-                {nutrient.unit}
-              </Typography>))}
-          <IconButton sx={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '10px', }}
-          onClick={handleForwardButton}
-          disabled={(nutrientsPageIndex + 1) * 15 >= Object.entries(recipe?.totalNutrients).length }
+      {recipe?.totalNutrients && (
+        <Grid item mt={2}>
+          <Box
+            sx={{
+              marginLeft: '30px',
+              height: '500px',
+              width: '100%', // Adjust the width as needed
+              position: 'relative',
+              backgroundColor: '#FFF3E0', // Background color
+              borderRadius: '10px', // Rounded corners
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+              padding: '20px', // Add some padding for spacing
+            }}
           >
-            <ArrowForwardIcon />
-          </IconButton>
-          <IconButton sx={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '45px',
-          }}
-          disabled={nutrientsPageIndex === 0}
-          onClick={handleBackButton}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-        </Box>
-      </Grid>}
+            <Typography variant="h5" sx={{ marginBottom: '10px' }}>
+              Nutritional Information ({multiplier} servings):
+            </Typography>
+            {Object.entries(recipe?.totalNutrients)
+              .slice(
+                nutrientsPageIndex * 15,
+                (nutrientsPageIndex + 1) * 15
+              ).map(([key, nutrient]) => (
+                <Typography
+                  key={key}
+                  variant="body1"
+                  sx={{ marginBottom: '8px' }}
+                >
+                  <strong>{nutrient.label}:</strong>{' '}
+                  {roundValue(handleMultiply(nutrient.quantity))}
+                  {nutrient.unit}
+                </Typography>
+              ))}
+            <IconButton
+              sx={{
+                position: 'absolute',
+                bottom: '10px',
+                right: '10px',
+              }}
+              onClick={handleForwardButton}
+              disabled={
+                (nutrientsPageIndex + 1) * 15 >=
+                Object.entries(recipe?.totalNutrients).length
+              }
+            >
+              <ArrowForwardIcon />
+            </IconButton>
+            <IconButton
+              sx={{
+                position: 'absolute',
+                bottom: '10px',
+                right: '45px',
+              }}
+              disabled={nutrientsPageIndex === 0}
+              onClick={handleBackButton}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          </Box>
+        </Grid>
+      )}
     </Grid>
   )}
 

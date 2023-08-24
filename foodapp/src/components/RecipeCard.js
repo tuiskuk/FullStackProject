@@ -6,6 +6,7 @@ import './RecipeCard.css'
 
 
 const RecipeCard = ({ recipe }) => {
+  console.log(recipe)
   let recipe_id  = recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.recipeId
   let favoriteRecipe = null
   const [displayedRecipe,setDisplayedRecipe] = useState(null)
@@ -40,7 +41,7 @@ const RecipeCard = ({ recipe }) => {
       //and does not contain api information
       if(!recipe?.creator && !recipe?.url){
         //we need to make sure that properties instruktions, totalTime
-        //and so on are will be set in sessionStorage and in recipeViewPages state
+        //and so on will be set in sessionStorage and in recipeViewPages state
         recipe = dataFromApi?.recipe
         console.log(recipe)
       }
@@ -57,6 +58,8 @@ const RecipeCard = ({ recipe }) => {
 
     console.log(displayedRecipe)
   }, [recipe ,dataFromApi])
+
+  console.log(displayedRecipe)
 
 
 

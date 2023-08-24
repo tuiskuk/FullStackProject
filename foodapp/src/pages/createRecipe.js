@@ -1,335 +1,496 @@
-import { useEffect, useState } from 'react'
 import { useCreateInteractionMutation } from '../services/interactionSlice'
 import { useUploadRecipePictureMutation } from '../services/pictureHandlerApiSlice'
+import AddAPhotoIcon from '@mui/icons-material/AddAPhoto'
+import DeleteIcon from '@mui/icons-material/Delete'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
-import { TextField, Button, Grid, Container, Typography, Snackbar, Alert, CircularProgress, Input
-  //Avatar,
-} from '@mui/material'
+import { TextField, Container,  Grid, Tooltip, Box, ImageListItem, ImageListItemBar, IconButton, Button, Snackbar, Alert, Typography } from '@mui/material'
+import { useRef, useState } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { cuisineOptions, dishOptions, healthFilterOptions, mealTypes } from '../data'
+import { WarningDialog } from '../components/WarningDialog'
+import OptionsDialog from '../components/SelectOptionsForRecipeDialog'
+
+
 
 const CreateRecipePage = () => {
-  const [instructions, setInstruktions] = useState('')
-  const [ingredientLines, setIngredientLines] = useState([])
-  const [ingredient, setIngredient] = useState('')
-  const [ingredientAmount, setIngredientAmount] = useState('')
-  const [recommendation, setRecommendation] = useState('')
-  const [totalTime, setTotalTime] = useState(0)
-  const [mealType, setMealType] = useState('')
-  const [cuisineType, setCuisineType] = useState('')
-  const [dishType, setDishType] = useState('')
-  const [label, setLabel] = useState('')
-  const [createRecipe, { data, isLoading ,isSuccess, isError }] = useCreateInteractionMutation()
-  const [uploadRecipePicture] = useUploadRecipePictureMutation()
-  const [openSnackbar, setOpenSnackbar] = useState(false)
+  //hooks related to recipe pictures
+  const fileInputRef = useRef(null)
+  const [selectedFiles, setSelectedFiles] = useState([])
+  const [imageIndex, setImageIndex] = useState(-1)
+
+  //user and show varnig dialog variable
   const user = useSelector(selectCurrentUser)
-  const [files, setFiles] = useState([])
-  const [snacBarMessage, setSnacBarMessage] = useState('')
+  const [showWarningDialog, setShowWarningDialog] = useState(false)
 
-  //show notification when creation of recipe is
-  // tried and reset ewerything if it is succesfull
-  useEffect(() => {
-    console.log(files)
-    if(isSuccess || isError){
-      if(isSuccess){
-        setSnacBarMessage('recipe created')
-        setIngredient('')
-        setIngredientAmount('')
-        setRecommendation('')
-        setInstruktions('')
-        setMealType('')
-        setDishType('')
-        setTotalTime(0)
-        setCuisineType('')
-        setLabel('')
-        setIngredientLines([])
-      }else{
-        setSnacBarMessage('an error occured during recipe creation')
-      }
-      setOpenSnackbar(true)
-    }
-  }, [isSuccess, isError])
+  //state variables related to snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [snacbarSeverity, setSnacbarSeverity] = useState('error')
 
 
-  //function to remove file
-  const deleteFile = (index) => {
-    const updatedFiles = files.filter((_, i) => i !== index)
-    setFiles(updatedFiles)
+  //state variables for creating ingredient object
+  const [measureAmount, setMeasureAmount] = useState('')
+  const [measure, setMeasure] = useState('')
+  const [ingredientName, setIngredientName] = useState('')
+  const [recommendBrand, setRecommendBrand] = useState('')
+  const [ingredients,setIngredients] = useState([])
+
+
+  //state variables for storing depicting filter options
+  const [selectedMealTypes, setSelectedMealTypes] = useState([])
+  const [selectedDishTypes, setSelectedDishTypes] = useState([])
+  const [selectedCuisineTypes, setSelectedCuisineTypes] = useState([])
+  const [selectedHealthFilters, setSelectedHealthFilters] = useState([])
+
+  // Dialog state variables. selectedMealTypes etc are chosen in dialog
+  const [openDialog, setOpenDialog] = useState(false)
+  const [dialogTitle, setDialogTitle] = useState('')
+  const [dialogOptions, setDialogOptions] = useState([])
+  const [dialogSelectedOptions, setDialogSelectedOptions] = useState([])
+
+  //redux Toolkit hooks for creating recipe and uploading its pictures
+  const [ createInteraction ] = useCreateInteractionMutation()
+  const [ uploadRecipePicture ] = useUploadRecipePictureMutation()
+
+  const { handleSubmit, control,formState: { errors }, trigger, reset } = useForm()
+
+  const handleBlur = (field) => {
+    trigger(field.name)
   }
 
-  const handleFileChange = (event) => {
-    console.log(event.target.files)
-    const newFile = event.target.files[0]
-    if (newFile.type.startsWith('image/')) {
-      setFiles((prevFiles) => [...prevFiles, newFile])
-    }
+  const handleAddImageClick = () => {
+    // Programmatically trigger the file input click
+    fileInputRef.current.click()
   }
 
-  //function to delete undesired ingredientLIne
-  const editIngredients = (index) => {
-    const updatedIngredients = ingredientLines.filter((_, i) => i !== index)
-    setIngredientLines(updatedIngredients)
-  }
-
-
-  //function to add ingredients
-  const handleIngredientAddition = () => {
-    console.log('add function entered')
-    if (ingredient.trim() === '' || ingredientAmount.trim() === '') {
-      setSnacBarMessage('ingredient and it\'s quintity must be set')
-      setOpenSnackbar(true)
-      return
-    }
-
-    if (recommendation.trim() !== '') {
-      setIngredientLines([...ingredientLines,`${ingredient} ${ingredientAmount} (recommendation) ${recommendation}`])
+  const handleToLeftImage = () => {
+    if(imageIndex > 0) {
+      setImageIndex(imageIndex - 1)
     } else {
-      setIngredientLines([...ingredientLines,`${ingredient} ${ingredientAmount}`])
+      setImageIndex(selectedFiles?.length - 1)
     }
-    setIngredient('')
-    setIngredientAmount('')
-    setRecommendation('')
   }
 
-  //function to create new recipe
-  const handleRecipeCreation = async () => {
-    if(files.length === 0){
-      setSnacBarMessage('recipe cannot be created without main picture')
-      setOpenSnackbar(true)
-      return
-    } else if(ingredientLines.length === 0) {
-      setSnacBarMessage('remember to add incredients to your recipe')
-      setOpenSnackbar(true)
-      return
-    } else if(instructions.length < 50) {
-      setSnacBarMessage('instrucktions must be over 50 characters long')
-      setOpenSnackbar(true)
-      return
-    } else if(label.trim() === '' || mealType.trim() === '' || cuisineType.trim() === ''
-    || dishType.trim() === '' || totalTime === 0) {
-      setSnacBarMessage('remeber to input all information about your recipe label, time and all types')
-      setOpenSnackbar(true)
+  const handleToRightImage = () => {
+    if(imageIndex < (selectedFiles?.length - 1)) {
+      setImageIndex(imageIndex + 1)
+    } else {
+      setImageIndex(0)
+    }
+  }
+
+  //function to delete files to selectedFiles property
+  const handleDeletePicture = () => {
+    const confirmed = window.confirm('Are you sure you want to delete this picture?')
+    if (confirmed) {
+      const updatedFiles = [...selectedFiles]
+      updatedFiles.splice(imageIndex, 1)
+      if(imageIndex === selectedFiles?.length - 1) {
+        setImageIndex(prevIndex => prevIndex - 1)
+      }
+      setSelectedFiles(updatedFiles)
+    }
+  }
+
+  //function to add files to selectedFiles property
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]
+    console.log(file)
+    if (file) {
+      setImageIndex(prevIndex => prevIndex + 1) //this is why imageIdexes initial state is -1
+      setSelectedFiles((prevFiles) => [...prevFiles, file])
+    }
+    console.log(imageIndex,selectedFiles)
+  }
+
+  //function to add ingredient
+  const handleAddIngredient = () => {
+    if (!measureAmount || !measure || !ingredientName) {
+      console.log('if entered')
+      showSnackbar('all ingredients must have name, measure and amount of ingredient','error')
       return
     }
 
+    const ingredientObject = {
+      text: `${measure} ${ingredientName} ${recommendBrand ? `(recommended ${recommendBrand})` : ''}`,
+      quantity: measureAmount
+    }
+    setIngredients((prevIngredients) => [...prevIngredients, ingredientObject])
 
-    const recipe = {
-      creator: user.id,
-      label,
-      instructions,
-      ingredientLines,
-      totalTime,
-      mealType,
-      cuisineType,
-      dishType,
+    // Clear ingredient fields
+    setMeasureAmount('')
+    setMeasure('')
+    setIngredientName('')
+    setRecommendBrand('')
+  }
+
+  //functino to remove ingredient
+  const handleRemoveIngredient = (i) => {
+    setIngredients((prevIngredients) => {
+      const updatedIngredients = [...prevIngredients]
+      updatedIngredients.splice(i, 1)
+      return updatedIngredients
+    })
+  }
+
+  //function to handle opening snacbar
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message)
+    setSnacbarSeverity(severity)
+    setSnackbarOpen(true)
+  }
+
+  //function to handle opening dialg where mealtypes etc are chosen
+  const openOptionsDialog = (title, options, selectedOptions) => {
+    setDialogTitle(title)
+    setDialogOptions(options)
+    setDialogSelectedOptions(selectedOptions)
+    setOpenDialog(true)
+    console.log(dialogOptions)
+    console.log(dialogSelectedOptions)
+  }
+
+  //function ot handle creating recipe
+  const onSubmit = async (submitData) => {
+    if (!user) {
+      setShowWarningDialog(true)
+      return
     }
 
-    try{
-      const response = await createRecipe(recipe)
-      console.log(response)
-      await uploadRecipePicture({ files, id: response.data.id })
-      console.log(data)
+    if (selectedFiles.length === 0) {
+      showSnackbar('Recipe mut have at least one picture','error')
+      return
+    } else if (ingredients.length === 0) {
+      showSnackbar('Remember to input ingredients','error')
+      return
+    }
+
+    try {
+      if (Object.keys(errors).length === 0) {
+        const {
+          recipeYield,
+          totalTime,
+          ...restSubmitData
+        } = submitData
+
+        const createData = {
+          ...restSubmitData,
+          ingredients: ingredients,
+          mealType: selectedMealTypes,
+          dishType: selectedDishTypes,
+          cuisineType: selectedCuisineTypes,
+          healthLabels: selectedHealthFilters,
+          creator: user?.id,
+          recipeYield: parseInt(recipeYield),
+          totalTime: parseInt(totalTime)
+        }
+
+        const response = await createInteraction(createData)
+        console.log('recipe created', response?.data?.savedRecipe)
+
+        const imageResponse = await uploadRecipePicture({ files: selectedFiles, id: response?.data?.savedRecipe.id })
+        console.log('recipes pictures uploaded and added to recipes image property,', imageResponse?.data?.recipeImages)
+
+        //reset everything and show success messgae to user
+        reset()
+        setIngredients([])
+        setSelectedFiles([])
+        setSelectedMealTypes([])
+        setSelectedCuisineTypes([])
+        setSelectedDishTypes([])
+        setSelectedHealthFilters([])
+        setImageIndex(-1)
+        showSnackbar('Recipe creted','success')
+      }
     } catch (error) {
-      console.error('An error occurred:', error.message)
+      console.error('An error while creating recipe:', error)
+      // Handle the error, show a message to the user, etc.
     }
   }
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false)
-  }
+
+
+
 
   return (
     <Container maxWidth="md" >
-      <Snackbar open={openSnackbar} autoHideDuration={5000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={isSuccess ? 'success' : 'error'}  sx={{ width: '100%' }}>
-          { snacBarMessage }
-        </Alert>
-      </Snackbar>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12}>
-          <Typography variant="h1">
-            Create and publish your own recipe
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h2">
-            Lets start by listing all ingredients
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          {ingredientLines.map((ingredient, index) => (
-            <Grid
-              container
-              key={index}
-              alignItems="center"
-              justifyContent="space-between"
+
+      <Grid
+        container
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        spacing={2}
+      >
+        <form onSubmit={handleSubmit(onSubmit)}>
+
+          <Grid item xs={6}>
+            <Snackbar
+              open={snackbarOpen}
+              autoHideDuration={6000} // Adjust the duration as needed
+              onClose={() => setSnackbarOpen(false)}
             >
-              <Grid item>
-                <Typography variant="h6">
-                  { ingredient }
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => editIngredients(index)}
-                >
-                  Rewrite
-                </Button>
-              </Grid>
-            </Grid>
-          ))}
-        </Grid>
-        <Grid item xs={2}>
-          <TextField
-            label="quantity"
-            required={true}
-            multiline
-            value={ingredientAmount}
-            onChange={(e) => setIngredientAmount(e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <TextField
-            label="Input ingredient e.g. ketchup"
-            required={true}
-            multiline
-            value={ingredient}
-            onChange={(e) => setIngredient(e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <TextField
-            label="recommend brand e.g. Felix"
-            multiline
-            value={recommendation}
-            onChange={(e) => setRecommendation(e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleIngredientAddition}
-            fullWidth
-          >
-            Add ingredient
-          </Button>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h2">
-            Lets continue by writing the instructions
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="give instruction to your recipe here. simple senteces are usually good idea"
-            multiline
-            rows={5}
-            value={instructions}
-            onChange={(e) => setInstruktions(e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h2">
-            basic information about your recipe
-          </Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <TextField
-            label="give time estimation in minutes"
-            value={totalTime}
-            onChange={(e) => setTotalTime(e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <TextField
-            label="mealType e.g. dessert"
-            value={mealType}
-            onChange={(e) => setMealType(e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <TextField
-            label="cuisineType e.g. american"
-            value={cuisineType}
-            onChange={(e) => setCuisineType(e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <TextField
-            label="dishType a.g starter"
-            value={dishType}
-            onChange={(e) => setDishType(e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Grid item xs={5}>
-            <Typography variant="h5">give label to you recipe</Typography>
-          </Grid>
-          <Grid item xs={5}>
-            <TextField
-              label="label here"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              fullWidth
+              <Alert
+                onClose={() => setSnackbarOpen(false)}
+                severity={snacbarSeverity}
+                sx={{ width: '100%' }}
+              >
+                {snackbarMessage}
+              </Alert>
+            </Snackbar>
+            <Typography variant="h5" sx={{ marginTop: 3 }}>Give a Label to Your Recipe</Typography>
+            <Controller
+              name="label"
+              control={control}
+              rules={{ required: true }}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  label="label"
+                  {...field}
+                  error={!!errors.label}
+                  helperText={errors.label ? 'Label is required' : ''}
+                  onBlur={() => handleBlur(field)}
+                  fullWidth
+                />
+              )}
             />
+            <Typography variant="h5">Add Pictures to Depict Your Recipe</Typography>
           </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h3">add pictures to depict your recipe, first is main picture</Typography>
-          <Grid item xs={5}>
-            <Input
+
+          <Grid item>
+            {selectedFiles?.length === 0 ? ( <Tooltip title='click here to add pictures to your recipe'>
+              <Box onClick={handleAddImageClick}
+                sx={{
+                  backgroundColor: 'grey',
+                  padding: '10px',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center', // Center vertically
+                  height: '250px',
+                  width: '300px',
+                }}
+              >
+                <AddAPhotoIcon sx={{ fontSize: '78px' }} />
+              </Box>
+            </Tooltip> ) : (
+              <ImageListItem sx={{ height: '250px', width: '300px' }}>
+                <img
+                  src={selectedFiles[imageIndex] ? URL.createObjectURL(selectedFiles[imageIndex]) : ''}
+                  alt={'...loading'}
+                  style={{ width: '100%', height: '100%' }}
+                />
+                <ImageListItemBar
+                  actionIcon={
+                    <>
+                      <IconButton onClick={handleToLeftImage}
+                        key={'lefticon'}
+                        sx={{ color: 'white' }}>
+                        <ArrowBackIosNewIcon/>
+                      </IconButton>
+                      <IconButton onClick={handleToRightImage}
+                        key={'righticon'}
+                        sx={{ color: 'white' }}>
+                        <ArrowForwardIosIcon/>
+                      </IconButton>
+                      <Tooltip title="add more pictures">
+                        <IconButton sx={{ color: 'white' }} onClick={handleAddImageClick}>
+                          <AddAPhotoIcon/>
+                        </IconButton>
+                      </Tooltip>
+                      <IconButton sx={{ color: 'white' }} onClick={handleDeletePicture}>
+                        <DeleteIcon/>
+                      </IconButton>
+                    </>}
+                />
+              </ImageListItem>)}
+            <input
+              ref={fileInputRef}
               type="file"
-              name="recipePicture"
+              style={{ display: 'none' }}
               onChange={handleFileChange}
             />
           </Grid>
-          {files.map((file, index) => (
-            <Grid
-              container
-              key={index}
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Grid item>
-                <Typography variant="h6">
-                  { file.name }
-                </Typography>
+
+          <Grid item>
+            <Typography variant="h5">Add Ingredients to Your Recipe</Typography>
+          </Grid>
+
+          {ingredients[0] && (
+            <Grid item>
+              <h3>List of ingredients in a way other users will see them</h3>
+              {ingredients.map((ingredient, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                  <h3 style={{ marginRight: '10px' }}>{`${index + 1}. ${ingredient?.quantity} ${ingredient?.text}`}</h3>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    style={{ backgroundColor: 'red', color: 'black' }}
+                    onClick={() => handleRemoveIngredient(index)}
+                  >
+                  Remove
+                  </Button>
+                </div>
+              ))}
+            </Grid>)}
+
+          <Grid item>
+
+            <Grid container spacing={2} alignItems="center" sx={{ padding: '8px' }}>
+
+              <Grid item xs={2}>
+                <TextField
+                  type="number"
+                  value={measureAmount}
+                  onChange={(event) => setMeasureAmount(event.target.value)}
+                  placeholder='e.g. 3'
+                  helperText='how much'
+                  inputProps={{ min: 1 }}
+                />
               </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => deleteFile(index)}
-                >
-                  remowe
-                </Button>
+
+              <Grid item xs={3}>
+                <TextField
+                  value={measure}
+                  onChange={(event) => setMeasure(event.target.value)}
+                  label='e. g. Cup or Cups'
+                  helperText='measure' />
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  value={ingredientName}
+                  onChange={(event) => setIngredientName(event.target.value)}
+                  placeholder='e. g. wheat flour'
+                  helperText='ingredient name'/>
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  value={recommendBrand}
+                  onChange={(event) => setRecommendBrand(event.target.value)}
+                  placeholder='e. g. felix'
+                  helperText='recommend brand (optional)'/>
               </Grid>
             </Grid>
-          ))}
-        </Grid>
-        <Grid item xs={3}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleRecipeCreation}
-            fullWidth
-          >
-            {isLoading ? <CircularProgress size={32} /> : 'Create recipe'}
-          </Button>
-        </Grid>
+
+            <Button onClick={handleAddIngredient} style={{ backgroundColor: '#FFA726', color: 'black' }}>
+            Add ingredient
+            </Button>
+
+          </Grid>
+
+          <Grid item xs={12} sx={{ width: '100%' }}>
+            <Typography variant="h5">Write Instructions for Your Recipe</Typography>
+            <Controller
+              name="instructions"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  rows={8}
+                  multiline
+                  fullWidth
+                  placeholder="Write instructions here"
+                  error={!!errors.instructions}
+                  helperText={errors.instructions ? 'instructions is required' : ''}
+                  onBlur={() => handleBlur(field)}
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography variant="h5">How Long to Make and Serving Size</Typography>
+            <Grid container direction={'row'} justifyContent={'space-around'}>
+              <Controller
+                name="totalTime"
+                control={control}
+                rules={{ required: true }}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    label="Total Time (minutes)"
+                    type="number"
+                    inputProps={{ min: 1 }}
+                    {...field}
+                    error={!!errors.totalTime}
+                    helperText={errors.totalTime ? 'Total Time is required' : ''}
+                    onBlur={() => handleBlur(field)}
+                  />
+                )}
+              />
+
+              <Controller
+                name="recipeYield"
+                control={control}
+                rules={{ required: true }}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    label="serving size"
+                    type="number"
+                    inputProps={{ min: 1 }}
+                    {...field}
+                    error={!!errors.recipeYield}
+                    helperText={errors.recipeYield ? 'serving size is required' : ''}
+                    onBlur={() => handleBlur(field)}
+                  />
+                )}
+              />
+            </Grid>
+
+          </Grid>
+
+          <Grid item>
+            <Typography variant="h5">Add Depicting Hashtags to Your Recipe</Typography>
+            <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Meal Types', mealTypes, selectedMealTypes)}>
+              Select Meal Types
+            </Button>
+            <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Dish Types', dishOptions, selectedDishTypes)}>
+              Select Dish Types
+            </Button>
+            <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Cuisine Types', cuisineOptions, selectedCuisineTypes)}>
+              Select Cuisine Types
+            </Button>
+            <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Diet/Allergic Options', healthFilterOptions, selectedHealthFilters)}>
+              Select Diet/Allergic options
+            </Button>
+            <OptionsDialog
+              setOpenDialog={setOpenDialog}
+              open={openDialog}
+              title={dialogTitle}
+              options={dialogOptions}
+              selectedOptions={dialogSelectedOptions}
+              setSelectedMealTypes={setSelectedMealTypes}
+              setSelectedDishTypes={setSelectedDishTypes}
+              setSelectedCuisineTypes={setSelectedCuisineTypes}
+              setSelectedHealthFilters={setSelectedHealthFilters}
+            />
+          </Grid>
+
+
+          <Grid item>
+            <Button variant="contained" color="primary" type="submit">
+              Create recipe
+            </Button>
+          </Grid>
+
+        </form>
       </Grid>
+      <WarningDialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)} user={user} />
     </Container>
   )
 }
+
+
 
 export default CreateRecipePage

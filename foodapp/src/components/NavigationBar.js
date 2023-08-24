@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '../services/loginSlice'
-import { Avatar ,Menu, IconButton, useMediaQuery, AppBar, Toolbar, Button, MenuItem, Grid } from '@mui/material'
+import { Avatar ,Menu, IconButton, useMediaQuery, AppBar, Toolbar, Button, MenuItem, Grid, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useState } from 'react'
-//import LogOutDialog from './LogOutDialog'
+import LogOutDialog from './LogOutDialog'
 import { useSendLogoutMutation } from '../services/loginApiSlice'
 
 const NavigationBar = () => {
@@ -29,8 +29,8 @@ const NavigationBar = () => {
 
     return (
       <>
-        <IconButton onClick={handleMenuOpen} sx={{ position: 'absolute', top: 10, left: 10, zIndex: 100, }}>
-          <MenuIcon sx={{ fontSize: '34px', color: '#000' }} />
+        <IconButton onClick={handleMenuOpen} sx={{ position: 'fixed', top: 10, left: 10, color: '#FFA726' }}>
+          <MenuIcon sx={{ fontSize: '44px' }} />
         </IconButton>
         <Menu
           anchorEl={anchorEl}
@@ -68,22 +68,42 @@ const NavigationBar = () => {
   else
     return(
       <AppBar position="static" >
-        <Toolbar sx={{ height: '75px' }}>
+        <Toolbar sx={{ height: '50px' }}>
           <Button color="inherit" component={Link} to="/">
             <img src="/vectors/logo.svg" alt="Logo" style={{ height: '50px' }}/>
           </Button>
-          <Button color="inherit" component={Link} to="/search">
-            search
+          <Button
+            color="inherit"
+            component={Link}
+            to="/search"
+            sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
+          >
+            <Typography variant="subtitle2">Search</Typography>
           </Button>
-          <Button color="inherit" component={Link} to="/userRecipesearch">
-            recipes by other users
+          <Button
+            color="inherit"
+            component={Link}
+            to="/userRecipesearch"
+            sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
+          >
+            <Typography variant="subtitle2">Recipes by Other Users</Typography>
           </Button>
-          <Button color="inherit" component={Link} to="/users">
-            Discover users
+          <Button
+            color="inherit"
+            component={Link}
+            to="/users"
+            sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
+          >
+            <Typography variant="subtitle2">Discover Users</Typography>
           </Button>
           {user && (
-            <Button color="inherit" component={Link} to="/createrecipe">
-              Create recipe
+            <Button
+              color="inherit"
+              component={Link}
+              to="/createrecipe"
+              sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
+            >
+              <Typography variant="subtitle2">Create Recipe</Typography>
             </Button>
           )}
           <Grid style={{ marginLeft: 'auto' }}>
@@ -94,13 +114,13 @@ const NavigationBar = () => {
     )
 }
 
-const LoginNavigationBarItem = ({ user, logout }) => {
+const LoginNavigationBarItem = ({ user }) => {
 
   const fisrstname = user?.user?.name?.split(' ')[0]
   const secondName = user?.user?.name?.split(' ')[1]
 
   const [anchorEl, setAnchorEl] = useState(null)
-  //const [showLogOutDialog, setShowLogOutDialog] = useState(false)
+  const [showLogOutDialog, setShowLogOutDialog] = useState(false)
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget)
@@ -125,10 +145,11 @@ const LoginNavigationBarItem = ({ user, logout }) => {
           <MenuItem component={Link} to="/profile">
             My Profile
           </MenuItem>
-          <MenuItem onClick={() => logout()}>
-          Log out
+          <MenuItem onClick={() => setShowLogOutDialog(true)} >
+            log out
           </MenuItem>
         </Menu>
+        <LogOutDialog open={showLogOutDialog} onClose={() => setShowLogOutDialog(false)}/>
       </>
 
     )

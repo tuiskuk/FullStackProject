@@ -12,8 +12,10 @@ import { useGetUsersQuery } from '../services/userApiSlice'
 import { selectCurrentUser } from '../services/loginSlice'
 import UserCard from '../components/UserCard'
 
+
 const HomePage = () => {
   const [recipes, setRecipes] = useState([])
+  const [users, setUsers] = useState([])
   const { data: recipesData, isLoading, isFetching } = useGetAllInteractionRecipesQuery()
   const { data: usersData, isLoading: isLoadingUsers, isFetching: isFetchingUsers } = useGetUsersQuery()
   const currentUser = useSelector(selectCurrentUser)
@@ -35,14 +37,13 @@ const HomePage = () => {
       setRecipes(sortedRecipes)
     }
   }, [recipesData])
-
-  const sortedUsersData = React.useMemo(() => {
-    if (usersData) {
+  useEffect(() => {
+    // Sort the recipes based on the number of likes in descending order
+    if(usersData) {
       const userList = Object.values(usersData.entities)
       const sortedUsers = userList.sort((a, b) => b.followers.length - a.followers.length)
-      return sortedUsers
+      setUsers(sortedUsers)
     }
-    return []
   }, [usersData])
 
   const handleBannerClick = (link) => {
@@ -113,17 +114,17 @@ const HomePage = () => {
             Most followed users
           </Typography>
           {isLoadingUsers || isFetchingUsers ? (
-            <CircularProgress /> // Render the loading spinner when loading is true
+            <Grid container spacing={3} marginTop={0.2}><CircularProgress /> </Grid>
           ) : recipes.length !== 0 ? (
             <Grid container spacing={3} marginTop={0.2}>
-              {sortedUsersData.slice(0, 5).map((user, index) => (
+              {users.slice(0, 5).map((user, index) => (
                 <Grid item xs={12} sm={6} md={4} lg={2.5} xl={2} key={index}>
                   <UserCard user={user} currentUser={currentUser}/>
                 </Grid>
               ))}
             </Grid>
           ) : (
-            <h3>No recipes found</h3>
+            <h3>No users found</h3>
           )}
         </Paper>
       </Grid>

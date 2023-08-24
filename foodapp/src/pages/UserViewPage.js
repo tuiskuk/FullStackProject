@@ -10,6 +10,7 @@ import UserListItem from '../components/userListItem'
 import { WarningDialog } from '../components/WarningDialog'
 import formatFinnishDate from '../helpers/formatFinnishDate'
 import { Link } from 'react-router-dom'
+import { useGetAllSpecificUserCreatedRecipesQuery } from '../services/interactionSlice'
 
 
 const UserViewPage = () => {
@@ -29,12 +30,13 @@ const UserViewPage = () => {
   const [ unfollow, { isLoading: isUnfollowMutateLoading } ] = useUnfollowMutation()
   const { data: followersData } = useGetAllFollowersQuery({ userId: targetUserId })
   const { data: followingData } = useGetAllFollowingQuery({ userId: targetUserId })
+  const { data: userCreatedRecipes } = useGetAllSpecificUserCreatedRecipesQuery({ userId: targetUserId })
   const isFollowing = Boolean(userCurrent?.following.includes(targetUserId))
   const [anchorEl, setAnchorEl] = useState(null)
   const [followingListVisible, setFollowingListVisible] = useState(false)
   const [anchorElFollowers, setAnchorElFollowers] = useState(null)
   const [followersListVisible, setFollowersListVisible] = useState(false)
-  const postCount = 0
+  const postCount = userCreatedRecipes?.length
   const followers = followersData?.followers
   const following = followingData?.following
   const followingCount = following?.length
@@ -230,6 +232,14 @@ const UserViewPage = () => {
           targetUser?.favorites?.map((favorite, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={favorite.recipeId} recipe={favorite} />
+            </Grid>
+          ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {selectedOption === 'myRecipes' &&
+          userCreatedRecipes?.map((recipe, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={recipe.recipeId} recipe={recipe} />
             </Grid>
           ))}
       </Grid>
