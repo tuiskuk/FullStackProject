@@ -187,9 +187,9 @@ const removeDislikeInteraction = async (request, response, next) => {
 const getAllInteractions = async (request, response, next) => {
   try {
     const { recipeId } = request.query
-    console.log(recipeId)
+
     const recipe = await Recipe.findOne({ recipeId })
-    console.log(recipe)
+
 
     // If recipe is not found, return empty
     if (!recipe) {
@@ -230,5 +230,22 @@ const getAllUserCreatedInteractions = async (request, response, next) => {
   }
 }
 
+const getAllSpecificUserCreatedRecipes = async (request, response, next) => {
+  try {
+    const { userId } = request.query
+    console.log(request.query)
+    console.log(userId)
+    const recipes = await Recipe.find({ creator: userId }).populate('creator')
+    // If no recipes found, return empty
+    if (!recipes) {
+      return response.status(204).json()
+    }
 
-export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions }
+    response.status(200).json(recipes)
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions, getAllSpecificUserCreatedRecipes }
