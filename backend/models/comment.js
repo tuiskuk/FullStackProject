@@ -10,6 +10,9 @@ const commentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  recipeId: {
+    type: String
+  },
   createdAt: {
     type: Date,
     default: Date.now

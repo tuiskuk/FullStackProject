@@ -44,6 +44,7 @@ const addLikeInteraction = async (request, response, next) => {
       User.findById(userIdObject),
       Recipe.findOne({ recipeId }),
     ])
+    console.log(recipe)
 
     if (!currentUser) {
       return response.status(404).json({ error: 'UserId not found' })
@@ -185,10 +186,11 @@ const removeDislikeInteraction = async (request, response, next) => {
 
 const getAllInteractions = async (request, response, next) => {
   try {
-    const recipeId = request.query.recipeId
-    console.log(recipeId)
-    const recipe = await Recipe.findById(recipeId).populate('creator')
-    console.log(recipe)
+    const { recipeId } = request.query
+
+    const recipe = await Recipe.findOne({ recipeId })
+
+
     // If recipe is not found, return empty
     if (!recipe) {
       return response.status(204).json({ recipe })
@@ -228,5 +230,22 @@ const getAllUserCreatedInteractions = async (request, response, next) => {
   }
 }
 
+const getAllSpecificUserCreatedRecipes = async (request, response, next) => {
+  try {
+    const { userId } = request.query
+    console.log(request.query)
+    console.log(userId)
+    const recipes = await Recipe.find({ creator: userId }).populate('creator')
+    // If no recipes found, return empty
+    if (!recipes) {
+      return response.status(204).json()
+    }
 
-export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions }
+    response.status(200).json(recipes)
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions, getAllSpecificUserCreatedRecipes }

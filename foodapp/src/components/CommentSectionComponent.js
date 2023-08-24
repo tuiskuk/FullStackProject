@@ -1,7 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import dayjs from 'dayjs'
-import 'dayjs/locale/fi'
+
 import { Typography, Grid, Card, CardContent, Button, InputAdornment, OutlinedInput, IconButton, CardActions, Avatar } from '@mui/material'
 import { useAddCommentMutation, useDeleteCommentMutation, useGetCommentsForRecipeQuery, useAddReplyMutation,
   useLikeCommentMutation, useRemoveLikeCommentMutation, useDislikeCommentMutation, useRemoveDislikeCommentMutation, useEditCommentMutation } from '../services/commentSlice'
@@ -14,16 +13,9 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Link } from 'react-router-dom'
 import { WarningDialog } from './WarningDialog'
+import formatFinnishDate from '../helpers/formatFinnishDate'
 
-function formatFinnishDate(dateString) {
-  const date = dayjs(dateString)
-  const day = date.format('D')
-  const month = date.locale('fi').format('MMMM') // Format month in Finnish
-  const year = date.format('YYYY')
-  const time = date.format('HH:mm')
 
-  return `${day}. ${month} ${year} klo ${time}`
-}
 
 const CommentSection = ({ recipeId, userId , interactionData, label, image }) => {
   const { data: commentData, isLoading, isError, refetch } = useGetCommentsForRecipeQuery({ recipeId }, { refetchOnMountOrArgChange: true })
@@ -91,7 +83,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
       const handleSubmitReply = async (commentId) => {
         try {
           console.log('Reply:', reply)
-          await addReply({ commentId, userId, text: reply })
+          await addReply({ recipeId, commentId, userId, text: reply })
           setReply('')
           setShowReply(false)
           refetch()
@@ -209,16 +201,16 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
                 <Grid item xs={10}>
                   <Grid container alignItems="center" spacing={2}>
                     <Grid item>
-                      <Avatar src={comment.user.profileImage || `https://eu.ui-avatars.com/api/?name=${comment.user.username}&size=200`} alt={comment.user.name} />
+                      <Avatar src={comment?.user?.profileImage || `https://eu.ui-avatars.com/api/?name=${comment?.user?.username}&size=200`} alt={comment?.user?.name} />
                     </Grid>
                     <Grid item>
                       <Link to={`/users/${comment.user?.id}`} style={{
                         textDecoration: 'none', color: 'black',
                       }}><Typography variant="body1" fontWeight="bold">
-                          {comment.user.name}
+                          {comment.user?.name}
                         </Typography></Link>
                       <Typography variant="body2" color="textSecondary">
-                        @{comment.user.username} - {formattedDate}
+                        @{comment.user?.username} - {formattedDate}
                       </Typography>
                       <Typography variant="body1">
                         {comment.text}
@@ -226,7 +218,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
                     </Grid>
                   </Grid>
                 </Grid>
-                {comment.user.id === userId && (
+                {comment.user?.id === userId && (
                   <Grid item>
                     <IconButton onClick={() => toggleEdit()} aria-label="Edit">
                       <EditIcon />

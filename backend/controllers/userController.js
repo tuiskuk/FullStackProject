@@ -8,7 +8,32 @@ import { Recipe } from '../models/recipe.js'
 const getUser = async (request, response, next) => {
   try {
     const { userId } = request.params
-    const user = await User.findById(userId).populate('favorites').populate('likes').populate('dislikes')
+    const user = await User.findById(userId)
+      .populate({
+        path: 'favorites',
+        model: 'Recipe', // Assuming 'favorites' refers to the 'Recipe' model
+        populate: {
+          path: 'creator',
+          model: 'User', // Assuming 'creator' refers to the 'User' model
+        },
+      })
+      .populate({
+        path: 'likes',
+        model: 'Recipe', // Assuming 'likes' refers to the 'Recipe' model
+        populate: {
+          path: 'creator',
+          model: 'User', // Assuming 'creator' refers to the 'User' model
+        },
+      })
+      .populate({
+        path: 'dislikes',
+        model: 'Recipe', // Assuming 'dislikes' refers to the 'Recipe' model
+        populate: {
+          path: 'creator',
+          model: 'User', // Assuming 'creator' refers to the 'User' model
+        },
+      })
+      .populate('comments')
 
     if (!user) {
       return response.status(404).json({ error: 'User not found' })
@@ -273,7 +298,7 @@ const addFollow = async (request, response, next) => {
     targetUser.followers.push(currentUserIdObj)
     await targetUser.save()
 
-    response.status(200).json({ message: 'Successfully added follow' })
+    response.status(200).json(currentUser)
   } catch (error) {
     next(error)
   }
@@ -313,7 +338,7 @@ const removeFollow = async (request, response, next) => {
     )
     await targetUser.save()
 
-    response.status(200).json({ message: 'Successfully removed follow' })
+    response.status(200).json(currentUser)
   } catch (error) {
     next(error)
   }

@@ -1,4 +1,4 @@
-import { Typography, Grid, Avatar, Button, CircularProgress, Container, Popover, Box } from '@mui/material'
+import { Typography, Grid, Avatar, Button, CircularProgress, Container, Popover, Box, Card, CardContent } from '@mui/material'
 import { useGetUserQuery } from '../services/userApiSlice'
 import { useParams } from 'react-router-dom'
 import { useFollowMutation, useUnfollowMutation, useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
@@ -8,6 +8,9 @@ import { useState } from 'react'
 import RecipeCard from '../components/RecipeCard'
 import UserListItem from '../components/userListItem'
 import { WarningDialog } from '../components/WarningDialog'
+import formatFinnishDate from '../helpers/formatFinnishDate'
+import { Link } from 'react-router-dom'
+import { useGetAllSpecificUserCreatedRecipesQuery } from '../services/interactionSlice'
 
 
 const UserViewPage = () => {
@@ -20,18 +23,20 @@ const UserViewPage = () => {
   const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(
     currentUserId , { skip: !currentUserId, refetchOnMountOrArgChange: true })
   const { data: targetUser, isLoading, refetch } = useGetUserQuery(id)
+  console.log(targetUser)
   const targetUserId = id
   const currentUserIsTarget = currentUserId === targetUserId ? true : false
   const [ follow, { isLoading: isFollowMutateLoading } ] = useFollowMutation()
   const [ unfollow, { isLoading: isUnfollowMutateLoading } ] = useUnfollowMutation()
   const { data: followersData } = useGetAllFollowersQuery({ userId: targetUserId })
   const { data: followingData } = useGetAllFollowingQuery({ userId: targetUserId })
+  const { data: userCreatedRecipes } = useGetAllSpecificUserCreatedRecipesQuery({ userId: targetUserId })
   const isFollowing = Boolean(userCurrent?.following.includes(targetUserId))
   const [anchorEl, setAnchorEl] = useState(null)
   const [followingListVisible, setFollowingListVisible] = useState(false)
   const [anchorElFollowers, setAnchorElFollowers] = useState(null)
   const [followersListVisible, setFollowersListVisible] = useState(false)
-  const postCount = 0
+  const postCount = userCreatedRecipes?.length
   const followers = followersData?.followers
   const following = followingData?.following
   const followingCount = following?.length
@@ -52,6 +57,8 @@ const UserViewPage = () => {
       console.log(updatedUser)
     }
   }
+
+  console.log(targetUser?.comments)
 
   const handleFollow = async() => {
     if(!currentUser) {
@@ -229,6 +236,14 @@ const UserViewPage = () => {
           ))}
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
+        {selectedOption === 'myRecipes' &&
+          userCreatedRecipes?.map((recipe, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={recipe.recipeId} recipe={recipe} />
+            </Grid>
+          ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'likes' &&
           targetUser?.likes?.map((like, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
@@ -246,12 +261,40 @@ const UserViewPage = () => {
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'comments' &&
-          targetUser?.comments?.map((comment, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              {comment}
-            </Grid>
-          ))}
+        targetUser?.comments?.map((comment) => (
+          <Grid item xs={12} key={comment._id}>
+            <Card variant="outlined">
+              <CardContent>
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Avatar
+                      src={targetUser.profileImage || `https://eu.ui-avatars.com/api/?name=${targetUser.username}&size=200`}
+                      alt={comment.user.name}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="body1" fontWeight="bold">
+                      {targetUser.name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {formatFinnishDate(comment.createdAt)}
+                    </Typography>
+                    <Typography variant="body1">
+                      {comment.text}
+                    </Typography>
+                    <Link to={`/recipes/${comment.recipeId}`} style={{ textDecoration: 'none', color: 'gray' }}>
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        Check out this recipe
+                      </Typography>
+                    </Link>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
+
     </Container>
   )
 }

@@ -12,22 +12,28 @@ import {
   DialogActions,
   Box,
   Popover,
+  Card,
+  CardContent
 } from '@mui/material'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useGetUserQuery, useUpdateUserMutation } from '../services/userApiSlice'
 import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSlice'
 import { setUser } from '../services/loginSlice'
-import { useGetAllFavoritesQuery } from '../services/favoriteSlice'
+
 import { useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
+import { Link, useNavigate } from 'react-router-dom'
 import RecipeCard from '../components/RecipeCard'
 import UserListItem from '../components/userListItem'
+import formatFinnishDate from '../helpers/formatFinnishDate'
+import { useGetAllSpecificUserCreatedRecipesQuery } from '../services/interactionSlice'
 
 
 
 const UserProfile = () => {
   const [profileDescription, setProfileDescription] = useState('')
   const [anchorEl, setAnchorEl] = useState(null)
+  const navigate = useNavigate()
   const [followingListVisible, setFollowingListVisible] = useState(false)
   const [anchorElFollowers, setAnchorElFollowers] = useState(null)
   const [followersListVisible, setFollowersListVisible] = useState(false)
@@ -36,12 +42,15 @@ const UserProfile = () => {
   const [newProfilPicture, setNewProfilPicture] = useState(null)
   const [editProfileVisible, setEditProfileVisible] = useState(false)
   const [selectedOption, setSelectedOption] = useState('favorites')
-  const postCount = 0
   const user = useSelector(selectCurrentUser)
   const [ updateUser ] = useUpdateUserMutation()
   const [uploadProfilePicture] = useUploadProfilePictureMutation()
   const fileInputRef = useRef(null)
   const userId = user?.id
+  useEffect(() => {
+    if(!user) navigate('/login')
+  }, [user])
+
   const { data: followingData, refetch: refetchFollowing } = useGetAllFollowingQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
   const { data: followersData, refetch: refetchFollowers } = useGetAllFollowersQuery(
@@ -49,13 +58,15 @@ const UserProfile = () => {
 
   const followers = followersData?.followers
   const following = followingData?.following
-  const { data: favoritesData } = useGetAllFavoritesQuery(
-    { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
   const { data: userData } = useGetUserQuery(
     userId, { skip: !userId, refetchOnMountOrArgChange: true })
   console.log(userData)
+  const { data: userCreatedRecipes } = useGetAllSpecificUserCreatedRecipesQuery({
+    userId, // Pass the actual value here
+  })
+  const postCount = userCreatedRecipes?.length
   //TODO: dislikesData, LikesData, favoritesData, commentsData
-  console.log(favoritesData)
+  console.log(userCreatedRecipes)
   const dispatch = useDispatch()
   const followingCount = following?.length
   const followersCount = followers?.length
@@ -200,10 +211,10 @@ const UserProfile = () => {
             disablePortal
           >
             <Box p={2} minWidth={200}>
-              {followers ? (
+              {followers?.length > 0 ? (
                 followers.map((user) => <UserListItem key={user.id} user={user} />)
               ) : (
-                <Typography>Loading...</Typography>
+                <Typography>No followers.</Typography>
               )}
             </Box>
           </Popover>
@@ -231,10 +242,10 @@ const UserProfile = () => {
             disablePortal
           >
             <Box p={2} minWidth={200}>
-              {following ? (
+              {following?.length > 0 ? (
                 following.map((user) => <UserListItem key={user.id} user={user} />)
               ) : (
-                <Typography>Loading...</Typography>
+                <Typography>Not following anyone.</Typography>
               )}
             </Box>
           </Popover>
@@ -327,9 +338,17 @@ const UserProfile = () => {
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'favorites' &&
-          favoritesData?.favorites?.map((favorite, index) => (
+          userData?.favorites?.map((favorite, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <RecipeCard key={favorite.recipeId} recipe={favorite} />
+            </Grid>
+          ))}
+      </Grid>
+      <Grid container spacing={3} marginTop={0.2}>
+        {selectedOption === 'myRecipes' &&
+          userCreatedRecipes?.map((recipe, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <RecipeCard key={recipe.recipeId} recipe={recipe} />
             </Grid>
           ))}
       </Grid>
@@ -351,11 +370,38 @@ const UserProfile = () => {
       </Grid>
       <Grid container spacing={3} marginTop={0.2}>
         {selectedOption === 'comments' &&
-          userData?.comments?.map((comment, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              {comment}
-            </Grid>
-          ))}
+        userData?.comments?.map((comment) => (
+          <Grid item xs={12} key={comment._id}>
+            <Card variant="outlined">
+              <CardContent>
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Avatar
+                      src={user.profileImage || `https://eu.ui-avatars.com/api/?name=${user.username}&size=200`}
+                      alt={user.name}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="body1" fontWeight="bold">
+                      {user.name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {formatFinnishDate(comment.createdAt)}
+                    </Typography>
+                    <Typography variant="body1">
+                      {comment.text}
+                    </Typography>
+                    <Link to={`/recipes/${comment.recipeId}`} style={{ textDecoration: 'none', color: 'gray' }}>
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        Check out this recipe
+                      </Typography>
+                    </Link>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
     </Container>
   )

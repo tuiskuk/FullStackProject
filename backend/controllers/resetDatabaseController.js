@@ -1,4 +1,4 @@
-import { User } from '../models/user.js'
+//import { User } from '../models/user.js'
 import { Recipe } from '../models/recipe.js'
 async function resetDatabase(request, response) {
   try {

@@ -28,6 +28,7 @@ const addComment = async (request, response, next) => {
     const newComment = new Comment({
       user: userIdObject,
       text,
+      recipeId
     })
     await newComment.save()
 
@@ -178,7 +179,7 @@ const getCommentsForRecipe = async (request, response, next) => {
 // Comment on a specific comment (reply to a comment)
 const addReply = async (request, response, next) => {
   try {
-    const { commentId, userId, text } = request.body
+    const { recipeId, commentId, userId, text } = request.body
 
     const userIdObject = new mongoose.Types.ObjectId(userId)
 
@@ -198,6 +199,7 @@ const addReply = async (request, response, next) => {
     // Create a new comment document for the reply
     const newReply = new Comment({
       user: userId,
+      recipeId,
       text,
     })
     await newReply.save()

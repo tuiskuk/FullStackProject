@@ -6,7 +6,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
-import { TextField, Container,  Grid, Tooltip, Box, ImageListItem, ImageListItemBar, IconButton, Button, Snackbar, Alert } from '@mui/material'
+import { TextField, Container,  Grid, Tooltip, Box, ImageListItem, ImageListItemBar, IconButton, Button, Snackbar, Alert, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { cuisineOptions, dishOptions, healthFilterOptions, mealTypes } from '../data'
@@ -241,7 +241,7 @@ const CreateRecipePage = () => {
                 {snackbarMessage}
               </Alert>
             </Snackbar>
-            <h2>give label to your recipe</h2>
+            <Typography variant="h5" sx={{ marginTop: 3 }}>Give a Label to Your Recipe</Typography>
             <Controller
               name="label"
               control={control}
@@ -258,7 +258,7 @@ const CreateRecipePage = () => {
                 />
               )}
             />
-            <h2>add pictures to depict your recipe (one required)</h2>
+            <Typography variant="h5">Add Pictures to Depict Your Recipe</Typography>
           </Grid>
 
           <Grid item>
@@ -319,7 +319,7 @@ const CreateRecipePage = () => {
           </Grid>
 
           <Grid item>
-            <h2>add ingredients to you recipe</h2>
+            <Typography variant="h5">Add Ingredients to Your Recipe</Typography>
           </Grid>
 
           {ingredients[0] && (
@@ -387,7 +387,7 @@ const CreateRecipePage = () => {
           </Grid>
 
           <Grid item xs={12} sx={{ width: '100%' }}>
-            <h1>Write instructions to your recipe here</h1>
+            <Typography variant="h5">Write Instructions for Your Recipe</Typography>
             <Controller
               name="instructions"
               control={control}
@@ -409,7 +409,7 @@ const CreateRecipePage = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <h2>How long does it take to make your recipe and what is the serving size?</h2>
+            <Typography variant="h5">How Long to Make and Serving Size</Typography>
             <Grid container direction={'row'} justifyContent={'space-around'}>
               <Controller
                 name="totalTime"
@@ -451,7 +451,7 @@ const CreateRecipePage = () => {
           </Grid>
 
           <Grid item>
-            <h2>add depicting hashtags to your recipe. helps other users find your recipe</h2>
+            <Typography variant="h5">Add Depicting Hashtags to Your Recipe</Typography>
             <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Meal Types', mealTypes, selectedMealTypes)}>
               Select Meal Types
             </Button>

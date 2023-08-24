@@ -78,6 +78,16 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       },
       providesTags: ['Interactions']
     }),
+    getAllSpecificUserCreatedRecipes: builder.query({
+      query: ({ userId }) => {
+        console.log(userId)
+        return {
+          url: '/interactions/all/specificUserCreated',
+          params: { userId }
+        }
+      },
+      providesTags: ['Interactions']
+    })
   })
 })
 
@@ -89,5 +99,6 @@ export const {
   useGetAllInteractionsQuery,
   useCreateInteractionMutation,
   useGetAllInteractionRecipesQuery,
-  useGetAllUserCreatedInteractionsQuery
+  useGetAllUserCreatedInteractionsQuery,
+  useGetAllSpecificUserCreatedRecipesQuery
 } = interactionApiSlice

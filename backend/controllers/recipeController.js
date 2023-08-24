@@ -114,17 +114,18 @@ const getLink = async (request, response, next) => {
 const getRecipe = async (request, response, next) => {
   try {
     const { id } = request.query
-    console.log(id)
 
     const foundRecipe = await Recipe.findById(id)
+
 
     if (!foundRecipe) {
       return response.status(404).json({ error: 'Recipe not found' })
     }
     const recipeId = foundRecipe.recipeId
 
+
     const url = `https://api.edamam.com/api/recipes/v2/${recipeId}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
-    console.log(url)
+
 
     const apiResponse = await axios.get(url)
     const recipe = apiResponse.data
