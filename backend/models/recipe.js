@@ -5,7 +5,7 @@ import mongoose from 'mongoose'
 const recipeSchema = new mongoose.Schema({
   recipeId: {
     type: String,
-    required: true,
+    //required: true, cannot be required here since user created recipes
   },
   label: {
     type: String,
@@ -23,24 +23,37 @@ const recipeSchema = new mongoose.Schema({
     type: Number,
     default: 4,
   },
+  totalTime: {
+    type: Number,
+    default: null
+  },
   ingredients: {
     type: Array,
     default: [],
   },
-  totalNutrients: {
-    type: Object,
-    default: null,
-  },
   instructions: {
     type: String,
   },
-  url: {           //has to be saved since we want these from main page to be clickable
-    type: String,
-    default: null  //(there coulb be possibility to get these from api in home page as well)
+  mealType: {
+    type: Array,
+    default: [],
+  },
+  dishType: {
+    type: Array,
+    default: [],
+  },
+  cuisineType: {
+    type: Array,
+    default: [],
+  },
+  healthLabels: {
+    type: Array,
+    default: [],
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    default: null
   },
   likes: [
     {

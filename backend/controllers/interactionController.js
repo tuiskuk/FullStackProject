@@ -6,17 +6,21 @@ const createInteraction = async (request, response, next) => {
   try {
     //yield is handled like it is because yield is illegal name
     const { recipeId, label, image, images, recipeYield, url,
-      ingredients, totalNutrients, creator , instructions
+      ingredients, creator , instructions, totalTime, mealType,
+      dishType, cuisineType, healthLabels
     }  = request.body
+
+    console.log(recipeId)
 
     //Check that recipe do not already exist
     const searchRecipe = await Recipe.findOne({ recipeId })
-    if(searchRecipe) {
+    if(searchRecipe && recipeId) {
       return response.status(400).json({ error: 'Recipe already exist' })
     }
 
-    const recipe = new Recipe({ recipeId, label, image, images, yield: recipeYield, url,
-      ingredients, totalNutrients, creator,  instructions, likes: [], dislikes: [], comments: [] })
+    const recipe = new Recipe({ recipeId, label, image, images, yield: recipeYield, url, totalTime,
+      ingredients, creator, instructions,  mealType,
+      dishType, cuisineType, healthLabels, likes: [], dislikes: [], comments: [] })
 
     //
     if(creator){

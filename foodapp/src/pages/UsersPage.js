@@ -1,5 +1,5 @@
 import { useGetUsersQuery } from '../services/userApiSlice'
-import UserCard from './UserCard'
+import UserCard from '../components/UserCard'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '../services/loginSlice'
 import { Container, Typography, Grid } from '@mui/material'

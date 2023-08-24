@@ -1,7 +1,7 @@
 import { useMediaQuery, Tooltip, TextField, Link, Box ,Avatar, Container, Grid, IconButton, ImageListItem ,ImageListItemBar, Typography, InputAdornment } from '@mui/material'
 import { useEffect, useState } from 'react'
-import FavoriteIcon from '@mui/icons-material/Favorite'
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd'
+import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
@@ -11,13 +11,13 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
-import CommentSection from './CommentSectionComponent'
+import CommentSection from '../components/CommentSectionComponent'
 import { useAddFavoriteMutation, useRemoveFavoriteMutation, useGetAllFavoritesQuery } from '../services/favoriteSlice'
 import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation,
   useAddDislikeInteractionMutation, useRemoveDislikeInteractionMutation,
   useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
 
-import { WarningDialog } from './WarningDialog'
+import { WarningDialog } from '../components/WarningDialog'
 import { useNavigate, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
@@ -47,6 +47,7 @@ const RecipeViewPage = () => {
     { recipeId }, { skip: !recipeId, refetchOnMountOrArgChange: true })
 
 
+  console.log(interactionData)
   console.log(recipe)
   console.log(interactionData)
 
@@ -109,10 +110,6 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
   const label = recipe.label
   const image = recipe.image
-  const ingredients = recipe.ingredients
-  const totalNutrients = recipe.totalNutrients
-  const url = recipe.url
-  const recipeYield = recipe.yield
 
   const [ addLikeInteraction ] = useAddLikeInteractionMutation()
   const [ removeLikeInteraction ] = useRemoveLikeInteractionMutation()
@@ -124,6 +121,9 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
   const { data: favoriteData, refetch } = useGetAllFavoritesQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
+
+
+  console.log(favoriteData)
 
 
   const creatorNameParts = recipe?.creator?.name
@@ -159,7 +159,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
     if(!interactionData){
       try {
-        await createInteraction({ recipeId, label, image, url, ingredients, totalNutrients, recipeYield })
+        await createInteraction({ recipeId, label, image })
         console.log('create')
       } catch (error) {
         setDisableIconButton(false)
@@ -208,7 +208,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
     if(!interactionData){
       try {
-        await createInteraction({ recipeId, label, image, url, ingredients, totalNutrients, recipeYield })
+        await createInteraction({ recipeId, label, image })
         console.log('create')
       } catch (error) {
         setDisableIconButton(false)
@@ -258,7 +258,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
     if (!isFavorite) {
       if(!interactionData){
         try {
-          await createInteraction({ recipeId, label, image, url, ingredients, totalNutrients, recipeYield })
+          await createInteraction({ recipeId, label, image })
           console.log('create')
         } catch (error) {
           setDisableIconButton(false)
@@ -337,7 +337,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
           </ImageListItem>
         </Grid>
 
-        <Grid item>
+        <Grid item sx={{ width: '100%' }}>
           <Grid container
             spacing={2}
             direction="row"
@@ -364,7 +364,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
               </Link>
             </Grid>)}
 
-            <Grid item>
+            {!isScreenSmall && <Grid item>
               {recipe?.creator ? (
                 <>
                   <h1>how did you</h1>
@@ -374,7 +374,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
                   <h1>Dishcovery user did not </h1>
                   <h1>do this recipe, rate it</h1>
                 </> )}
-            </Grid>
+            </Grid>}
 
             <Grid item >
               <Grid container
@@ -382,7 +382,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
                 justifyContent="center"
                 alignItems="center">
                 <Grid item >
-                  <IconButton disabled={disableIconButton} style={{ color: isLiked ? '#00008B' : '#0000FF' }} onClick={handleLike}>
+                  <IconButton disabled={disableIconButton} style={{ color: isLiked ? '#FFA726' : '#ffeb85' }} onClick={handleLike}>
                     <ThumbUpIcon/>
                   </IconButton>
                 </Grid>
@@ -398,7 +398,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
                 justifyContent="center"
                 alignItems="center">
                 <Grid item >
-                  <IconButton disabled={disableIconButton} style={{ color: isDisliked ? '#00008B' : '#0000FF' }} onClick={handleDislike}>
+                  <IconButton disabled={disableIconButton} style={{ color: isDisliked ? '#FFA726' : '#ffeb85' }} onClick={handleDislike}>
                     <ThumbDownIcon/>
                   </IconButton>
                 </Grid>
@@ -410,8 +410,17 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
 
             <Grid item>
               <Tooltip title={isFavorite ? 'remove from favourites' : 'save to favourites' }>
-                <IconButton disabled={disableIconButton} style={{ color: 'red', height: '75px', width: '75px' }} onClick={handleFavorite}>
-                  {isFavorite ? <FavoriteIcon sx={{ height: '55px', width: '55px' }}/> : <FavoriteBorderIcon sx={{ height: '55px', width: '55px' }}/>}
+                <IconButton
+                  disabled={disableIconButton}
+                  style={{
+                    color: isFavorite ? '#FFA726' : '#ffeb85',
+                    height: '75px',
+                    width: '75px',
+                  }}
+                  onClick={handleFavorite}
+                >
+                  {isFavorite ? <BookmarkAddIcon sx={{ height: '55px', width: '55px' }}/>
+                    : <BookmarkAddedIcon sx={{ height: '55px', width: '55px' }}/>  }
                 </IconButton>
               </Tooltip>
             </Grid>

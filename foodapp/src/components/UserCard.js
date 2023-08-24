@@ -113,6 +113,7 @@ const UserCard = ({ user, currentUser }) => {
               <Button
                 variant={isFollowing ? 'outlined' : 'contained'}
                 onClick={isFollowing ? handleUnfollow : handleFollow}
+                fullWidth
               >
                 {isFollowing ? 'Unfollow' :  'Follow'}
               </Button>
