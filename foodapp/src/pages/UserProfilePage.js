@@ -182,7 +182,13 @@ const UserProfile = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h5">{user?.username}</Typography>
+
+          <Typography variant="h4" style={{ fontSize: '24px', margin: '0' }}>{user?.name}</Typography>
+
+          <Typography variant="body1" style={{ fontSize: '18px', color: 'gray', margin: '0' }}>@{user?.username}</Typography>
+          <Typography variant="body1" style={{ fontSize: '16px', margin: '10px 0' }}>
+            {user?.profileText}
+          </Typography>
           <Button variant="outlined" size="small" onClick={() => setEditProfileVisible(!editProfileVisible)}>
               Edit Profile
           </Button>
@@ -249,9 +255,6 @@ const UserProfile = () => {
               )}
             </Box>
           </Popover>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h6">{user?.name}</Typography>
         </Grid>
         <Dialog open={editProfileVisible} onClose={() => setEditProfileVisible(false)}>
           <DialogTitle>Edit your sweet profile</DialogTitle>

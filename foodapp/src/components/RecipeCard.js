@@ -2,6 +2,8 @@ import { Card, CardMedia, CardContent, Typography, CardActionArea  } from '@mui/
 import { Link } from 'react-router-dom'
 import { useGetRecipeQuery } from '../services/apiSlice'
 import { useEffect, useState, useRef } from 'react'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble'
 import './RecipeCard.css'
 
 
@@ -10,8 +12,11 @@ const RecipeCard = ({ recipe }) => {
   let recipe_id  = recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.recipeId
   let favoriteRecipe = null
   const [displayedRecipe,setDisplayedRecipe] = useState(null)
+  const [isHovered, setIsHovered] = useState(false)
+
 
   const { data: dataFromApi } = useGetRecipeQuery(recipe.id)
+  console.log(isHovered)
 
   const textRef = useRef(null)
 
@@ -23,6 +28,7 @@ const RecipeCard = ({ recipe }) => {
         underline.style.height = `${textHeight}px`
       }
     }
+    setIsHovered(true)
   }
 
   const handleMouseLeave = () => {
@@ -32,6 +38,7 @@ const RecipeCard = ({ recipe }) => {
         underline.style.height = '0'
       }
     }
+    setIsHovered(false)
   }
 
   //inside useEffect to make sure that dataFromApi and recipe are defined
@@ -60,6 +67,7 @@ const RecipeCard = ({ recipe }) => {
   }, [recipe ,dataFromApi])
 
   console.log(displayedRecipe)
+  console.log(recipe)
 
 
 
@@ -74,87 +82,99 @@ const RecipeCard = ({ recipe }) => {
   }
 
   return (
-    <Link
-      to={`/recipes/${recipe_id}`}
-      onClick={handleRecipeClick}
-      style={{ textDecoration: 'none' }}
+    <div
+      className="card-wrapper"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <Card
-        sx={{
-          maxWidth: 200,
-          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-          transition: 'transform 0.2s',
-          '&:hover': { transform: 'scale(1.03)' },
-        }}
+      <Link
+        to={`/recipes/${recipe_id}`}
+        onClick={handleRecipeClick}
+        style={{ textDecoration: 'none' }}
       >
-        <CardActionArea onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-          <CardMedia
-            component="img"
-            src={
-              displayedRecipe?.images?.SMALL?.url ||
-              displayedRecipe?.image ||
-              displayedRecipe?.images[0]
-            }
-            alt={displayedRecipe?.label}
-            height={200}
-            width={200}
-            style={{ objectFit: 'cover' }}
-            onError={(e) => {
-              e.target.src = 'https://via.placeholder.com/200?text=No+Image'
-            }}
-          />
-          <CardContent
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center',
-              minHeight: 80,
-              padding: '8px',
-              position: 'relative', // Added for positioning pseudo-element
-            }}
-          >
-            <span className="recipe-label" ref={textRef}>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 'bold',
-                  fontSize: '1.2rem',
-                  marginBottom: 1,
-                  overflow: 'hidden',
-                  whiteSpace: 'normal',
-                  display: '-webkit-box',
-                  '-webkit-line-clamp': 2,
-                  '-webkit-box-orient': 'vertical',
-                  position: 'relative', // Added for positioning pseudo-element
-                }}
-              >
-                {displayedRecipe?.label}
-                <span className="underline"></span>
-              </Typography>
-            </span>
-            <div className="tags">
-              {displayedRecipe?.dishType?.map((dish, index) => (
-                <span key={index} className="tag">
-                  {dish}
-                </span>
-              ))}
-              {displayedRecipe?.cuisineType?.map((cuisine, index) => (
-                <span key={index} className="tag">
-                  {cuisine}
-                </span>
-              ))}
-              {displayedRecipe?.mealType?.map((meal, index) => (
-                <span key={index} className="tag">
-                  {meal}
-                </span>
-              ))}
-            </div>
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    </Link>
+
+        <Card
+          sx={{
+            maxWidth: 200,
+            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <CardActionArea>
+            <CardMedia
+              component="img"
+              src={
+                displayedRecipe?.images?.SMALL?.url ||
+                displayedRecipe?.image ||
+                displayedRecipe?.images[0]
+              }
+              alt={displayedRecipe?.label}
+              height={200}
+              width={200}
+              style={{ objectFit: 'cover' }}
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/200?text=No+Image'
+              }}
+            />
+            <CardContent
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+                minHeight: 80,
+                padding: '8px',
+                position: 'relative', // Added for positioning pseudo-element
+              }}
+            >
+              <span className="recipe-label" ref={textRef}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 'bold',
+                    fontSize: '1.2rem',
+                    marginBottom: 1,
+                    overflow: 'hidden',
+                    whiteSpace: 'normal',
+                    display: '-webkit-box',
+                    '-webkit-line-clamp': 2,
+                    '-webkit-box-orient': 'vertical',
+                    position: 'relative', // Added for positioning pseudo-element
+                  }}
+                >
+                  {displayedRecipe?.label}
+                  <span className="underline"></span>
+                </Typography>
+              </span>
+              <div className="tags">
+                {displayedRecipe?.dishType?.map((dish, index) => (
+                  <span key={index} className="tag">
+                    {dish}
+                  </span>
+                ))}
+                {displayedRecipe?.cuisineType?.map((cuisine, index) => (
+                  <span key={index} className="tag">
+                    {cuisine}
+                  </span>
+                ))}
+                {displayedRecipe?.mealType?.map((meal, index) => (
+                  <span key={index} className="tag">
+                    {meal}
+                  </span>
+                ))}
+              </div>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        {isHovered && <div className="overlay">{/* Likes and Comments Count */}
+          <div className="likes-comments">
+            <span className="likes"><ThumbUpIcon/> {recipe?.likes?.length ? recipe?.likes?.length : 0} </span>
+            <span className="comments"><ChatBubbleIcon/> {recipe?.comments?.length ? recipe?.comments?.length : 0} </span>
+          </div>
+        </div>}
+
+      </Link>
+    </div>
   )
 }
 

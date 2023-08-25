@@ -349,7 +349,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
             alignItems="center">
 
             {recipe?.creator && ( <Grid item>
-              <Link to="#" onClick={() => navigate(`/users/${recipe?.creator.id}`)}>
+              <Link style={{ cursor: 'pointer' }} to="#" onClick={() => navigate(`/users/${recipe?.creator.id}`)}>
                 <Tooltip title="View profile">
                   <Box       sx={{
                     width: '120px',
@@ -359,7 +359,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>
-                    <Avatar src={ recipe?.creator?.profileImage ||
+                    <Avatar  src={ recipe?.creator?.profileImage ||
             `https://eu.ui-avatars.com/api/?name=${creatorFirstName}+${creatorLastName}&size=200` }
                     sx={{ width: 80, height: 80 }}/>
                     <Typography variant="h6" color={'black'} >{recipe?.creator?.username}</Typography>
@@ -375,7 +375,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
                 <Typography variant='h5'>How did you <br/> like my recipe?</Typography>
               ) :
                 (
-                  <Typography variant='h5'>Dishcovery user did not <br/> create this recipe, please rate it!</Typography>
+                  <Typography variant='h5'> A discovery user did not <br/> make this recipe, please rate it!</Typography>
                 )}
             </Grid>}
 

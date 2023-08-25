@@ -106,7 +106,15 @@ const UserViewPage = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h5">{targetUser?.username}</Typography>
+          <Typography variant="h4" style={{ fontSize: '24px', margin: '0' }}>
+            {targetUser?.name}
+          </Typography>
+          <Typography variant="body1" style={{ fontSize: '18px', color: 'gray', margin: '0' }}>
+            @{targetUser?.username}
+          </Typography>
+          <Typography variant="body1" style={{ fontSize: '16px', margin: '10px 0' }}>
+            {targetUser?.profileText}
+          </Typography>
           {!currentUserIsTarget &&
             <Button
               variant={isFollowing ? 'outlined' : 'contained'}
