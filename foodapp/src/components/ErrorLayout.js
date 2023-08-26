@@ -12,7 +12,7 @@ const ErrorLayout = ({ children }) => {
   const exp = useSelector(selectCurrentExpTime, { skip: !user })
 
   // Set the threshold time for showing the warning
-  const thresholdTime = 10 * 60 * 1000
+  const thresholdTime = 1 * 60 * 1000
 
   useEffect(() => {
     console.log(exp)
