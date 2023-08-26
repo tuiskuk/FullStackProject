@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import  { useMediaQuery, TextField, Typography, Button, Container, Grid, Snackbar, Alert } from '@mui/material'
-import { Link } from 'react-router-dom'
+//import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useLoginMutation } from '../services/loginApiSlice'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../services/loginSlice'
 import { ExpirationWarningDialog } from '../components/WarningDialog'
 
-const LoginPage = ({ action }) => {
+const LoginPage = ({ action, closeDialog }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [openSnackbar, setOpenSnackbar] = useState(false)
@@ -55,17 +55,21 @@ const LoginPage = ({ action }) => {
     try {
       const response = await login({ email, password }).unwrap()
       const loggedInUser = response.user
-
       dispatch(setUser(loggedInUser))
       setEmail('')
       setPassword('')
-
-      if(!action) {
+      if (!action){
         navigate('/')
       }
+      closeDialog()
     } catch (error) {
       console.log(error)
     }
+  }
+
+  const handleRegisterClick = () => {
+    closeDialog()
+    navigate('/register')
   }
 
   return (
@@ -124,7 +128,7 @@ const LoginPage = ({ action }) => {
                 </Grid>
                 <Grid item xs={12}>
                   <Typography variant="h5">
-                    Dont have an account? <Link to="/register">Click here</Link> to sign up.
+                    Dont have an account? <Button onClick={handleRegisterClick}>Click here</Button> to sign up.
                   </Typography>
                 </Grid>
               </Grid>

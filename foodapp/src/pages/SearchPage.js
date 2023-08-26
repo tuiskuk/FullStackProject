@@ -50,7 +50,7 @@ const SearchPage = () => {
 
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllRecipesQuery({
-    searchTerm: searchTerm || 'recommended',
+    searchTerm: searchTerm || '',
     filterOptionTerms: filterOptionTerms || [],
     cuisineTypeTerms: cuisineTypeTerms || [],
     dishTypeTerms: dishTypeTerms || [],

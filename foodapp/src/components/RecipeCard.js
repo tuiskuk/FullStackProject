@@ -8,7 +8,7 @@ import './RecipeCard.css'
 
 
 const RecipeCard = ({ recipe }) => {
-  console.log(recipe)
+  //console.log(recipe)
   let recipe_id  = recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.recipeId
   let favoriteRecipe = null
   const [displayedRecipe,setDisplayedRecipe] = useState(null)
@@ -16,7 +16,7 @@ const RecipeCard = ({ recipe }) => {
 
 
   const { data: dataFromApi } = useGetRecipeQuery(recipe.id)
-  console.log(isHovered)
+  //console.log(isHovered)
 
   const textRef = useRef(null)
 
@@ -50,7 +50,7 @@ const RecipeCard = ({ recipe }) => {
         //we need to make sure that properties instruktions, totalTime
         //and so on will be set in sessionStorage and in recipeViewPages state
         recipe = dataFromApi?.recipe
-        console.log(recipe)
+        //console.log(recipe)
       }
 
       setDisplayedRecipe(recipe)
@@ -63,11 +63,11 @@ const RecipeCard = ({ recipe }) => {
       console.log('card error', e)
     }
 
-    console.log(displayedRecipe)
+    //console.log(displayedRecipe)
   }, [recipe ,dataFromApi])
 
-  console.log(displayedRecipe)
-  console.log(recipe)
+  //console.log(displayedRecipe)
+  //console.log(recipe)
 
 
 

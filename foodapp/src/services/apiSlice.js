@@ -70,6 +70,24 @@ export const apiSlice = createApi({
     getAllRecipes: builder.query({
       query: ({ searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms }) => {
         console.log('searchTerm:', searchTerm, filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms)
+        const valuesToCheck = [searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms ]
+
+        const hasNonEmptyValue = valuesToCheck.some(value => {
+          if (Array.isArray(value)) {
+            return value.length > 0
+          }
+          if (typeof value === 'object' && value !== null) {
+            const nonEmptyProperties = Object.values(value).filter(prop => !!prop)
+            return nonEmptyProperties.length > 0
+          }
+          return !!value
+        })
+
+        //Adding random value to search term if there is no filter set. Without at least one value the api call will not return recipes
+        if(!hasNonEmptyValue) {
+          searchTerm = 'recommended'
+        }
+        console.log(hasNonEmptyValue)
         return {
           url: '/recipes',
           params: { search: searchTerm, healthFilters: filterOptionTerms, time: timeTerm, calories: caloriesTerm, nutrients: JSON.stringify(nutrientInputsTerms),
