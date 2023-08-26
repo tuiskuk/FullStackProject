@@ -1,35 +1,10 @@
-import LoginPage from '../pages/loginPage'
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
 import { useRefreshMutation, useSendLogoutMutation } from '../services/loginApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentAccessToken, setUser } from '../services/loginSlice'
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-
-const WarningDialog = ({ open, onClose, user }) => {
-  const [closeDialog, setCloseDialog] = useState(false)
-
-  useEffect(() => {
-    if (closeDialog) {
-      onClose()
-      setCloseDialog(false)
-    }
-  }, [closeDialog])
-
-  return (
-    <Dialog open={open} onClose={onClose}>
-      {!user && <DialogTitle sx={{ textAlign: 'center' }}>You need to log in before this action</DialogTitle>}
-      <DialogContent>
-        <LoginPage action={true} closeDialog={() => setCloseDialog(true)}/>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
-  )
-}
+import { useState } from 'react'
+import WarningDialog from './WarningDialog'
 
 const ExpirationWarningDialog = ({ loggedOut, open, onClose }) => {
   const navigate = useNavigate()
@@ -116,4 +91,4 @@ const ExpirationWarningDialog = ({ loggedOut, open, onClose }) => {
   )
 }
 
-export { WarningDialog, ExpirationWarningDialog }
+export default ExpirationWarningDialog

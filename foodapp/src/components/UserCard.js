@@ -6,7 +6,7 @@ import { useGetUserQuery } from '../services/userApiSlice'
 import { styled } from '@mui/system'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser, setUser } from '../services/loginSlice'
-import { WarningDialog } from './WarningDialog'
+import WarningDialog from '../dialogs/WarningDialog'
 import GroupIcon from '@mui/icons-material/Group'
 
 const StyledCard = styled(Card)(({ theme }) => ({
