@@ -12,6 +12,7 @@ import RangeInputComponent from '../components/RangeInputComponent'
 import NutrientDialog from '../dialogs/NutrientDialog'
 
 const SearchPage = () => {
+  localStorage.clear()
   const [recipes, setRecipes] = useState([])
   const [nextPageLink, setNextPageLink] = useState('')
 
@@ -92,6 +93,7 @@ const SearchPage = () => {
     setNutrientInputsTerms(nutrientInputs)
     setIngridienstNumberTerm(ingridientsNumber)
     setMealTypeOptionTerms(mealTypeOptions)
+    setNextPageLink('')
     if (allRecipesData) {
       setRecipes(allRecipesData.hits.map((hit) => hit.recipe))
       if (allRecipesData._links.next && allRecipesData._links.next.href) {
@@ -219,44 +221,44 @@ const SearchPage = () => {
               />
             </FormControl>
             <Box className='chip-box'>
-              {mealTypeOptions.map((value) => (
+              {mealTypeOptions.map((value, index) => (
                 <Chip
                   className='chip-meal'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteMealTypeChip(value)}
+                  onDelete={() => handleDeleteMealTypeChip(index)}
                 />
               ))}
-              {filterOptions.map((value) => (
+              {filterOptions.map((value, index) => (
                 <Chip
                   className='chip-allergy'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteAllergyChip(value)}
+                  onDelete={() => handleDeleteAllergyChip(index)}
                 />
               ))}
-              {cuisineTypes.map((value) => (
+              {cuisineTypes.map((value, index) => (
                 <Chip
                   className='chip-cuisine'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteCuisineChip(value)}
+                  onDelete={() => handleDeleteCuisineChip(index)}
                 />
               ))}
-              {dishTypes.map((value) => (
+              {dishTypes.map((value, index) => (
                 <Chip
                   className='chip-dish'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteDishChip(value)}
+                  onDelete={() => handleDeleteDishChip(index)}
                 />
               ))}
-              {excludedChipArray.map((value) => (
+              {excludedChipArray.map((value, index) => (
                 <Chip
                   className='chip-excluded'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteChip(value)}
+                  onDelete={() => handleDeleteChip(index)}
                 />
               ))}
             </Box>
