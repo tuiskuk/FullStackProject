@@ -310,9 +310,33 @@ const getAllUserCreatedInteractions = async (request, response, next) => {
       })
     }
 
+    // Filter out recipes based on excluded filters
+    console.log(excludedFilters, typeof(excludedFilters))
+    if (excludedFilters) {
+      const excludedFiltersRegex = excludedFilters.split(',').map(filter => new RegExp(filter.trim(), 'i'))
+
+      //filter out by label
+      conditions.push({
+        label: {
+          $not: {
+            $in: excludedFiltersRegex
+          }
+        }
+      })
+
+      //filter out by text of ingredients
+      conditions.push({
+        'ingredients.text': {
+          $not: {
+            $in: excludedFiltersRegex
+          }
+        }
+      })
+    }
+
     console.log(conditions)
     const recipes = await Recipe.find({ $and: conditions }).populate('creator')
-
+    console.log(recipes)
     // If no recipes found, return empty
     if (!recipes) {
       return response.status(204).json()

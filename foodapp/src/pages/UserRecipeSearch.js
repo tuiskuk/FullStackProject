@@ -9,7 +9,7 @@ import './Search.css'
 import RangeInputComponent from '../components/RangeInputComponent'
 
 const UserSearchPage = () => {
-  const [recipes, setRecipes] = useState([])
+  const [recipesShown, setRecipesShown] = useState([])
 
   const [search, setSearch] = useState(localStorage.getItem('search') ||'')
   const [searchTerm, setSearchTerm] = useState('')
@@ -37,6 +37,23 @@ const UserSearchPage = () => {
   const [mealTypeOptionTerms, setMealTypeOptionTerms] = useState([])
 
   const [clear, setClear] = useState(false)
+
+  const recipeBatch = 1
+  const [batchCounter, setBatchCounter] = useState(1)
+  const [showLoadMore, setShowLoadMore] = useState(true)
+
+  const showMoreRecipes = () => {
+    const start = batchCounter * recipeBatch
+    const end = start + recipeBatch
+
+    if (end >= allRecipesData.length) {
+      setShowLoadMore(false)
+    }
+    const nextBatch = allRecipesData.slice(start, end)
+
+    setRecipesShown(prevRecipes => [...prevRecipes, ...nextBatch])
+    setBatchCounter(batchCounter + 1)
+  }
 
   const { data: allRecipesData, isLoading, isFetching
   } = useGetAllUserCreatedInteractionsQuery({
@@ -72,7 +89,13 @@ const UserSearchPage = () => {
     setIngridienstNumberTerm(ingridientsNumber)
     setMealTypeOptionTerms(mealTypeOptions)
     if (allRecipesData) {
-      setRecipes(allRecipesData.map((hit) => hit))
+      setRecipesShown(allRecipesData.slice(0, recipeBatch))
+      setBatchCounter(1)
+      if (recipeBatch < allRecipesData.length) {
+        setShowLoadMore(true)
+      } else {
+        setShowLoadMore(false)
+      }
     }
   }
 
@@ -163,44 +186,44 @@ const UserSearchPage = () => {
               />
             </FormControl>
             <Box className='chip-box'>
-              {mealTypeOptions.map((value) => (
+              {mealTypeOptions.map((value, index) => (
                 <Chip
                   className='chip-meal'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteMealTypeChip(value)}
+                  onDelete={() => handleDeleteMealTypeChip(index)}
                 />
               ))}
-              {filterOptions.map((value) => (
+              {filterOptions.map((value, index) => (
                 <Chip
                   className='chip-allergy'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteAllergyChip(value)}
+                  onDelete={() => handleDeleteAllergyChip(index)}
                 />
               ))}
-              {cuisineTypes.map((value) => (
+              {cuisineTypes.map((value, index) => (
                 <Chip
                   className='chip-cuisine'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteCuisineChip(value)}
+                  onDelete={() => handleDeleteCuisineChip(index)}
                 />
               ))}
-              {dishTypes.map((value) => (
+              {dishTypes.map((value, index) => (
                 <Chip
                   className='chip-dish'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteDishChip(value)}
+                  onDelete={() => handleDeleteDishChip(index)}
                 />
               ))}
-              {excludedChipArray.map((value) => (
+              {excludedChipArray.map((value, index) => (
                 <Chip
                   className='chip-excluded'
                   key={value}
                   label={value}
-                  onDelete={() => handleDeleteChip(value)}
+                  onDelete={() => handleDeleteChip(index)}
                 />
               ))}
             </Box>
@@ -432,9 +455,9 @@ const UserSearchPage = () => {
         </Typography>
         {isLoading || isFetching ? (
           <CircularProgress /> // Render the loading spinner when loading is true
-        ) : recipes.length !== 0 ? (
+        ) : allRecipesData.length !== 0 ? (
           <Grid container spacing={2} marginTop={1} justifyContent="space-around" >
-            {recipes.map((recipe, index) => (
+            {recipesShown.map((recipe, index) => (
               <Grid item key={index}  >
                 <RecipeCard key={recipe.id} recipe={recipe} />
               </Grid>
@@ -445,9 +468,11 @@ const UserSearchPage = () => {
         )}
       </Grid>
       <Grid item xs={12} sx={{ textAlign: 'center' }} >
-        <Button variant="contained"  sx={{ m: 0.5, width: 200 }}>
-          Load more
-        </Button>
+        {showLoadMore && (
+          <Button variant="contained" onClick={showMoreRecipes} sx={{ m: 0.5, width: 200 }}>
+            Load more
+          </Button>
+        )}
       </Grid>
     </Grid>
   )
