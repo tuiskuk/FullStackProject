@@ -218,13 +218,108 @@ const getAllInteractionRecipes = async (request, response, next) => {
 
 const getAllUserCreatedInteractions = async (request, response, next) => {
   try {
-    const recipes = await Recipe.find({ creator: { $ne: null } }).populate('creator')
+    const { search: searchTerm, time, ingr,
+      healthFilters = [], mealTypeOptions = [], excludedFilters = [],
+      cuisineTypeOptions = [], dishOptions = []  } = request.query
+
+    console.log( searchTerm, time, ingr, healthFilters, cuisineTypeOptions, mealTypeOptions, excludedFilters, cuisineTypeOptions, dishOptions)
+
+    //only user created recipes
+    let conditions = [{ creator: { $ne: null } }]
+
+    //filter by search term
+    if (searchTerm) {
+      conditions.push({ label: { $regex: searchTerm.trim(), $options: 'i' } })
+    }
+
+    //filter by amount of ingredients
+    if (ingr.includes('-')) {
+      conditions.push({
+        $expr: {
+          $and: [
+            { $gte: [{ $size: '$ingredients' }, parseInt(ingr.split('-')[0], 10)] },
+            { $lte: [{ $size: '$ingredients' }, parseInt(ingr.split('-')[1], 10)] }
+          ]
+        }
+      })
+    } else if (ingr.includes('+')) {
+      conditions.push({
+        $expr: {
+          $gte: [{ $size: '$ingredients' }, parseInt(ingr.split('+')[0], 10)]
+        }
+      })
+    } else if (ingr) {
+      conditions.push({
+        $expr: {
+          $lte: [{ $size: '$ingredients' }, parseInt(ingr, 10)],
+        }
+      })
+    }
+
+    //filter by time
+    if (time.includes('-')) {
+      conditions.push({
+        totalTime: {
+          $gte: parseInt(time.split('-')[0], 10),
+          $lte: parseInt(time.split('-')[1], 10)
+        }
+      })
+    } else if (time.includes('+')) {
+      conditions.push({
+        totalTime: {
+          $gte: parseInt(time.split('+')[0], 10)
+        }
+      })
+    } else if (time) {
+      conditions.push({
+        totalTime: {
+          $lte: parseInt(time, 10)
+        }
+      })
+    }
+
+    //filter by mealtypes
+    if (mealTypeOptions) {
+      const optionsArray = mealTypeOptions.split(',').map((filter) => filter.trim())
+      conditions.push({
+        mealType: { $in: optionsArray }
+      })
+    }
+
+    //filter by cuisine types
+    if (cuisineTypeOptions) {
+      const cuisinesArray = cuisineTypeOptions.split(',').map((filter) => filter.trim())
+      conditions.push({
+        cuisineType: { $in: cuisinesArray }
+      })
+    }
+
+    //filter by dish type
+    if (dishOptions) {
+      const dishOptionsArray = dishOptions.split(',').map((filter) => filter.trim())
+      conditions.push({
+        dishType: { $in: dishOptionsArray }
+      })
+    }
+
+    //filter by health/allergies
+    if (healthFilters) {
+      const healthFiltersArray = healthFilters.split(',').map((filter) => filter.trim())
+      conditions.push({
+        healthLabels: { $all: healthFiltersArray }
+      })
+    }
+
+    console.log(conditions)
+    const recipes = await Recipe.find({ $and: conditions }).populate('creator')
+
     // If no recipes found, return empty
     if (!recipes) {
       return response.status(204).json()
     }
 
     response.status(200).json(recipes)
+    console.log('success')
   } catch (error) {
     next(error)
   }

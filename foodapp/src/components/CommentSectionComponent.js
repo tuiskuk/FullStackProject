@@ -12,10 +12,8 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Link } from 'react-router-dom'
-import { WarningDialog } from './WarningDialog'
+import WarningDialog from '../dialogs/WarningDialog'
 import formatFinnishDate from '../helpers/formatFinnishDate'
-
-
 
 const CommentSection = ({ recipeId, userId , interactionData, label, image }) => {
   const { data: commentData, isLoading, isError, refetch } = useGetCommentsForRecipeQuery({ recipeId }, { refetchOnMountOrArgChange: true })

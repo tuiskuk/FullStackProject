@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useLoginMutation } from '../services/loginApiSlice'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../services/loginSlice'
-import { ExpirationWarningDialog } from '../components/WarningDialog'
+import ExpirationWarningDialog from '../dialogs/ExpirationWarningDialog'
 
 const LoginPage = ({ action, closeDialog }) => {
   const [email, setEmail] = useState('')
@@ -16,7 +16,6 @@ const LoginPage = ({ action, closeDialog }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const isScreenSmall = useMediaQuery('(max-width: 900px)')
-
 
   const imageStyle = {
     width: '100%',

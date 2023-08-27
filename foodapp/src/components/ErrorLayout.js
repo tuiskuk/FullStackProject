@@ -1,6 +1,6 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import { ExpirationWarningDialog } from './WarningDialog'
+import ExpirationWarningDialog from '../dialogs/ExpirationWarningDialog'
 import { useSelector } from 'react-redux'
 import { selectCurrentExpTime } from '../services/loginSlice'
 import { selectCurrentUser } from '../services/loginSlice'
@@ -12,7 +12,7 @@ const ErrorLayout = ({ children }) => {
   const exp = useSelector(selectCurrentExpTime, { skip: !user })
 
   // Set the threshold time for showing the warning
-  const thresholdTime = 1 * 60 * 1000
+  const thresholdTime = 10 * 60 * 1000
 
   useEffect(() => {
     console.log(exp)

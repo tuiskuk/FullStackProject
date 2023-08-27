@@ -27,19 +27,19 @@ const login = async (request, response) => {
     const accessToken = jwt.sign(
       userForToken,
       config.SECRET,
-      { expiresIn:  2 * 60 }
+      { expiresIn:  60 * 60 }
     )
 
     const refreshToken = jwt.sign(
       { id: user._id  },
       config.REFRESH_TOKEN_SECRET,
-      { expiresIn: 2 * 60 }
+      { expiresIn: 60 * 60 }
     )
 
     response.cookie('token', refreshToken, {
       httpOnly: true, // The cookie should be inaccessible to Javascript as possible, to reduce the chance of XSS.
       secure: true, // The cookie should be retrieved only over SSL or HTTPS.
-      maxAge:  2 * 60 * 1000, // The Refresh Token has the same life than the Access Token. Convert seconds to ms.
+      maxAge:  60 * 60 * 1000, // The Refresh Token has the same life than the Access Token. Convert seconds to ms.
       sameSite: 'None' // The cookie is cross-site
     })
 
@@ -93,19 +93,19 @@ const getRefreshToken = async (request, response) => {
       const accessToken = jwt.sign(
         userForToken,
         process.env.SECRET,
-        { expiresIn:  2 * 60 }
+        { expiresIn:  60 * 60 }
       )
 
       const refreshToken = jwt.sign(
         { id: user._id  },
         config.REFRESH_TOKEN_SECRET,
-        { expiresIn: 2 * 60 }
+        { expiresIn: 60 * 60 }
       )
 
       response.cookie('token', refreshToken, {
         httpOnly: true, // The cookie should be inaccessible to Javascript as possible, to reduce the chance of XSS.
         secure: true, // The cookie should be retrieved only over SSL or HTTPS.
-        maxAge:  2 * 60 * 1000, // The Refresh Token has the same life than the Access Token. Convert seconds to ms.
+        maxAge:  60 * 60 * 1000, // The Refresh Token has the same life than the Access Token. Convert seconds to ms.
         sameSite: 'None' // The cookie is cross-site
       })
 
