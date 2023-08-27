@@ -24,7 +24,7 @@ const getRecipes = async (request, response, next) => {
 
     const params = {
       type: 'public',
-      q: searchTerm,
+      q: searchTerm.trim(),
       app_id: config.EDAMAM_ID,
       app_key: config.EDAMAM_APPLICATION_KEY,
     }
