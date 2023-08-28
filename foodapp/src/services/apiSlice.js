@@ -92,7 +92,14 @@ export const apiSlice = createApi({
     getRecipe : builder.query({
       query: (id) => ({
         url: '/recipes/id',
-        params: { id: id }
+        params: { id: id },
+        transformResponse: (response) => {
+          if (response.status === 404) {
+            // Handle 404 error here and return a custom error object
+            return { error: 'API Recipe not found' }
+          }
+          return response.json()
+        },
       })
     })
 

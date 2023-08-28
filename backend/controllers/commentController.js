@@ -146,8 +146,6 @@ const populateReplies = async (comment) => {
 // Get all comments for a specific recipe, including replies
 const getCommentsForRecipe = async (request, response, next) => {
   const { recipeId } = request.query
-  console.log(request)
-  console.log(recipeId)
   try {
     // Find the recipe and populate the comments with the actual comment documents, including replies
     const recipe = await Recipe.findOne({ recipeId }).populate({
@@ -159,7 +157,6 @@ const getCommentsForRecipe = async (request, response, next) => {
         select: 'username profileImage name _id',
       },
     })
-    console.log(recipe)
     if (!recipe) {
       return response.status(204).json({ error: 'Recipe/comments not found' })
     }

@@ -25,13 +25,17 @@ const app = express()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-//allow requests under images folder to return picctures
-app.use('/images', express.static(join(__dirname, 'images')))
-
 const corsOptions = {
   origin: 'http://localhost:3000',
   credentials: true,
 }
+
+app.use(cors(corsOptions))
+
+//allow requests under images folder to return picctures
+app.use('/images', express.static(join(__dirname, 'images')))
+
+
 
 const url = config.MONGODB_URI
 
@@ -43,7 +47,7 @@ mongoose.connect(url)
     console.log('error connecting to MongoDB:', error.message)
   })
 
-app.use(cors(corsOptions))
+
 app.use(express.json())
 app.use(cookieParser())
 app.use(middleware.requestLogger)

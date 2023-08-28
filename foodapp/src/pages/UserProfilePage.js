@@ -30,6 +30,7 @@ import { useGetAllSpecificUserCreatedRecipesQuery } from '../services/interactio
 
 
 
+
 const UserProfile = () => {
   const [profileDescription, setProfileDescription] = useState('')
   const [anchorEl, setAnchorEl] = useState(null)
@@ -45,6 +46,8 @@ const UserProfile = () => {
   const user = useSelector(selectCurrentUser)
   const [ updateUser ] = useUpdateUserMutation()
   const [uploadProfilePicture] = useUploadProfilePictureMutation()
+
+
   const fileInputRef = useRef(null)
   const userId = user?.id
   useEffect(() => {
@@ -114,6 +117,7 @@ const UserProfile = () => {
     dispatch(setUser({ user: updatedUser }))
     setNewProfilPicture(null)
   }
+
 
   const handleClickFollowing = (event) => {
     setAnchorEl(event.currentTarget)
@@ -343,7 +347,7 @@ const UserProfile = () => {
         {selectedOption === 'favorites' &&
           userData?.favorites?.map((favorite, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
-              <RecipeCard key={favorite.recipeId} recipe={favorite} />
+              <RecipeCard key={favorite.recipeId} recipe={favorite}/>
             </Grid>
           ))}
       </Grid>
@@ -351,7 +355,7 @@ const UserProfile = () => {
         {selectedOption === 'myRecipes' &&
           userCreatedRecipes?.map((recipe, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
-              <RecipeCard key={recipe.recipeId} recipe={recipe} />
+              <RecipeCard key={recipe.recipeId} recipe={recipe} deleteRecipe={true} edit={true}/>
             </Grid>
           ))}
       </Grid>
@@ -359,7 +363,7 @@ const UserProfile = () => {
         {selectedOption === 'dislikes' &&
           userData?.dislikes?.map((dislike, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
-              <RecipeCard key={dislike.recipeId} recipe={dislike} />
+              <RecipeCard key={dislike.recipeId} recipe={dislike}/>
             </Grid>
           ))}
       </Grid>
