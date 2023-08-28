@@ -29,7 +29,8 @@ const App = () => {
               <Route path="/login" element={<LoginPage />} />
               <Route path='/register' element={<RegistrationForm/>}/>
               <Route path='/users' element={<UsersPage/>}/>
-              <Route path='/createrecipe' element={<CreateRecipePage/>}/>
+              <Route path='/createRecipe' element={<CreateRecipePage/>}/>
+              <Route path='/editRecipe' element={<CreateRecipePage/>}/>
               <Route path='/recipes/:recipeId' element={
                 <RecipeViewPage/>
               }/>

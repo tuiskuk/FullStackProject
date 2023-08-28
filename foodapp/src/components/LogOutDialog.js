@@ -20,7 +20,7 @@ const LogOutDialog = ({ open, onClose }) => {
   return(
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>
-        <p>are you sure you want to log out?</p>
+        <p>Are you sure you want to log out?</p>
       </DialogTitle>
       <DialogActions>
         <Button onClick={handleStayLoggedIn} color="primary">

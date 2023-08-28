@@ -7,17 +7,27 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
 import { TextField, Container,  Grid, Tooltip, Box, ImageListItem, ImageListItemBar, IconButton, Button, Snackbar, Alert, Typography } from '@mui/material'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { cuisineOptions, dishOptions, healthFilterOptions, mealTypes } from '../data'
 import { WarningDialog } from '../components/WarningDialog'
 import OptionsDialog from '../components/SelectOptionsForRecipeDialog'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 
 
 const CreateRecipePage = () => {
   //hooks related to recipe pictures
   const fileInputRef = useRef(null)
+  const [recipe, setRecipe] = useState({})
+  const location = useLocation()
+  const navigate = useNavigate()
+  console.log(location)
+  const pathName = location.pathname
+  const isEditing = pathName === '/editRecipe' ? true : false
+  console.log(pathName)
+  console.log(recipe)
+
   const [selectedFiles, setSelectedFiles] = useState([])
   const [imageIndex, setImageIndex] = useState(-1)
 
@@ -55,7 +65,84 @@ const CreateRecipePage = () => {
   const [ createInteraction ] = useCreateInteractionMutation()
   const [ uploadRecipePicture ] = useUploadRecipePictureMutation()
 
-  const { handleSubmit, control,formState: { errors }, trigger, reset } = useForm()
+  console.log(isEditing)
+
+
+
+  const { handleSubmit, control, formState: { errors }, trigger, reset, setValue } = useForm()
+
+  const fetchImageBlob = async (imageUrl) => {
+    const response = await fetch(imageUrl)
+    const blob = await response.blob()
+    return blob
+  }
+
+  useEffect(() => {
+    if (isEditing) {
+      console.log('isEditing is true')
+      const recipeData = sessionStorage.getItem('recipe')
+      const parsedRecipe = JSON.parse(recipeData)
+      if(!parsedRecipe) navigate('/')
+      if (parsedRecipe && parsedRecipe.creator) {
+        console.log(parsedRecipe.creator)
+        console.log('parcing recipe')
+        console.log(parsedRecipe)
+        setValue('label', parsedRecipe.label)
+        setValue('instructions', parsedRecipe.instructions)
+        setValue('recipeYield', parsedRecipe.yield)
+        setValue('totalTime', parsedRecipe.totalTime)
+        setRecipe(parsedRecipe)
+        setSelectedMealTypes(parsedRecipe.mealType || [])
+        setSelectedDishTypes(parsedRecipe.dishType || [])
+        setSelectedCuisineTypes(parsedRecipe.cuisineType || [])
+        setSelectedHealthFilters(parsedRecipe.healthLabels || [])
+        setIngredients(parsedRecipe.ingredients || [])
+        const imageUrls = parsedRecipe.images || []
+
+        // Convert image URLs to File objects
+        const imageFilesPromises = imageUrls?.map(async (imageUrl) => {
+          const fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1).replace(/^\d+/, '')
+          const imageBlob = await fetchImageBlob(imageUrl)
+          return new File([imageBlob], fileName, { type: 'image/jpeg' })
+        })
+
+        Promise.all(imageFilesPromises)
+          .then((imageFiles) => {
+            setSelectedFiles(imageFiles)
+            setImageIndex(0)
+          })
+          .catch((error) => {
+            console.error('Error fetching and creating image files:', error)
+          })
+
+        // Update selectedFiles state with imageFiles
+        setImageIndex(imageUrls.length > 0 ? imageUrls.length - 1 : -1)
+        console.log('selectedFiles:', selectedFiles)
+        console.log('imageIndex:', imageIndex)
+
+      }
+    }
+    else {
+      // Reset the form values when navigating from edit to create
+      console.log('else block')
+      setIngredients([])
+      setSelectedFiles([])
+      setSelectedMealTypes([])
+      setSelectedCuisineTypes([])
+      setSelectedDishTypes([])
+      setSelectedHealthFilters([])
+      setValue('label', '')
+      setValue('instructions', '')
+      setValue('recipeYield', '')
+      setValue('totalTime', '')
+      setImageIndex(-1)
+    }
+    setRecipe({})
+  }, [isEditing, location.pathname, reset])
+
+  console.log(control)
+
+  console.log(selectedFiles, selectedCuisineTypes)
 
   const handleBlur = (field) => {
     trigger(field.name)
@@ -105,6 +192,7 @@ const CreateRecipePage = () => {
     }
     console.log(imageIndex,selectedFiles)
   }
+  console.log(selectedFiles)
 
   //function to add ingredient
   const handleAddIngredient = () => {
@@ -168,6 +256,8 @@ const CreateRecipePage = () => {
       return
     }
 
+    const updateOperation = isEditing && recipe.recipeId
+
     try {
       if (Object.keys(errors).length === 0) {
         const {
@@ -176,7 +266,7 @@ const CreateRecipePage = () => {
           ...restSubmitData
         } = submitData
 
-        const createData = {
+        const interactionData = {
           ...restSubmitData,
           ingredients: ingredients,
           mealType: selectedMealTypes,
@@ -188,7 +278,15 @@ const CreateRecipePage = () => {
           totalTime: parseInt(totalTime)
         }
 
-        const response = await createInteraction(createData)
+        let response
+        if (updateOperation) {
+          // Update the existing recipe
+          interactionData.recipeId = recipe.recipeId
+          //response = await updateInteraction(interactionData)// You need to implement updateInteraction function
+        } else {
+          // Create a new recipe
+          response = await createInteraction(interactionData)
+        }
         console.log('recipe created', response?.data?.savedRecipe)
 
         const imageResponse = await uploadRecipePicture({ files: selectedFiles, id: response?.data?.savedRecipe.id })
@@ -203,7 +301,7 @@ const CreateRecipePage = () => {
         setSelectedDishTypes([])
         setSelectedHealthFilters([])
         setImageIndex(-1)
-        showSnackbar('Recipe creted','success')
+        showSnackbar('Recipe created','success')
       }
     } catch (error) {
       console.error('An error while creating recipe:', error)
@@ -211,6 +309,7 @@ const CreateRecipePage = () => {
     }
   }
 
+  console.log(selectedFiles[imageIndex])
 
 
 
@@ -245,8 +344,8 @@ const CreateRecipePage = () => {
             <Controller
               name="label"
               control={control}
+              defaultValue=''
               rules={{ required: true }}
-              defaultValue=""
               render={({ field }) => (
                 <TextField
                   label="label"
@@ -282,8 +381,12 @@ const CreateRecipePage = () => {
             </Tooltip> ) : (
               <ImageListItem sx={{ height: '250px', width: '300px' }}>
                 <img
-                  src={selectedFiles[imageIndex] ? URL.createObjectURL(selectedFiles[imageIndex]) : ''}
-                  alt={'...loading'}
+                  src={
+
+                    URL.createObjectURL(selectedFiles[imageIndex]) // Create object URL for File object
+
+                  }
+                  alt={selectedFiles[imageIndex].name || '...loading'}
                   style={{ width: '100%', height: '100%' }}
                 />
                 <ImageListItemBar
@@ -322,7 +425,7 @@ const CreateRecipePage = () => {
             <Typography variant="h5">Add Ingredients to Your Recipe</Typography>
           </Grid>
 
-          {ingredients[0] && (
+          {ingredients?.length > 0 && (
             <Grid item>
               <h3>List of ingredients in a way other users will see them</h3>
               {ingredients.map((ingredient, index) => (
@@ -391,7 +494,7 @@ const CreateRecipePage = () => {
             <Controller
               name="instructions"
               control={control}
-              defaultValue=""
+              defaultValue=''
               rules={{ required: true }}
               render={({ field }) => (
                 <TextField
@@ -480,7 +583,7 @@ const CreateRecipePage = () => {
 
           <Grid item>
             <Button variant="contained" color="primary" type="submit">
-              Create recipe
+              {isEditing ? 'Update recipe' : 'Create recipe'}
             </Button>
           </Grid>
 

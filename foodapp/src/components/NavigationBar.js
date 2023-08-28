@@ -53,7 +53,7 @@ const NavigationBar = () => {
           <MenuItem component={Link} to="/profile">
             My Profile
           </MenuItem>
-          <MenuItem component={Link} to="/createrecipe">
+          <MenuItem component={Link} to="/createRecipe">
             Create recipe
           </MenuItem>
           {!user ? <MenuItem component={Link} to="/login">
@@ -100,7 +100,7 @@ const NavigationBar = () => {
             <Button
               color="inherit"
               component={Link}
-              to="/createrecipe"
+              to="/createRecipe"
               sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
             >
               <Typography variant="subtitle2">Create Recipe</Typography>

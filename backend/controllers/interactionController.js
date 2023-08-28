@@ -233,7 +233,6 @@ const getAllUserCreatedInteractions = async (request, response, next) => {
 const getAllSpecificUserCreatedRecipes = async (request, response, next) => {
   try {
     const { userId } = request.query
-    console.log(request.query)
     console.log(userId)
     const recipes = await Recipe.find({ creator: userId }).populate('creator')
     // If no recipes found, return empty
@@ -246,6 +245,23 @@ const getAllSpecificUserCreatedRecipes = async (request, response, next) => {
     next(error)
   }
 }
+const deleteSpecificUserCreatedRecipe = async (request, response, next) => {
+  try {
+    const { userId, recipeId } = request.query
+    // Find the specific recipe by creator and recipeId
+    const result = await Recipe.deleteOne({ creator: userId, recipeId })
+
+    // Check if a recipe was actually deleted
+    if (result.deletedCount === 0) {
+      return response.status(404).json({ message: 'Recipe not found' })
+    }
+
+    response.status(200).json({ message: 'Recipe deleted successfully' })
+  } catch (error) {
+    next(error)
+  }
+}
 
 
-export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions, getAllSpecificUserCreatedRecipes }
+
+export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions, getAllSpecificUserCreatedRecipes, deleteSpecificUserCreatedRecipe }

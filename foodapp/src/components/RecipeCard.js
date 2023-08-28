@@ -1,22 +1,52 @@
-import { Card, CardMedia, CardContent, Typography, CardActionArea  } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Card, CardMedia, CardContent, Typography, CardActionArea, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions  } from '@mui/material'
+import { Link, useNavigate } from 'react-router-dom'
 import { useGetRecipeQuery } from '../services/apiSlice'
 import { useEffect, useState, useRef } from 'react'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble'
+import { useDeleteSpecificUserCreatedRecipeMutation } from '../services/interactionSlice'
 import './RecipeCard.css'
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '../services/loginSlice'
 
 
-const RecipeCard = ({ recipe }) => {
-  console.log(recipe)
+const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
   let recipe_id  = recipe.uri ? recipe.uri.substring(recipe.uri.lastIndexOf('_') + 1) : recipe.recipeId
   let favoriteRecipe = null
   const [displayedRecipe,setDisplayedRecipe] = useState(null)
   const [isHovered, setIsHovered] = useState(false)
+  const user = useSelector(selectCurrentUser)
+  const userId = user?.id
+  const navigate = useNavigate()
 
 
   const { data: dataFromApi } = useGetRecipeQuery(recipe.id)
-  console.log(isHovered)
+  const [ deleteSpecificUserCreatedRecipe ] = useDeleteSpecificUserCreatedRecipeMutation()
+
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
+
+  // Handle opening the delete confirmation dialog
+  const handleOpenDeleteDialog = (event) => {
+    event.preventDefault() // Prevent the link navigation
+    setDeleteDialogOpen(true)
+  }
+
+  // Handle closing the delete confirmation dialog
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false)
+  }
+
+  // Handle recipe deletion after confirmation
+  const handleDeleteRecipe = async (event) => {
+    event.preventDefault()
+    try {
+      await deleteSpecificUserCreatedRecipe({ userId: userId, recipeId: recipe.recipeId })
+      // Additional logic you may want to perform after deletion
+    } catch (error) {
+      // Handle error if deletion fails
+    }
+    handleCloseDeleteDialog()
+  }
 
   const textRef = useRef(null)
 
@@ -65,9 +95,6 @@ const RecipeCard = ({ recipe }) => {
 
     console.log(displayedRecipe)
   }, [recipe ,dataFromApi])
-
-  console.log(displayedRecipe)
-  console.log(recipe)
 
 
 
@@ -137,8 +164,8 @@ const RecipeCard = ({ recipe }) => {
                     overflow: 'hidden',
                     whiteSpace: 'normal',
                     display: '-webkit-box',
-                    '-webkit-line-clamp': 2,
-                    '-webkit-box-orient': 'vertical',
+                    WebkitLineClamp: 2, // Change to camelCase
+                    WebkitBoxOrient: 'vertical', // Change to camelCase
                     position: 'relative', // Added for positioning pseudo-element
                   }}
                 >
@@ -163,6 +190,38 @@ const RecipeCard = ({ recipe }) => {
                   </span>
                 ))}
               </div>
+              {deleteRecipe && (
+                <div>
+                  <Button onClick={handleOpenDeleteDialog}>Delete</Button>
+                  <Dialog open={isDeleteDialogOpen} onClose={handleCloseDeleteDialog}>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        Are you sure you want to delete this recipe?
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+                      <Button onClick={handleDeleteRecipe} color="error">
+                        Delete
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </div>
+              )}
+              {edit && (
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    sessionStorage.setItem('recipe', JSON.stringify(displayedRecipe))
+                    navigate({
+                      pathname: '/editRecipe',
+                    })
+                  }}
+                >
+                  Edit
+                </Button>
+              )}
             </CardContent>
           </CardActionArea>
         </Card>

@@ -86,6 +86,17 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
         }
       },
       providesTags: ['Interactions']
+    }),
+    deleteSpecificUserCreatedRecipe: builder.mutation({
+      query: ({ userId, recipeId }) => {
+        console.log(userId, recipeId)
+        return {
+          url: '/interactions/all/specificUserCreated',
+          method: 'DELETE',
+          params: { userId, recipeId }
+        }
+      },
+      invalidatesTags: ['Interactions']
     })
   })
 })
@@ -99,5 +110,6 @@ export const {
   useCreateInteractionMutation,
   useGetAllInteractionRecipesQuery,
   useGetAllUserCreatedInteractionsQuery,
-  useGetAllSpecificUserCreatedRecipesQuery
+  useGetAllSpecificUserCreatedRecipesQuery,
+  useDeleteSpecificUserCreatedRecipeMutation
 } = interactionApiSlice

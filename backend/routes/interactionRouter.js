@@ -11,5 +11,6 @@ interactionRouter.post('/likes', interactionController.addLikeInteraction)
 interactionRouter.delete('/likes', interactionController.removeLikeInteraction)
 interactionRouter.post('/dislikes', interactionController.addDislikeInteraction)
 interactionRouter.delete('/dislikes', interactionController.removeDislikeInteraction)
+interactionRouter.delete('/all/specificUserCreated',interactionController.deleteSpecificUserCreatedRecipe)
 
 export default interactionRouter
