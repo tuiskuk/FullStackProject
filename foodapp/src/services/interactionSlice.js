@@ -40,6 +40,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
     }),
     getAllInteractions: builder.query({
       query: ({ recipeId }) => {
+        console.log(recipeId)
         return {
           url: '/interactions',
           params: { recipeId },
@@ -70,9 +71,13 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       providedTags: ['Interactions'],
     }),
     getAllUserCreatedInteractions: builder.query({
-      query: () => {
+      query: ({ searchTerm,  filterOptionTerms, timeTerm, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms }) => {
+        console.log('searchTerm:', searchTerm, filterOptionTerms, timeTerm, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms)
+        //const valuesToCheck = [searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms ]
         return {
           url: '/interactions/all/userCreated',
+          params: { search: searchTerm, healthFilters: filterOptionTerms, time: timeTerm, ingr: ingridientsNumberTerm, mealTypeOptions: mealTypeOptionTerms,
+            excludedFilters: excludedChipArrayTerms, cuisineTypeOptions: cuisineTypeTerms, dishOptions: dishTypeTerms },
         }
       },
       providesTags: ['Interactions']

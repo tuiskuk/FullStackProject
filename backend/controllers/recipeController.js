@@ -24,7 +24,7 @@ const getRecipes = async (request, response, next) => {
 
     const params = {
       type: 'public',
-      q: searchTerm,
+      q: searchTerm.trim(),
       app_id: config.EDAMAM_ID,
       app_key: config.EDAMAM_APPLICATION_KEY,
     }
@@ -53,8 +53,7 @@ const getRecipes = async (request, response, next) => {
       const excluded = excludedFilters.split(',').map((filter) => filter.trim())
       excludedString = `&excluded=${excluded.join('&excluded=')}`
     }
-    console.log(excludedFilters)
-    console.log(excludedString)
+
     let filterString = ''
     if (healthFilters.length > 0) {
       const filters = healthFilters.split(',').map((filter) => filter.trim())
@@ -100,7 +99,6 @@ const getRecipes = async (request, response, next) => {
 const getLink = async (request, response, next) => {
   try {
     const searchTerm = request.query.link
-    console.log(searchTerm)
     const apiResponse = await axios.get(searchTerm)
 
     const recipes = apiResponse.data
@@ -114,7 +112,6 @@ const getLink = async (request, response, next) => {
 const getRecipe = async (request, response, next) => {
   try {
     const { id } = request.query
-
     const foundRecipe = await Recipe.findById(id)
 
 
@@ -123,11 +120,7 @@ const getRecipe = async (request, response, next) => {
     }
     console.log(foundRecipe)
     const recipeId = foundRecipe.recipeId
-
-
     const url = `https://api.edamam.com/api/recipes/v2/${recipeId}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
-
-    console.log('just before axios get')
     const apiResponse = await axios.get(url)
     const recipe = apiResponse.data
     response.status(200).json(recipe)

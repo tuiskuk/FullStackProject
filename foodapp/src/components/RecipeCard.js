@@ -80,7 +80,7 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
         //we need to make sure that properties instruktions, totalTime
         //and so on will be set in sessionStorage and in recipeViewPages state
         recipe = dataFromApi?.recipe
-        console.log(recipe)
+        //console.log(recipe)
       }
 
       setDisplayedRecipe(recipe)
@@ -93,7 +93,7 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
       console.log('card error', e)
     }
 
-    console.log(displayedRecipe)
+    //console.log(displayedRecipe)
   }, [recipe ,dataFromApi])
 
 

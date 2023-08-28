@@ -10,11 +10,9 @@ import { TextField, Container,  Grid, Tooltip, Box, ImageListItem, ImageListItem
 import { useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { cuisineOptions, dishOptions, healthFilterOptions, mealTypes } from '../data'
-import { WarningDialog } from '../components/WarningDialog'
+import WarningDialog from '../dialogs/WarningDialog'
 import OptionsDialog from '../components/SelectOptionsForRecipeDialog'
 import { useLocation, useNavigate } from 'react-router-dom'
-
-
 
 const CreateRecipePage = () => {
   //hooks related to recipe pictures
