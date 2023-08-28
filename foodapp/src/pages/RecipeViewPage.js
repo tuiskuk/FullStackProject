@@ -16,7 +16,7 @@ import { useAddLikeInteractionMutation, useRemoveLikeInteractionMutation,
   useAddDislikeInteractionMutation, useRemoveDislikeInteractionMutation,
   useGetAllInteractionsQuery, useCreateInteractionMutation } from '../services/interactionSlice'
 
-import { WarningDialog } from '../components/WarningDialog'
+import WarningDialog from '../dialogs/WarningDialog'
 import { useNavigate, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
@@ -32,15 +32,11 @@ const RecipeViewPage = () => {
   const [showRecipeGrid, setShowRecipeGrid] = useState(true)
   const isScreenSmall = useMediaQuery('(max-width: 800px)')
 
-
   useEffect(() => {
     const savedRecipe = sessionStorage.getItem('recipe')
     const parsedRecipe = JSON.parse(savedRecipe)
     setRecipe(parsedRecipe)
   }, [])
-
-
-
 
   const { data: interactionData } = useGetAllInteractionsQuery(
     { recipeId }, { skip: !recipeId, refetchOnMountOrArgChange: true })
@@ -49,8 +45,6 @@ const RecipeViewPage = () => {
   console.log(interactionData)
   console.log(recipe)
   console.log(interactionData)
-
-
 
   if(isScreenSmall){
     return (
@@ -70,7 +64,6 @@ const RecipeViewPage = () => {
           )}
         </Grid>
 
-
         <CommentSection recipeId={recipeId} userId={userId} interactionData={interactionData} label={recipe?.label} image={recipe?.image} />
         <WarningDialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)} user={user} />
       </Container>
@@ -87,7 +80,6 @@ const RecipeViewPage = () => {
           alignItems="flex-start"
           style={{ marginTop: '20px' }}>
 
-
           <RecipeGrid recipe={recipe} interactionData={interactionData} recipeId={recipeId} user={user} userId={userId} setShowWarningDialog={setShowWarningDialog} isScreenSmall={isScreenSmall} setShowRecipeGrid={setShowRecipeGrid} />
           <InfoGrid recipe={recipe}  isScreenSmall={isScreenSmall} setShowRecipeGrid={setShowRecipeGrid}/>
 
@@ -98,9 +90,6 @@ const RecipeViewPage = () => {
     )
   }
 }
-
-
-
 
 const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDialog, userId, isScreenSmall, setShowRecipeGrid }) => {
   const navigate = useNavigate()
@@ -121,9 +110,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
   const { data: favoriteData, refetch } = useGetAllFavoritesQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
 
-
   console.log(favoriteData)
-
 
   const creatorNameParts = recipe?.creator?.name
   const creatorFirstName = creatorNameParts && creatorNameParts[0]
@@ -371,7 +358,6 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
             {!isScreenSmall && <Grid item>
               {recipe?.creator ? (
 
-
                 <Typography variant='h5'>How did you <br/> like my recipe?</Typography>
               ) :
                 (
@@ -434,7 +420,6 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
       </Grid>
     </Grid>
   )}
-
 
 const InfoGrid = ({ recipe, isScreenSmall, setShowRecipeGrid }) => {
   const [pageIndex, setPageIndex] = useState(0)

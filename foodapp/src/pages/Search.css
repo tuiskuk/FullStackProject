@@ -1,0 +1,92 @@
+.image-container {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+}
+
+.search-banner {
+  width: 100%;
+  height: auto;
+  min-height: 280px;
+  object-fit: cover;
+}
+
+.image-items {
+  position: absolute;
+  top: 20%;
+  bottom: auto;
+  left: 10%;
+  right: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.input {
+  background-color: white;
+}
+
+.image-items .MuiFormControl-root {
+  margin-bottom: 16px;
+}
+
+.search-end-adorment img {
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+}
+
+.chip-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-content: center;
+  max-height: 105px;
+  overflow-y: auto; 
+}
+
+.chip-meal {
+  background-color: #c8e6c9 !important;
+}
+
+.chip-meal:hover {
+  background-color: #a5d6a7 !important;
+}
+
+.chip-allergy {
+  background-color: #90caf9 !important;
+}
+
+.chip-allergy:hover {
+  background-color: #64b5f6 !important;
+}
+
+.chip-cuisine {
+  background-color: #f9cb9c !important;
+}
+
+.chip-cuisine:hover {
+  background-color: #f9b24e !important;
+}
+
+.chip-dish {
+  background-color: #b39ddb !important;
+}
+
+.chip-dish:hover {
+  background-color: #7e57c2 !important;
+}
+
+.chip-excluded {
+  background-color: #ef9a9a !important;
+}
+
+.chip-excluded:hover {
+  background-color: #e57373 !important;
+}
+
+.toolbar-container {
+  justify-content: space-around;
+  flex-wrap: wrap;
+}

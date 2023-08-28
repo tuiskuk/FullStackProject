@@ -77,6 +77,7 @@ least important = 5
 * 2. functionality to update own recipes
 
 Navigation diagram with functionalities
-![image](https://github.com/tuiskuk/FullStackProject/assets/124632924/4f9a34c8-8eb6-4f51-9904-c207c37ab4b1)
+![image](https://github.com/tuiskuk/FullStackProject/assets/124632924/f5d54fc1-d87b-4990-8c39-de06283b69b9)
+
 
 

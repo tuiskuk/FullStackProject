@@ -27,18 +27,19 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
 
   // Handle opening the delete confirmation dialog
   const handleOpenDeleteDialog = (event) => {
-    event.preventDefault() // Prevent the link navigation
+    event?.preventDefault() // Prevent the link navigation
     setDeleteDialogOpen(true)
   }
 
   // Handle closing the delete confirmation dialog
-  const handleCloseDeleteDialog = () => {
+  const handleCloseDeleteDialog = (event) => {
+    event?.preventDefault()
     setDeleteDialogOpen(false)
   }
 
   // Handle recipe deletion after confirmation
   const handleDeleteRecipe = async (event) => {
-    event.preventDefault()
+    event?.preventDefault()
     try {
       await deleteSpecificUserCreatedRecipe({ userId: userId, recipeId: recipe.recipeId })
       // Additional logic you may want to perform after deletion
@@ -80,7 +81,7 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
         //we need to make sure that properties instruktions, totalTime
         //and so on will be set in sessionStorage and in recipeViewPages state
         recipe = dataFromApi?.recipe
-        console.log(recipe)
+        //console.log(recipe)
       }
 
       setDisplayedRecipe(recipe)
@@ -93,7 +94,7 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
       console.log('card error', e)
     }
 
-    console.log(displayedRecipe)
+    //console.log(displayedRecipe)
   }, [recipe ,dataFromApi])
 
 

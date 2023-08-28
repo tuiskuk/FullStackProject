@@ -1,6 +1,6 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import { ExpirationWarningDialog } from './WarningDialog'
+import ExpirationWarningDialog from '../dialogs/ExpirationWarningDialog'
 import { useSelector } from 'react-redux'
 import { selectCurrentExpTime } from '../services/loginSlice'
 import { selectCurrentUser } from '../services/loginSlice'

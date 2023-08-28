@@ -7,14 +7,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useState } from 'react'
 import RecipeCard from '../components/RecipeCard'
 import UserListItem from '../components/userListItem'
-import { WarningDialog } from '../components/WarningDialog'
+import WarningDialog from '../dialogs/WarningDialog'
 import formatFinnishDate from '../helpers/formatFinnishDate'
 import { Link } from 'react-router-dom'
 import { useGetAllSpecificUserCreatedRecipesQuery } from '../services/interactionSlice'
 
-
 const UserViewPage = () => {
-
   const { id } = useParams()
   const [selectedOption, setSelectedOption] = useState('favorites')
   const dispatch = useDispatch()
