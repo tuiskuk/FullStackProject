@@ -38,7 +38,7 @@ const UserSearchPage = () => {
 
   const [clear, setClear] = useState(false)
 
-  const recipeBatch = 1
+  const recipeBatch = 20
   const [batchCounter, setBatchCounter] = useState(1)
   const [showLoadMore, setShowLoadMore] = useState(true)
 
