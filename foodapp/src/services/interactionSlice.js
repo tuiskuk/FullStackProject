@@ -62,6 +62,20 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
       },
       invalidatesTags: ['Interactions'],
     }),
+    updateInteraction: builder.mutation({
+      query: ({ recipeId, label, image, creator, cuisineType, dishType, healthLabels,
+        ingredients, instructions, mealType, recipeYield, totalTime }) => {
+        return {
+          url: '/interactions/all/specificUserCreated',
+          method: 'PUT',
+          body: {
+            recipeId, label, image, creator, cuisineType, dishType, healthLabels,
+            ingredients, instructions, mealType, recipeYield, totalTime
+          },
+        }
+      },
+      invalidatesTags: ['Interactions'],
+    }),
     getAllInteractionRecipes: builder.query({
       query: () => {
         return {
@@ -116,5 +130,6 @@ export const {
   useGetAllInteractionRecipesQuery,
   useGetAllUserCreatedInteractionsQuery,
   useGetAllSpecificUserCreatedRecipesQuery,
-  useDeleteSpecificUserCreatedRecipeMutation
+  useDeleteSpecificUserCreatedRecipeMutation,
+  useUpdateInteractionMutation
 } = interactionApiSlice

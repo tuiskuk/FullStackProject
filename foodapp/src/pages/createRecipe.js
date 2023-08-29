@@ -1,4 +1,4 @@
-import { useCreateInteractionMutation } from '../services/interactionSlice'
+import { useCreateInteractionMutation, useUpdateInteractionMutation } from '../services/interactionSlice'
 import { useUploadRecipePictureMutation } from '../services/pictureHandlerApiSlice'
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -14,6 +14,7 @@ import WarningDialog from '../dialogs/WarningDialog'
 import OptionsDialog from '../components/SelectOptionsForRecipeDialog'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+
 const CreateRecipePage = () => {
   //hooks related to recipe pictures
   const fileInputRef = useRef(null)
@@ -28,6 +29,7 @@ const CreateRecipePage = () => {
 
   const [selectedFiles, setSelectedFiles] = useState([])
   const [imageIndex, setImageIndex] = useState(-1)
+  const [recipeId, setRecipeId] = useState('')
 
   //user and show varnig dialog variable
   const user = useSelector(selectCurrentUser)
@@ -62,6 +64,7 @@ const CreateRecipePage = () => {
   //redux Toolkit hooks for creating recipe and uploading its pictures
   const [ createInteraction ] = useCreateInteractionMutation()
   const [ uploadRecipePicture ] = useUploadRecipePictureMutation()
+  const [ updateInteraction ] = useUpdateInteractionMutation()
 
   console.log(isEditing)
 
@@ -95,6 +98,7 @@ const CreateRecipePage = () => {
         setSelectedCuisineTypes(parsedRecipe.cuisineType || [])
         setSelectedHealthFilters(parsedRecipe.healthLabels || [])
         setIngredients(parsedRecipe.ingredients || [])
+        setRecipeId(parsedRecipe.recipeId || '')
         const imageUrls = parsedRecipe.images || []
 
         // Convert image URLs to File objects
@@ -107,7 +111,6 @@ const CreateRecipePage = () => {
         Promise.all(imageFilesPromises)
           .then((imageFiles) => {
             setSelectedFiles(imageFiles)
-            setImageIndex(0)
           })
           .catch((error) => {
             console.error('Error fetching and creating image files:', error)
@@ -191,6 +194,7 @@ const CreateRecipePage = () => {
     console.log(imageIndex,selectedFiles)
   }
   console.log(selectedFiles)
+  console.log(imageIndex)
 
   //function to add ingredient
   const handleAddIngredient = () => {
@@ -254,7 +258,9 @@ const CreateRecipePage = () => {
       return
     }
 
-    const updateOperation = isEditing && recipe.recipeId
+    const updateOperation = isEditing
+    console.log(updateOperation)
+    console.log(recipe.recipeId)
 
     try {
       if (Object.keys(errors).length === 0) {
@@ -276,19 +282,30 @@ const CreateRecipePage = () => {
           totalTime: parseInt(totalTime)
         }
 
+        console.log(interactionData)
+
         let response
         if (updateOperation) {
           // Update the existing recipe
-          interactionData.recipeId = recipe.recipeId
-          //response = await updateInteraction(interactionData)// You need to implement updateInteraction function
+          console.log('update operation')
+          interactionData.recipeId = recipeId
+          response = await updateInteraction(interactionData)// You need to implement updateInteraction function
+          console.log(response)
+          const imageResponse = await uploadRecipePicture({ files: selectedFiles, id: response?.data?.id })
+          console.log('recipes pictures uploaded and added to recipes image property,', imageResponse?.data?.recipeImages)
+          showSnackbar('Recipe updated','success')
         } else {
           // Create a new recipe
+          console.log('create recipe')
           response = await createInteraction(interactionData)
+          const imageResponse = await uploadRecipePicture({ files: selectedFiles, id: response?.data?.savedRecipe?.id })
+          console.log('recipes pictures uploaded and added to recipes image property,', imageResponse?.data?.recipeImages)
+          console.log('recipe created', response?.data?.savedRecipe)
+          showSnackbar('Recipe created','success')
         }
-        console.log('recipe created', response?.data?.savedRecipe)
 
-        const imageResponse = await uploadRecipePicture({ files: selectedFiles, id: response?.data?.savedRecipe.id })
-        console.log('recipes pictures uploaded and added to recipes image property,', imageResponse?.data?.recipeImages)
+        console.log(response)
+
 
         //reset everything and show success messgae to user
         reset()
@@ -299,10 +316,9 @@ const CreateRecipePage = () => {
         setSelectedDishTypes([])
         setSelectedHealthFilters([])
         setImageIndex(-1)
-        showSnackbar('Recipe created','success')
       }
     } catch (error) {
-      console.error('An error while creating recipe:', error)
+      console.error('An error while creating or updating recipe:', error)
       // Handle the error, show a message to the user, etc.
     }
   }
@@ -381,10 +397,10 @@ const CreateRecipePage = () => {
                 <img
                   src={
 
-                    URL.createObjectURL(selectedFiles[imageIndex]) // Create object URL for File object
+                    selectedFiles[imageIndex] ? URL.createObjectURL(selectedFiles[imageIndex]) : ''
 
                   }
-                  alt={selectedFiles[imageIndex].name || '...loading'}
+                  alt={selectedFiles[imageIndex]?.name || '...loading'}
                   style={{ width: '100%', height: '100%' }}
                 />
                 <ImageListItemBar

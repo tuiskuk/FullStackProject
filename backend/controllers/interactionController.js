@@ -381,6 +381,29 @@ const deleteSpecificUserCreatedRecipe = async (request, response, next) => {
   }
 }
 
+const updateSpecificUserCreatedRecipe = async (request, response, next) => {
+  const { recipeId, ...updateFields } = request.body // Assuming recipeId is passed as a URL parameter
+  console.log('inside update', updateFields)
+
+  try {
+    // Check if the recipe exists
+    const existingRecipe = await Recipe.findById(recipeId)
+    if (!existingRecipe) {
+      return response.status(404).json({ error: 'Recipe not found' })
+    }
+
+    // Update the recipe fields
+    Object.assign(existingRecipe, updateFields)
+
+    // Save the updated recipe
+    const savedRecipe = await existingRecipe.save()
+
+    response.json(savedRecipe) // Respond with the updated recipe
+  } catch (error) {
+    next(error) // Pass the error to the error handling middleware
+  }
+}
 
 
-export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions, getAllSpecificUserCreatedRecipes, deleteSpecificUserCreatedRecipe }
+
+export default { createInteraction, addLikeInteraction, removeLikeInteraction, addDislikeInteraction, removeDislikeInteraction, getAllInteractions, getAllInteractionRecipes, getAllUserCreatedInteractions, getAllSpecificUserCreatedRecipes, deleteSpecificUserCreatedRecipe, updateSpecificUserCreatedRecipe }
