@@ -1,6 +1,7 @@
 import { Recipe } from '../models/recipe.js'
 import { User } from '../models/user.js'
 import mongoose from 'mongoose'
+import { recipePictureDeleter } from '../utils/helperFunctions.js'
 
 const createInteraction = async (request, response, next) => {
   try {
@@ -368,12 +369,17 @@ const deleteSpecificUserCreatedRecipe = async (request, response, next) => {
   try {
     const { userId, recipeId } = request.query
     // Find the specific recipe by creator and recipeId
-    const result = await Recipe.deleteOne({ creator: userId, recipeId })
+    const recipeTodelete = await Recipe.findOne({ creator: userId, recipeId })
 
-    // Check if a recipe was actually deleted
-    if (result.deletedCount === 0) {
+    // Check if a recipe exists
+    if (!recipeTodelete) {
       return response.status(404).json({ message: 'Recipe not found' })
     }
+
+    //delete recipe and its pictures from image folder
+    recipePictureDeleter(recipeTodelete?.images)
+    await recipeTodelete.deleteOne()
+    console.log('recipe deleted')
 
     response.status(200).json({ message: 'Recipe deleted successfully' })
   } catch (error) {

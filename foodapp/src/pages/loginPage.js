@@ -67,7 +67,9 @@ const LoginPage = ({ action, closeDialog }) => {
   }
 
   const handleRegisterClick = () => {
-    closeDialog()
+    if(action) {
+      closeDialog()
+    }
     navigate('/register')
   }
 

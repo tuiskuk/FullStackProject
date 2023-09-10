@@ -6,27 +6,28 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector } from 'react-redux'
-import { TextField, Container,  Grid, Tooltip, Box, ImageListItem, ImageListItemBar, IconButton, Button, Snackbar, Alert, Typography } from '@mui/material'
+import { useMediaQuery, TextField, Container,  Grid, Tooltip, Box, ImageListItem, ImageListItemBar, IconButton, Button, Snackbar, Alert, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { cuisineOptions, dishOptions, healthFilterOptions, mealTypes } from '../data'
 import WarningDialog from '../dialogs/WarningDialog'
-import OptionsDialog from '../components/SelectOptionsForRecipeDialog'
+import OptionsDialog from '../dialogs/SelectOptionsForRecipeDialog'
 import { useLocation, useNavigate } from 'react-router-dom'
+import './CreateRecipes.css'
 
 
 const CreateRecipePage = () => {
-  //hooks related to recipe pictures
-  const fileInputRef = useRef(null)
   const [recipe, setRecipe] = useState({})
   const location = useLocation()
   const navigate = useNavigate()
-  console.log(location)
   const pathName = location.pathname
   const isEditing = pathName === '/editRecipe' ? true : false
-  console.log(pathName)
-  console.log(recipe)
+  const isScreenSmall = useMediaQuery('(max-width: 800px)')
 
+
+
+  //hooks related to recipe pictures
+  const fileInputRef = useRef(null)
   const [selectedFiles, setSelectedFiles] = useState([])
   const [imageIndex, setImageIndex] = useState(-1)
   const [recipeId, setRecipeId] = useState('')
@@ -329,282 +330,288 @@ const CreateRecipePage = () => {
 
 
   return (
-    <Container maxWidth="md" >
+    <div className='create-recipe-page'>
+      <Container maxWidth="md" className="container" >
 
-      <Grid
-        container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-      >
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid
+          container
+          direction="column"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <form onSubmit={handleSubmit(onSubmit)}>
 
-          <Grid item xs={6}>
-            <Snackbar
-              open={snackbarOpen}
-              autoHideDuration={6000} // Adjust the duration as needed
-              onClose={() => setSnackbarOpen(false)}
-            >
-              <Alert
+            <Grid item xs={isScreenSmall ? 12 : 6} sx={{ margin: '0 auto', width: '100%', textAlign: 'center', marginBottom: 4, marginTop: 6 }}>
+              <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000} // Adjust the duration as needed
                 onClose={() => setSnackbarOpen(false)}
-                severity={snacbarSeverity}
-                sx={{ width: '100%' }}
               >
-                {snackbarMessage}
-              </Alert>
-            </Snackbar>
-            <Typography variant="h5" sx={{ marginTop: 3 }}>Give a Label to Your Recipe</Typography>
-            <Controller
-              name="label"
-              control={control}
-              defaultValue=''
-              rules={{ required: true }}
-              render={({ field }) => (
-                <TextField
-                  label="label"
-                  {...field}
-                  error={!!errors.label}
-                  helperText={errors.label ? 'Label is required' : ''}
-                  onBlur={() => handleBlur(field)}
-                  fullWidth
-                />
-              )}
-            />
-            <Typography variant="h5">Add Pictures to Depict Your Recipe</Typography>
-          </Grid>
+                <Alert
+                  onClose={() => setSnackbarOpen(false)}
+                  severity={snacbarSeverity}
+                  sx={{ width: '100%' }}
+                >
+                  {snackbarMessage}
+                </Alert>
+              </Snackbar>
+              <Typography variant="h5" className="body" sx={{ marginTop: 3 }}>Give a Label to Your Recipe</Typography>
+              <Controller
+                name="label"
+                control={control}
+                defaultValue=''
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <TextField
+                    label="label"
+                    {...field}
+                    error={!!errors.label}
+                    helperText={errors.label ? 'Label is required' : ''}
+                    onBlur={() => handleBlur(field)}
+                    fullWidth
+                  />
+                )}
+              />
+              <Typography variant="h5">Add Pictures to Depict Your Recipe</Typography>
+            </Grid>
 
-          <Grid item>
-            {selectedFiles?.length === 0 ? ( <Tooltip title='click here to add pictures to your recipe'>
-              <Box onClick={handleAddImageClick}
-                sx={{
-                  backgroundColor: 'grey',
-                  padding: '10px',
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center', // Center vertically
-                  height: '250px',
-                  width: '300px',
-                }}
-              >
-                <AddAPhotoIcon sx={{ fontSize: '78px' }} />
-              </Box>
-            </Tooltip> ) : (
-              <ImageListItem sx={{ height: '250px', width: '300px' }}>
-                <img
-                  src={
+            <Grid item xs={isScreenSmall ? 12 : 6} sx={{ marginBottom: 6, margin: '0 auto', width: '100%', textAlign: 'center' }}>
+              {selectedFiles?.length === 0 ? ( <Tooltip title='click here to add pictures to your recipe'>
+                <Box onClick={handleAddImageClick}
+                  sx={{
+                    backgroundColor: 'grey',
+                    padding: '10px',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center', // Center vertically
+                    height: '250px',
+                    width: '300px',
+                  }}
+                >
+                  <AddAPhotoIcon sx={{ fontSize: '78px' }} />
+                </Box>
+              </Tooltip> ) : (
+                <ImageListItem sx={{ height: '250px', width: '300px', objectFit: 'cover', minHeight: '280px'  }}>
+                  <img
+                    src={
 
-                    selectedFiles[imageIndex] ? URL.createObjectURL(selectedFiles[imageIndex]) : ''
+                      selectedFiles[imageIndex] ? URL.createObjectURL(selectedFiles[imageIndex]) : ''
 
-                  }
-                  alt={selectedFiles[imageIndex]?.name || '...loading'}
-                  style={{ width: '100%', height: '100%' }}
-                />
-                <ImageListItemBar
-                  actionIcon={
-                    <>
-                      <IconButton onClick={handleToLeftImage}
-                        key={'lefticon'}
-                        sx={{ color: 'white' }}>
-                        <ArrowBackIosNewIcon/>
-                      </IconButton>
-                      <IconButton onClick={handleToRightImage}
-                        key={'righticon'}
-                        sx={{ color: 'white' }}>
-                        <ArrowForwardIosIcon/>
-                      </IconButton>
-                      <Tooltip title="add more pictures">
-                        <IconButton sx={{ color: 'white' }} onClick={handleAddImageClick}>
-                          <AddAPhotoIcon/>
+                    }
+                    alt={selectedFiles[imageIndex]?.name || '...loading'}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                  <ImageListItemBar
+                    actionIcon={
+                      <>
+                        <IconButton onClick={handleToLeftImage}
+                          key={'lefticon'}
+                          sx={{ color: 'white' }}>
+                          <ArrowBackIosNewIcon/>
                         </IconButton>
-                      </Tooltip>
-                      <IconButton sx={{ color: 'white' }} onClick={handleDeletePicture}>
-                        <DeleteIcon/>
-                      </IconButton>
-                    </>}
-                />
-              </ImageListItem>)}
-            <input
-              ref={fileInputRef}
-              type="file"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-          </Grid>
+                        <IconButton onClick={handleToRightImage}
+                          key={'righticon'}
+                          sx={{ color: 'white' }}>
+                          <ArrowForwardIosIcon/>
+                        </IconButton>
+                        <Tooltip title="add more pictures">
+                          <IconButton sx={{ color: 'white' }} onClick={handleAddImageClick}>
+                            <AddAPhotoIcon/>
+                          </IconButton>
+                        </Tooltip>
+                        <IconButton sx={{ color: 'white' }} onClick={handleDeletePicture}>
+                          <DeleteIcon/>
+                        </IconButton>
+                      </>}
+                  />
+                </ImageListItem>)}
+              <input
+                ref={fileInputRef}
+                type="file"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+            </Grid>
 
-          <Grid item>
-            <Typography variant="h5">Add Ingredients to Your Recipe</Typography>
-          </Grid>
+            <Grid item sx={{ marginTop: 4 }}>
+              <Typography variant="h5">Add Ingredients to Your Recipe</Typography>
+            </Grid>
 
-          {ingredients?.length > 0 && (
-            <Grid item>
-              <h3>List of ingredients in a way other users will see them</h3>
-              {ingredients.map((ingredient, index) => (
-                <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                  <h3 style={{ marginRight: '10px' }}>{`${index + 1}. ${ingredient?.quantity} ${ingredient?.text}`}</h3>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    style={{ backgroundColor: 'red', color: 'black' }}
-                    onClick={() => handleRemoveIngredient(index)}
-                  >
+            {ingredients?.length > 0 && (
+              <Grid item>
+                <h3>List of ingredients in a way other users will see them</h3>
+                {ingredients.map((ingredient, index) => (
+                  <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                    <h3 style={{ marginRight: '10px' }}>{`${index + 1}. ${ingredient?.quantity} ${ingredient?.text}`}</h3>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      style={{ backgroundColor: 'red', color: 'black' }}
+                      onClick={() => handleRemoveIngredient(index)}
+                    >
                   Remove
-                  </Button>
-                </div>
-              ))}
-            </Grid>)}
+                    </Button>
+                  </div>
+                ))}
+              </Grid>)}
 
-          <Grid item>
+            <Grid item sx={{ marginBottom: 4 }}>
 
-            <Grid container spacing={2} alignItems="center" sx={{ padding: '8px' }}>
+              <Grid container spacing={2} alignItems="center" sx={{ padding: '8px' }}>
 
-              <Grid item xs={2}>
-                <TextField
-                  type="number"
-                  value={measureAmount}
-                  onChange={(event) => setMeasureAmount(event.target.value)}
-                  placeholder='e.g. 3'
-                  helperText='how much'
-                  inputProps={{ min: 1 }}
-                />
+                <Grid item xs={isScreenSmall ? 6 : 2}>
+                  <TextField
+                    type="number"
+                    value={measureAmount}
+                    onChange={(event) => setMeasureAmount(event.target.value)}
+                    placeholder='e.g. 3'
+                    helperText='how much'
+                    inputProps={{ min: 1 }}
+                  />
+                </Grid>
+
+                <Grid item xs={isScreenSmall ? 6 : 3} sx={{ marginBottom: 4 }}>
+                  <TextField
+                    value={measure}
+                    onChange={(event) => setMeasure(event.target.value)}
+                    label='e. g. Cup or Cups'
+                    helperText='measure' />
+                </Grid>
+
+                <Grid item xs={isScreenSmall ? 6 : 4} sx={{ marginBottom: 4 }}>
+                  <TextField
+                    value={ingredientName}
+                    onChange={(event) => setIngredientName(event.target.value)}
+                    placeholder='e. g. wheat flour'
+                    helperText='ingredient name'/>
+                </Grid>
+
+                <Grid item xs={isScreenSmall ? 6 : 3} sx={{ marginBottom: 4 }}>
+                  <TextField
+                    value={recommendBrand}
+                    onChange={(event) => setRecommendBrand(event.target.value)}
+                    placeholder='e. g. felix'
+                    helperText='recommend brand (optional)'/>
+                </Grid>
               </Grid>
 
-              <Grid item xs={3}>
-                <TextField
-                  value={measure}
-                  onChange={(event) => setMeasure(event.target.value)}
-                  label='e. g. Cup or Cups'
-                  helperText='measure' />
-              </Grid>
-
-              <Grid item xs={4}>
-                <TextField
-                  value={ingredientName}
-                  onChange={(event) => setIngredientName(event.target.value)}
-                  placeholder='e. g. wheat flour'
-                  helperText='ingredient name'/>
-              </Grid>
-
-              <Grid item xs={3}>
-                <TextField
-                  value={recommendBrand}
-                  onChange={(event) => setRecommendBrand(event.target.value)}
-                  placeholder='e. g. felix'
-                  helperText='recommend brand (optional)'/>
-              </Grid>
-            </Grid>
-
-            <Button onClick={handleAddIngredient} style={{ backgroundColor: '#FFA726', color: 'black' }}>
+              <Button onClick={handleAddIngredient} style={{ backgroundColor: '#FFA726', color: 'black' }}>
             Add ingredient
-            </Button>
+              </Button>
 
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12} sx={{ width: '100%' }}>
-            <Typography variant="h5">Write Instructions for Your Recipe</Typography>
-            <Controller
-              name="instructions"
-              control={control}
-              defaultValue=''
-              rules={{ required: true }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  rows={8}
-                  multiline
-                  fullWidth
-                  placeholder="Write instructions here"
-                  error={!!errors.instructions}
-                  helperText={errors.instructions ? 'instructions is required' : ''}
-                  onBlur={() => handleBlur(field)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <Typography variant="h5">How Long to Make and Serving Size</Typography>
-            <Grid container direction={'row'} justifyContent={'space-around'}>
+            <Grid item xs={12} sx={{ width: '100%', marginBottom: 4 }} >
+              <Typography variant="h5">Write Instructions for Your Recipe</Typography>
               <Controller
-                name="totalTime"
+                name="instructions"
                 control={control}
+                defaultValue=''
                 rules={{ required: true }}
-                defaultValue=""
                 render={({ field }) => (
                   <TextField
-                    label="Total Time (minutes)"
-                    type="number"
-                    inputProps={{ min: 1 }}
                     {...field}
-                    error={!!errors.totalTime}
-                    helperText={errors.totalTime ? 'Total Time is required' : ''}
+                    rows={8}
+                    type="text"
+                    multiline
+                    fullWidth
+                    placeholder="Write instructions here"
+                    error={!!errors.instructions}
+                    helperText={errors.instructions ? 'instructions is required' : ''}
                     onBlur={() => handleBlur(field)}
-                  />
-                )}
-              />
-
-              <Controller
-                name="recipeYield"
-                control={control}
-                rules={{ required: true }}
-                defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    label="serving size"
-                    type="number"
-                    inputProps={{ min: 1 }}
-                    {...field}
-                    error={!!errors.recipeYield}
-                    helperText={errors.recipeYield ? 'serving size is required' : ''}
-                    onBlur={() => handleBlur(field)}
+                    sx={{  //this is here becouse css file for some reason did not affect this one
+                      backgroundColor: 'white',
+                      color: 'black',
+                    }}
                   />
                 )}
               />
             </Grid>
 
-          </Grid>
+            <Grid item xs={12} sx={{ marginBottom: 4 }}>
+              <Typography variant="h5">How Long to Make and Serving Size</Typography>
+              <Grid container direction={'row'} justifyContent={'space-around'}>
+                <Controller
+                  name="totalTime"
+                  control={control}
+                  rules={{ required: true }}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      label="Total Time (minutes)"
+                      type="number"
+                      inputProps={{ min: 1 }}
+                      {...field}
+                      error={!!errors.totalTime}
+                      helperText={errors.totalTime ? 'Total Time is required' : ''}
+                      onBlur={() => handleBlur(field)}
+                    />
+                  )}
+                />
 
-          <Grid item>
-            <Typography variant="h5">Add Depicting Hashtags to Your Recipe</Typography>
-            <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Meal Types', mealTypes, selectedMealTypes)}>
+                <Controller
+                  name="recipeYield"
+                  control={control}
+                  rules={{ required: true }}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      label="serving size"
+                      type="number"
+                      inputProps={{ min: 1 }}
+                      {...field}
+                      error={!!errors.recipeYield}
+                      helperText={errors.recipeYield ? 'serving size is required' : ''}
+                      onBlur={() => handleBlur(field)}
+                    />
+                  )}
+                />
+              </Grid>
+
+            </Grid>
+
+            <Grid item sx={{ marginBottom: 4 }}>
+              <Typography variant="h5">Add Depicting Hashtags to Your Recipe</Typography>
+              <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Meal Types', mealTypes, selectedMealTypes)}>
               Select Meal Types
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Dish Types', dishOptions, selectedDishTypes)}>
+              </Button>
+              <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Dish Types', dishOptions, selectedDishTypes)}>
               Select Dish Types
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Cuisine Types', cuisineOptions, selectedCuisineTypes)}>
+              </Button>
+              <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Cuisine Types', cuisineOptions, selectedCuisineTypes)}>
               Select Cuisine Types
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Diet/Allergic Options', healthFilterOptions, selectedHealthFilters)}>
+              </Button>
+              <Button variant="outlined" color="secondary" onClick={() => openOptionsDialog('Select Diet/Allergic Options', healthFilterOptions, selectedHealthFilters)}>
               Select Diet/Allergic options
-            </Button>
-            <OptionsDialog
-              setOpenDialog={setOpenDialog}
-              open={openDialog}
-              title={dialogTitle}
-              options={dialogOptions}
-              selectedOptions={dialogSelectedOptions}
-              setSelectedMealTypes={setSelectedMealTypes}
-              setSelectedDishTypes={setSelectedDishTypes}
-              setSelectedCuisineTypes={setSelectedCuisineTypes}
-              setSelectedHealthFilters={setSelectedHealthFilters}
-            />
-          </Grid>
+              </Button>
+              <OptionsDialog
+                setOpenDialog={setOpenDialog}
+                open={openDialog}
+                title={dialogTitle}
+                options={dialogOptions}
+                selectedOptions={dialogSelectedOptions}
+                setSelectedMealTypes={setSelectedMealTypes}
+                setSelectedDishTypes={setSelectedDishTypes}
+                setSelectedCuisineTypes={setSelectedCuisineTypes}
+                setSelectedHealthFilters={setSelectedHealthFilters}
+              />
+            </Grid>
 
 
-          <Grid item>
-            <Button variant="contained" color="primary" type="submit">
-              {isEditing ? 'Update recipe' : 'Create recipe'}
-            </Button>
-          </Grid>
+            <Grid item sx={{ marginBottom: 4 }}>
+              <Button variant="contained" color="primary" type="submit">
+                {isEditing ? 'Update recipe' : 'Create recipe'}
+              </Button>
+            </Grid>
 
-        </form>
-      </Grid>
-      <WarningDialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)} user={user} />
-    </Container>
+          </form>
+        </Grid>
+        <WarningDialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)} user={user} />
+      </Container>
+    </div>
   )
 }
 

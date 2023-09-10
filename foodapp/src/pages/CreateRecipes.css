@@ -1,0 +1,25 @@
+.grid-item {
+  margin-bottom: 10px;
+}
+
+.container {
+  background-image: url('../../public/images/createRecipeBackround.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.create-recipe-page h1,
+.create-recipe-page h2,
+.create-recipe-page h3,
+.create-recipe-page h4,
+.create-recipe-page h5,
+.create-recipe-page h6 {
+  color: orange; /* Change the color of all typography elements */
+}
+
+.create-recipe-page input[type="text"],
+.create-recipe-page input[type="number"],
+.create-recipe-page textarea {
+  background-color: white;
+  color: black;
+}

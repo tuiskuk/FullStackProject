@@ -42,7 +42,7 @@ const Footer = () => {
             </Typography>
             <Link href="https://github.com/tuiskuk/FullStackProject" target="_blank" rel="noopener noreferrer" color="inherit">Project</Link>
             <Link href="https://github.com/Zantemann" target="_blank" rel="noopener noreferrer" color="inherit">Santeri Ora</Link>
-            <Link href="https://github.com/tuiskuk" target="_blank" rel="noopener noreferrer" color="inherit">Otso Tikkane</Link>
+            <Link href="https://github.com/tuiskuk" target="_blank" rel="noopener noreferrer" color="inherit">Otso Tikkanen</Link>
             <Link href="https://github.com/Potso12" target="_blank" rel="noopener noreferrer" color="inherit">Tuisku Kaikuvuo</Link>
           </Grid>
           <Grid item align="center" display="flex" flexDirection="column">
