@@ -4,7 +4,7 @@ import { Avatar ,Menu, IconButton, useMediaQuery, AppBar, Toolbar, Button, MenuI
 import { Link } from 'react-router-dom'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useState } from 'react'
-import LogOutDialog from './LogOutDialog'
+import LogOutDialog from '../dialogs/LogOutDialog'
 import { useSendLogoutMutation } from '../services/loginApiSlice'
 
 const NavigationBar = () => {
@@ -53,7 +53,7 @@ const NavigationBar = () => {
           <MenuItem component={Link} to="/profile">
             My Profile
           </MenuItem>
-          <MenuItem component={Link} to="/createRecipe">
+          <MenuItem component={Link} to="/CreateRecipe">
             Create recipe
           </MenuItem>
           {!user ? <MenuItem component={Link} to="/login">
@@ -100,7 +100,7 @@ const NavigationBar = () => {
             <Button
               color="inherit"
               component={Link}
-              to="/createRecipe"
+              to="/CreateRecipe"
               sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
             >
               <Typography variant="subtitle2">Create Recipe</Typography>
