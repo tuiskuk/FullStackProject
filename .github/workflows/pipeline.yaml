@@ -49,8 +49,8 @@ jobs:
           cd foodapp
           npm run lint
 
-        - name: build prod version for frontend
-          run: |
+      - name: build prod version for frontend
+        run: |
           cd foodapp
           npm run build
 
