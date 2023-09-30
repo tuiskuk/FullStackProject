@@ -41,7 +41,7 @@ jobs:
 
       - name: Install Frontend Dependencies
         run: |
-          cd frontend
+          cd foodapp
           npm install
 
       - name: Run Frontend Lint
