@@ -308,7 +308,7 @@ const CreateRecipePage = () => {
         console.log(response)
 
 
-        //reset everything and show success messgae to user
+        //reset everything
         reset()
         setIngredients([])
         setSelectedFiles([])

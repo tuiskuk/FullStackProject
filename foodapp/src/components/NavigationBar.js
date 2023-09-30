@@ -106,6 +106,16 @@ const NavigationBar = () => {
               <Typography variant="subtitle2">Create Recipe</Typography>
             </Button>
           )}
+          {user && (
+            <Button
+              color="inherit"
+              component={Link}
+              to="/profile"
+              sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
+            >
+              <Typography variant="subtitle2">My profile</Typography>
+            </Button>
+          )}
           <Grid style={{ marginLeft: 'auto' }}>
             <LoginNavigationBarItem user={user} logout={logout} />
           </Grid>
