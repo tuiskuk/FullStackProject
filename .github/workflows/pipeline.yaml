@@ -1,15 +1,5 @@
 name: Deployment pipeline
 
-on:
-  push:
-    branches:
-      - '*'
-  pull_request:
-    branches:
-      - '*'
-    types:
-      - synchronize
-
 
 on:
   push:
