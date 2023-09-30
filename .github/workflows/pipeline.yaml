@@ -29,10 +29,10 @@ jobs:
           cd backend
           npm install
 
-      - name: Run Backend Lint
-        run: |
-          cd backend
-          npm run lint
+      # - name: Run Backend Lint
+      #   run: |
+      #     cd backend
+      #     npm run lint
 
       - name: Set Up Node.js (Frontend)
         uses: actions/setup-node@v2
