@@ -46,7 +46,7 @@ jobs:
 
       - name: Run Frontend Lint
         run: |
-          cd frontend
+          cd foodapp
           npm run lint
         working-directory: ./frontend
 
