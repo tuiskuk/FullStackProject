@@ -28,13 +28,11 @@ jobs:
         run: |
           cd backend
           npm install
-        working-directory: ./backend
 
       - name: Run Backend Lint
         run: |
           cd backend
           npm run lint
-        working-directory: ./backend
 
       - name: Set Up Node.js (Frontend)
         uses: actions/setup-node@v2
