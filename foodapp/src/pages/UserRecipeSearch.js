@@ -46,7 +46,7 @@ const UserSearchPage = () => {
     const start = batchCounter * recipeBatch
     const end = start + recipeBatch
 
-    if (end >= allRecipesData.length) {
+    if (end >= allRecipesData?.length) {
       setShowLoadMore(false)
     }
     const nextBatch = allRecipesData.slice(start, end)
