@@ -26,7 +26,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'https://dishcovery.onrender.com',
   credentials: true,
 }
 

@@ -11,7 +11,7 @@ const confirmEmail = async (request, response, next) => {
     await User.findByIdAndUpdate(userId,
       { $set: { isEmailConfirmed: true } },
       { new: true })
-    response.redirect('http://localhost:3000/login')
+    response.redirect('https://dishcovery.onrender.com/login')
   } catch (error) {
     next(error)
   }
