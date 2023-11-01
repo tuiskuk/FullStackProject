@@ -40,7 +40,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
     }),
     getAllInteractions: builder.query({
       query: ({ recipeId }) => {
-        console.log(recipeId)
+
         return {
           url: '/interactions',
           params: { recipeId },
@@ -86,7 +86,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
     }),
     getAllUserCreatedInteractions: builder.query({
       query: ({ searchTerm,  filterOptionTerms, timeTerm, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms }) => {
-        console.log('searchTerm:', searchTerm, filterOptionTerms, timeTerm, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms)
+
         //const valuesToCheck = [searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms ]
         return {
           url: '/interactions/all/userCreated',
@@ -98,7 +98,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
     }),
     getAllSpecificUserCreatedRecipes: builder.query({
       query: ({ userId }) => {
-        console.log(userId)
+
         return {
           url: '/interactions/all/specificUserCreated',
           params: { userId }
@@ -108,7 +108,7 @@ export const interactionApiSlice = apiSlice.injectEndpoints({
     }),
     deleteSpecificUserCreatedRecipe: builder.mutation({
       query: ({ userId, recipeId }) => {
-        console.log(userId, recipeId)
+
         return {
           url: '/interactions/all/specificUserCreated',
           method: 'DELETE',

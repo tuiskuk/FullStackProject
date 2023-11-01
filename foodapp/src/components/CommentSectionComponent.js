@@ -29,11 +29,11 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
     }
 
     if (userComment.trim() !== '') {
-      console.log(interactionData)
+
       if(!interactionData) {
         try {
           await createInteraction({ recipeId, label, image })
-          console.log('create')
+
         } catch (error) {
           console.error('Failed to create interaction: ', error)
         }
@@ -59,7 +59,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
     const [ deleteComment ] = useDeleteCommentMutation()
 
     const CommentCard = ({ comment }) => {
-      console.log(comment)
+
       const formattedDate = formatFinnishDate(comment.createdAt)
       const [showReply, setShowReply] = useState(false)
       const [showEdit, setShowEdit] = useState(false)
@@ -80,7 +80,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
 
       const handleSubmitReply = async (commentId) => {
         try {
-          console.log('Reply:', reply)
+
           await addReply({ recipeId, commentId, userId, text: reply })
           setReply('')
           setShowReply(false)
@@ -91,7 +91,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
       }
 
       const handleLike = async (commentId) => {
-        console.log(commentId)
+
         if (!userId) {
           setOpenWarningDialog(true)
           return
@@ -125,7 +125,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
       }
 
       const handleDislike = async (commentId) => {
-        console.log(commentId)
+
         if (!userId) {
           setOpenWarningDialog(true)
           return
@@ -134,7 +134,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
         if(!interactionData){
           try {
             await createInteraction({ commentId })
-            console.log('create')
+
           } catch (error) {
             console.error('Failed to create interaction: ', error)
           }
@@ -183,7 +183,7 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
 
       const handleDelete = async (commentId) => {
         try {
-          console.log(userId)
+
           await deleteComment({ userId, commentId })
           refetch()
         } catch (error) {
@@ -293,11 +293,11 @@ const CommentSection = ({ recipeId, userId , interactionData, label, image }) =>
     }
 
     const renderReplies = (replies, level) => {
-      console.log(replies)
+
       return (
         <div className="reply-box">
           {replies.map((reply) => {
-            console.log(reply)
+
             return(
               <div key={reply._id} style={{ marginLeft: `${level * 20}px` }}>
                 <CommentCard comment={reply} />

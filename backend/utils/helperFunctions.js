@@ -12,10 +12,6 @@ export const sendUserConfirmationEmail = (email, user) => {
   } , config.EMAIL_SECRET , { expiresIn: '1d' } )
 
   const url = `http://localhost:3001/api/register/${emailToken}`
-  console.log(url)
-  console.log(config.MY_GMAIL)
-  console.log(config.MY_GMAIL_PASSWORD)
-  console.log(email)
 
 
   const transporter = nodemailer.createTransport({
@@ -68,7 +64,7 @@ export const imageDeleter = (user) => {
       }
     })
   }
-  console.log('old profile picture deleted')
+
 }
 
 export const recipePictureDeleter = (images) => {
@@ -82,7 +78,7 @@ export const recipePictureDeleter = (images) => {
     .map(image => '../' + image.replace('http://localhost:3001/', ''))
     .map(imagePathEnd => resolve(__dirname, imagePathEnd))
 
-  console.log(recipePicturesToDelete)
+
 
   let picturesDeletedCount = 0
   recipePicturesToDelete.forEach((recipePicturePath) => {
@@ -99,7 +95,7 @@ export const recipePictureDeleter = (images) => {
       })
     }
   })
-  console.log('loop for deleting recipe pictures executed')
+
 
 }
 

@@ -4,7 +4,7 @@ import axios from 'axios'
 
 //get recipes by params
 const getRecipes = async (request, response, next) => {
-  console.log('you are in getrecipes')
+
 
   try {
     const { search: searchTerm, calories, time, ingr, nutrients,
@@ -85,7 +85,7 @@ const getRecipes = async (request, response, next) => {
     }
 
     const url = `https://api.edamam.com/api/recipes/v2?${new URLSearchParams(params)}${filterString}${mealTypesString}${nutrientString}${excludedString}${cuisineString}${dishString}`.trim('')
-    console.log(url)
+
     const apiResponse = await axios.get(url)
 
     const recipes = apiResponse.data
@@ -118,7 +118,7 @@ const getRecipe = async (request, response, next) => {
     if (!foundRecipe || foundRecipe.creator !== null) {
       return response.status(404).json({ error: 'API Recipe not found' })
     }
-    console.log(foundRecipe)
+
     const recipeId = foundRecipe.recipeId
     const url = `https://api.edamam.com/api/recipes/v2/${recipeId}?type=public&app_id=${config.EDAMAM_ID}&app_key=${config.EDAMAM_APPLICATION_KEY}`
     const apiResponse = await axios.get(url)

@@ -5,12 +5,12 @@ const LogOutDialog = ({ open, onClose }) => {
   const [logout] = useSendLogoutMutation()
 
   const handleStayLoggedIn = async () => {
-    console.log('Stay logged in')
+
     onClose()
   }
 
   const handleLogOut = () => {
-    console.log('Log out')
+
 
     logout()
     onClose()

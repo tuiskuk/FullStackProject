@@ -177,10 +177,10 @@ const SearchPage = () => {
     setDishTypes(updatedDishes)
   }
   const handleOptionClick = (option) => {
-    console.log(option)
+
     setSelectedNutrient(option)
     setDialogOpen(true)
-    console.log(selectedNutrient)
+
   }
 
   return (

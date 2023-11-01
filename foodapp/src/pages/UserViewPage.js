@@ -20,7 +20,7 @@ const UserViewPage = () => {
   const { data: userCurrent, refetch: refetchCurrent } = useGetUserQuery(
     currentUserId , { skip: !currentUserId, refetchOnMountOrArgChange: true })
   const { data: targetUser, isLoading, refetch } = useGetUserQuery(id)
-  console.log(targetUser)
+
   const targetUserId = id
   const currentUserIsTarget = currentUserId === targetUserId ? true : false
   const [ follow, { isLoading: isFollowMutateLoading } ] = useFollowMutation()
@@ -51,11 +51,11 @@ const UserViewPage = () => {
       refetch() // Manually refetch the data after mutation is complete
       const updatedUser = await refetchCurrent().unwrap() // Get the updated user data
       dispatch(setUser({ user: updatedUser }))
-      console.log(updatedUser)
+
     }
   }
 
-  console.log(targetUser?.comments)
+
 
   const handleFollow = async() => {
     if(!currentUser) {

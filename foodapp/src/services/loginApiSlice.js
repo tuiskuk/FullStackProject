@@ -20,17 +20,15 @@ const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
   try {
 
     const response = await queryFulfilled
-    console.log(response.data)
+
     const { accessToken } = response.data
-    console.log(accessToken)
+
     dispatch(setAccessToken({ accessToken }))
 
     const { id, exp } = jwtDecode(accessToken)
-    const wholeToken = jwtDecode(accessToken)
-    console.log(wholeToken)
-    console.log(id)
+
     const user = await fetchUser(id)
-    console.log(user)
+
 
     if (!user) {
       console.log('User not found in the database.')
@@ -76,7 +74,7 @@ export const loginApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled
-          console.log('onquerystart')
+
           dispatch(logOut())
           setTimeout(() => {
             dispatch(apiSlice.util.resetApiState())

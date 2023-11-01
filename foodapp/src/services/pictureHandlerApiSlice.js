@@ -16,7 +16,7 @@ export const pictureApiSlice = apiSlice.injectEndpoints({
     }),
     uploadRecipePicture: builder.mutation({
       query: ({ files, id }) => {
-        console.log(files)
+
         const formData = new FormData()
         for (const file of files) {
           formData.append('recipePicture', file)

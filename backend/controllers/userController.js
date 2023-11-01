@@ -95,7 +95,7 @@ const createUser = async (request, response, next) => {
 
 
     const savedUser = await user.save()
-    console.log('user saved')
+
     sendUserConfirmationEmail(email, user)
 
     response.status(201).json(savedUser)

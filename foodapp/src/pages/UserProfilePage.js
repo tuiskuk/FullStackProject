@@ -63,13 +63,13 @@ const UserProfile = () => {
   const following = followingData?.following
   const { data: userData } = useGetUserQuery(
     userId, { skip: !userId, refetchOnMountOrArgChange: true })
-  console.log(userData)
+
   const { data: userCreatedRecipes } = useGetAllSpecificUserCreatedRecipesQuery({
     userId, // Pass the actual value here
   })
   const postCount = userCreatedRecipes?.length
   //TODO: dislikesData, LikesData, favoritesData, commentsData
-  console.log(userCreatedRecipes)
+
   const dispatch = useDispatch()
   const followingCount = following?.length
   const followersCount = followers?.length

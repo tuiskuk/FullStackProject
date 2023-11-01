@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Box, CircularProgress } from '@mui/material'
 import { useRefreshMutation, useSendLogoutMutation } from '../services/loginApiSlice'
@@ -11,7 +11,7 @@ const PersistedUserLogin = () => {
   const exp = useSelector(selectCurrentExpTime)
   const [ logout ] = useSendLogoutMutation()
 
-  console.log((exp*1000)-Date.now())
+
 
   useEffect(() => {
     const timeRemaining = (exp * 1000) - Date.now()
@@ -23,7 +23,7 @@ const PersistedUserLogin = () => {
     return () => clearTimeout(timeout)
   }, [exp])
 
-  const useEffectRan = useRef(false) // Flag for if the useEffect has already ran once. It runs twice in React.strictmode, which is used for development.
+
   const [refreshSuccess, setRefreshSuccess] = useState(false)
 
   const [refresh, {
@@ -34,8 +34,8 @@ const PersistedUserLogin = () => {
   }] = useRefreshMutation()
 
   useEffect(() => {
-    console.log('moro')
-    console.log(useEffectRan)
+
+
 
     // useEffect runs twice in development with Strict Mode. If effectRan.current === true,
     // it means the useEffect has already ran once, as we set it to true in the clean up function.

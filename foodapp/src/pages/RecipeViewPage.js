@@ -43,9 +43,7 @@ const RecipeViewPage = () => {
     { recipeId }, { skip: !recipeId, refetchOnMountOrArgChange: true })
 
 
-  console.log(interactionData)
-  console.log(recipe)
-  console.log(interactionData)
+
 
   if(isScreenSmall){
     return (
@@ -111,7 +109,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
   const { data: favoriteData, refetch } = useGetAllFavoritesQuery(
     { userId }, { skip: !userId, refetchOnMountOrArgChange: true })
 
-  console.log(favoriteData)
+
 
   const creatorNameParts = recipe?.creator?.name
   const creatorFirstName = creatorNameParts && creatorNameParts[0]
@@ -135,7 +133,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
   }
 
   const handleLike = async () => {
-    console.log(recipeId)
+
     if(!user) {
       setShowWarningDialog(true)
       return
@@ -147,7 +145,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
     if(!interactionData){
       try {
         await createInteraction({ recipeId, label, image })
-        console.log('create')
+
       } catch (error) {
         setDisableIconButton(false)
         console.error('Failed to create interaction: ', error)
@@ -185,7 +183,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
   }
 
   const handleDislike = async () => {
-    console.log(recipeId)
+
     if(!user) {
       setShowWarningDialog(true)
       return
@@ -196,7 +194,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
     if(!interactionData){
       try {
         await createInteraction({ recipeId, label, image })
-        console.log('create')
+
       } catch (error) {
         setDisableIconButton(false)
         console.error('Failed to create interaction: ', error)
@@ -234,7 +232,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
   }
 
   const handleFavorite = async () => {
-    console.log(recipeId)
+
     if(!user) {
       setShowWarningDialog(true)
       return
@@ -246,7 +244,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
       if(!interactionData){
         try {
           await createInteraction({ recipeId, label, image })
-          console.log('create')
+
         } catch (error) {
           setDisableIconButton(false)
           console.error('Failed to create interaction: ', error)
@@ -274,7 +272,7 @@ const RecipeGrid = ({ recipe, interactionData ,user ,recipeId, setShowWarningDia
     setDisableIconButton(false)
   }
 
-  console.log(recipe)
+
 
   return(
     <Grid item xs={ isScreenSmall ? 12 : 6 } >
@@ -468,7 +466,7 @@ const InfoGrid = ({ recipe, isScreenSmall, setShowRecipeGrid }) => {
     }
 
     const fraction = new Fraction(value)
-    console.log(fraction)
+
     return fraction.toFraction(true)
   }
 

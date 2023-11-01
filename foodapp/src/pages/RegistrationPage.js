@@ -58,7 +58,7 @@ const RegistrationForm = () => {
   const [selectedFile, setSelectedFile] = useState(null)
 
   useEffect(() => {
-    console.log(selectedFile)
+
     // Do something with the profilePictureValue
   }, [selectedFile])
 
@@ -66,12 +66,10 @@ const RegistrationForm = () => {
 
     if (Object.keys(errors).length === 0) {
       try {
-        console.log(submitData)
         const response = await createUser(submitData).unwrap()
         const id = response.id
 
         if (selectedFile && id) {
-          console.log({ file: selectedFile, id })
           await uploadProfilePicture({ file: selectedFile, id }).unwrap()
         }
 
@@ -81,7 +79,7 @@ const RegistrationForm = () => {
         console.error('Failed to create user or upload profile picture: ', err)
       }
     }
-    console.log('Form submitted:', submitData)
+
   }
 
   const handleBlur = (field) => {

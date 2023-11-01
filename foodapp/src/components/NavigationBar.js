@@ -22,7 +22,7 @@ const NavigationBar = () => {
     setAnchorEl(null)
   }
 
-  console.log(user)
+
 
 
   if(isScreenSmall){
@@ -139,7 +139,7 @@ const LoginNavigationBarItem = ({ user }) => {
   const handleMenuClose = () => {
     setAnchorEl(null)
   }
-  console.log(user)
+
   if(user){
     return(
       <>

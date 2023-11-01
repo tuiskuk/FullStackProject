@@ -23,6 +23,7 @@ const CreateRecipePage = () => {
   const pathName = location.pathname
   const isEditing = pathName === '/editRecipe' ? true : false
   const isScreenSmall = useMediaQuery('(max-width: 800px)')
+  console.log(recipe)
 
 
 
@@ -67,7 +68,7 @@ const CreateRecipePage = () => {
   const [ uploadRecipePicture ] = useUploadRecipePictureMutation()
   const [ updateInteraction ] = useUpdateInteractionMutation()
 
-  console.log(isEditing)
+
 
 
 
@@ -81,14 +82,12 @@ const CreateRecipePage = () => {
 
   useEffect(() => {
     if (isEditing) {
-      console.log('isEditing is true')
+
       const recipeData = sessionStorage.getItem('recipe')
       const parsedRecipe = JSON.parse(recipeData)
       if(!parsedRecipe) navigate('/')
       if (parsedRecipe && parsedRecipe.creator) {
-        console.log(parsedRecipe.creator)
-        console.log('parcing recipe')
-        console.log(parsedRecipe)
+
         setValue('label', parsedRecipe.label)
         setValue('instructions', parsedRecipe.instructions)
         setValue('recipeYield', parsedRecipe.yield)
@@ -119,14 +118,13 @@ const CreateRecipePage = () => {
 
         // Update selectedFiles state with imageFiles
         setImageIndex(imageUrls.length > 0 ? imageUrls.length - 1 : -1)
-        console.log('selectedFiles:', selectedFiles)
-        console.log('imageIndex:', imageIndex)
+
 
       }
     }
     else {
       // Reset the form values when navigating from edit to create
-      console.log('else block')
+
       setIngredients([])
       setSelectedFiles([])
       setSelectedMealTypes([])
@@ -142,9 +140,9 @@ const CreateRecipePage = () => {
     setRecipe({})
   }, [isEditing, location.pathname, reset])
 
-  console.log(control)
 
-  console.log(selectedFiles, selectedCuisineTypes)
+
+
 
   const handleBlur = (field) => {
     trigger(field.name)
@@ -187,20 +185,19 @@ const CreateRecipePage = () => {
   //function to add files to selectedFiles property
   const handleFileChange = (event) => {
     const file = event.target.files[0]
-    console.log(file)
+
     if (file) {
       setImageIndex(prevIndex => prevIndex + 1) //this is why imageIdexes initial state is -1
       setSelectedFiles((prevFiles) => [...prevFiles, file])
     }
-    console.log(imageIndex,selectedFiles)
+
   }
-  console.log(selectedFiles)
-  console.log(imageIndex)
+
 
   //function to add ingredient
   const handleAddIngredient = () => {
     if (!measureAmount || !measure || !ingredientName) {
-      console.log('if entered')
+
       showSnackbar('All ingredients must have a name, a measure and a specified amount of an ingredient','error')
       return
     }
@@ -240,8 +237,7 @@ const CreateRecipePage = () => {
     setDialogOptions(options)
     setDialogSelectedOptions(selectedOptions)
     setOpenDialog(true)
-    console.log(dialogOptions)
-    console.log(dialogSelectedOptions)
+
   }
 
   //function ot handle creating recipe
@@ -250,7 +246,7 @@ const CreateRecipePage = () => {
       setShowWarningDialog(true)
       return
     }
-    console.log('submit')
+
 
     if (selectedFiles.length === 0) {
       showSnackbar('Recipe must have at least one picture','error')
@@ -261,8 +257,7 @@ const CreateRecipePage = () => {
     }
 
     const updateOperation = isEditing
-    console.log(updateOperation)
-    console.log(recipe.recipeId)
+
 
     try {
       if (Object.keys(errors).length === 0) {
@@ -284,21 +279,21 @@ const CreateRecipePage = () => {
           totalTime: parseInt(totalTime)
         }
 
-        console.log(interactionData)
+
 
         let response
         if (updateOperation) {
           // Update the existing recipe
-          console.log('update operation')
+
           interactionData.recipeId = recipeId
           response = await updateInteraction(interactionData)// You need to implement updateInteraction function
-          console.log(response)
+
           const imageResponse = await uploadRecipePicture({ files: selectedFiles, id: response?.data?.id })
           console.log('recipes pictures uploaded and added to recipes image property,', imageResponse?.data?.recipeImages)
           showSnackbar('Recipe updated','success')
         } else {
           // Create a new recipe
-          console.log('create recipe')
+
           response = await createInteraction(interactionData)
           const imageResponse = await uploadRecipePicture({ files: selectedFiles, id: response?.data?.savedRecipe?.id })
           console.log('recipes pictures uploaded and added to recipes image property,', imageResponse?.data?.recipeImages)
@@ -306,7 +301,7 @@ const CreateRecipePage = () => {
           showSnackbar('Recipe created','success')
         }
 
-        console.log(response)
+
 
 
         //reset everything
@@ -326,14 +321,15 @@ const CreateRecipePage = () => {
     }
   }
 
-  console.log(selectedFiles[imageIndex])
+
 
 
 
 
   return (
     <div className='create-recipe-page'>
-      <Container maxWidth="md" className="container">
+      <Container maxWidth="md" className="container" >
+
         <Grid
           container
           direction="column"

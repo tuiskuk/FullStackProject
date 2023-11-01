@@ -43,7 +43,7 @@ const login = async (request, response) => {
       sameSite: 'None' // The cookie is cross-site
     })
 
-    console.log({ accessToken, user })
+
 
     response.status(200).json({ accessToken, user })
   } catch (error) {
@@ -64,7 +64,7 @@ const getRefreshToken = async (request, response) => {
 
   const refreshToken = request.cookies.token
 
-  console.log(refreshToken)
+
 
   // Verify the validity of the Refresh Token, if there is one
 

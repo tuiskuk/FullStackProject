@@ -4,7 +4,7 @@ export const followApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     follow: builder.mutation({
       query: ({ currentUserId, targetUserId  }) => {
-        console.log(currentUserId, targetUserId)
+
         return ({
           url: '/users/follow',
           method: 'POST',
@@ -24,7 +24,7 @@ export const followApiSlice = apiSlice.injectEndpoints({
     }),
     getAllFollowing: builder.query({
       query: ({ userId }) => {
-        console.log(userId)
+
         return {
           url: '/users/follow/following',
           params: { userId },
@@ -35,7 +35,7 @@ export const followApiSlice = apiSlice.injectEndpoints({
     }),
     getAllFollowers: builder.query({
       query: ({ userId }) => {
-        console.log(userId)
+
         return {
           url: '/users/follow/followers',
           params: { userId },

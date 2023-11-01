@@ -31,7 +31,7 @@ const OptionsDialog = ({
 
 
   const handleCheckboxChange = (value) => {
-    console.log('entered')
+
     if (checkedOptions?.includes(value)) {
       const updatedOptions = checkedOptions?.filter((item) => item !== value)
       setCheckedOptions(updatedOptions)

@@ -26,7 +26,7 @@ const RangeInputComponent = ({ value, nameBackend, nameUser, unit, onChange, cle
   }, [minValue, maxValue, update])
 
   useEffect(() => {
-    console.log(minValue, maxValue)
+
     if(updateUi && edited) {
       handleParse()
     }

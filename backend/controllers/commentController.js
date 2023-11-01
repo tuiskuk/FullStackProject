@@ -16,7 +16,7 @@ const addComment = async (request, response, next) => {
       Recipe.findOne({ recipeId }),
     ])
 
-    console.log(recipe)
+
 
     if (!currentUser) {
       return response.status(404).json({ error: 'User not found' })
@@ -61,7 +61,7 @@ const deleteComment = async (request, response, next) => {
 
     const userIdObject = new mongoose.Types.ObjectId(userId)
     const user = await User.findById(userIdObject)
-    console.log(user)
+
 
     if (!comment.user.equals(userIdObject)) {
       return response.status(403).json({ error: 'Deleting comment is not allowed' })
@@ -99,7 +99,7 @@ const deleteComment = async (request, response, next) => {
         )
 
         // Remove the comment from user's comments array
-        console.log(user.comments)
+
         user.comments = user.comments.filter((comm) => !comm.equals(commentId))
 
         await user.save()
@@ -187,7 +187,7 @@ const addReply = async (request, response, next) => {
       User.findById(userIdObject),
       Comment.findById(commentId),
     ])
-    console.log(parentComment)
+
 
     if (!parentComment) {
       return response.status(404).json({ error: 'Parent comment not found' })

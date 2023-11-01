@@ -15,11 +15,11 @@ const ExpirationWarningDialog = ({ loggedOut, open, onClose }) => {
   const [showWarningDialog, setShowWarningDialog] = useState(false)
 
   const handleStayLoggedIn = async () => {
-    console.log('Stay logged in')
+
 
     try {
       const response = await refresh()
-      console.log(response)
+
       const newAccessToken = response.data.accessToken
 
       // Save the new access token to the Redux store

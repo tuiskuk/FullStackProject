@@ -28,7 +28,7 @@ const baseQueryWithRefreshToken = async(args, api, extraOptions) => {
     // Attempt to acquire a new accessToken using our httpOnly RefreshToken.
     const refreshResponse = await baseQueryWithAccessToken('/login/refresh', api, extraOptions)
 
-    console.log(refreshResponse)
+
 
     // If we get data back, our refresh token is valid and the data
     // should contain the new accessToken.
@@ -69,7 +69,6 @@ export const apiSlice = createApi({
   endpoints: builder => ({
     getAllRecipes: builder.query({
       query: ({ searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms }) => {
-        console.log('searchTerm:', searchTerm, filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms)
         const valuesToCheck = [searchTerm,  filterOptionTerms, timeTerm, caloriesTerm, nutrientInputsTerms, ingridientsNumberTerm, mealTypeOptionTerms, excludedChipArrayTerms, cuisineTypeTerms, dishTypeTerms ]
 
         const hasNonEmptyValue = valuesToCheck.some(value => {
@@ -87,7 +86,7 @@ export const apiSlice = createApi({
         if(!hasNonEmptyValue) {
           searchTerm = 'recommended'
         }
-        console.log(hasNonEmptyValue)
+
         return {
           url: '/recipes',
           params: { search: searchTerm, healthFilters: filterOptionTerms, time: timeTerm, calories: caloriesTerm, nutrients: JSON.stringify(nutrientInputsTerms),

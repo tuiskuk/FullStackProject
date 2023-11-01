@@ -4,7 +4,7 @@ import RangeInputComponent from '../components/RangeInputComponent'
 
 const NutrientDialog = ({ open, onClose, nutrient, nutrientInputs, handleNutrientInputChange, clear }) => {
   const [update, setUpdate] = useState(false)
-  console.log(nutrient)
+
 
   useEffect(() => {
     if (update && open) {

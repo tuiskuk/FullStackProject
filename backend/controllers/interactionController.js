@@ -11,7 +11,7 @@ const createInteraction = async (request, response, next) => {
       dishType, cuisineType, healthLabels
     }  = request.body
 
-    console.log(recipeId)
+
 
     //Check that recipe do not already exist
     const searchRecipe = await Recipe.findOne({ recipeId })
@@ -45,7 +45,7 @@ const addLikeInteraction = async (request, response, next) => {
       User.findById(userIdObject),
       Recipe.findOne({ recipeId }),
     ])
-    console.log(recipe)
+
 
     if (!currentUser) {
       return response.status(404).json({ error: 'UserId not found' })
@@ -223,7 +223,7 @@ const getAllUserCreatedInteractions = async (request, response, next) => {
       healthFilters = [], mealTypeOptions = [], excludedFilters = [],
       cuisineTypeOptions = [], dishOptions = []  } = request.query
 
-    console.log( searchTerm, time, ingr, healthFilters, cuisineTypeOptions, mealTypeOptions, excludedFilters, cuisineTypeOptions, dishOptions)
+
 
     //only user created recipes
     let conditions = [{ creator: { $ne: null } }]
@@ -312,7 +312,7 @@ const getAllUserCreatedInteractions = async (request, response, next) => {
     }
 
     // Filter out recipes based on excluded filters
-    console.log(excludedFilters, typeof(excludedFilters))
+
     if (excludedFilters) {
       const excludedFiltersRegex = excludedFilters.split(',').map(filter => new RegExp(filter.trim(), 'i'))
 
@@ -335,16 +335,16 @@ const getAllUserCreatedInteractions = async (request, response, next) => {
       })
     }
 
-    console.log(conditions)
+
     const recipes = await Recipe.find({ $and: conditions }).populate('creator')
-    console.log(recipes)
+
     // If no recipes found, return empty
     if (!recipes) {
       return response.status(204).json()
     }
 
     response.status(200).json(recipes)
-    console.log('success')
+
   } catch (error) {
     next(error)
   }
@@ -353,7 +353,7 @@ const getAllUserCreatedInteractions = async (request, response, next) => {
 const getAllSpecificUserCreatedRecipes = async (request, response, next) => {
   try {
     const { userId } = request.query
-    console.log(userId)
+
     const recipes = await Recipe.find({ creator: userId }).populate('creator')
     // If no recipes found, return empty
     if (!recipes) {
@@ -379,7 +379,7 @@ const deleteSpecificUserCreatedRecipe = async (request, response, next) => {
     //delete recipe and its pictures from image folder
     recipePictureDeleter(recipeTodelete?.images)
     await recipeTodelete.deleteOne()
-    console.log('recipe deleted')
+
 
     response.status(200).json({ message: 'Recipe deleted successfully' })
   } catch (error) {
@@ -389,7 +389,7 @@ const deleteSpecificUserCreatedRecipe = async (request, response, next) => {
 
 const updateSpecificUserCreatedRecipe = async (request, response, next) => {
   const { recipeId, ...updateFields } = request.body // Assuming recipeId is passed as a URL parameter
-  console.log('inside update', updateFields)
+
 
   try {
     // Check if the recipe exists

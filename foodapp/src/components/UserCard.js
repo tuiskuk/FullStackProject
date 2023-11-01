@@ -83,7 +83,7 @@ const UserCard = ({ user }) => {
     if (targetUser && isFollowing && !isUnfollowMutateLoading && !isUnfollowMutateFetching) {
       const res = await unfollow({ currentUserId, targetUserId }).unwrap()
       dispatch(setUser({ user: res }))
-      console.log(currentUser)
+
     }
   }
 
@@ -97,7 +97,7 @@ const UserCard = ({ user }) => {
     if (targetUser && !isFollowing && !isFollowMutateLoading && !isFollowMutateFetching) {
       const res = await follow({ currentUserId, targetUserId }).unwrap()
       dispatch(setUser({ user: res }))
-      console.log(currentUser)
+
 
     }
 

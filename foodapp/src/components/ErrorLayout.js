@@ -15,12 +15,12 @@ const ErrorLayout = ({ children }) => {
   const thresholdTime = 10 * 60 * 1000
 
   useEffect(() => {
-    console.log(exp)
-    console.log(user)
+
+
     if (exp) {
       const timeRemaining = (exp * 1000) - Date.now()
       if (timeRemaining <= thresholdTime) {
-        console.log('Warning')
+
         setLogOut(false)
         setShowWarning(true)
       } else {
@@ -35,7 +35,7 @@ const ErrorLayout = ({ children }) => {
       if(showWarning) {
         setLogOut(true)
         setShowWarning(true)
-        console.log('Expiration time has passed.')
+
       }
     }
   }, [exp])
