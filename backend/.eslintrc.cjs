@@ -15,16 +15,15 @@ module.exports = {
     'object-curly-spacing': [
       'error', 'always'
     ],
+    'linebreak-style': [
+      'error', (process.platform === 'win32' ? 'windows' : 'unix')
+    ], // https://stackoverflow.com/q/39114446/2771889 otherwise did't get throught in pipeline
     'arrow-spacing': [
       'error', { 'before': true, 'after': true }
     ],
     'indent': [
       'error',
       2
-    ],
-    'linebreak-style': [
-      'error',
-      'windows'
     ],
     'quotes': [
       'error',

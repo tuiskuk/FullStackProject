@@ -21,6 +21,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import Fraction from 'fraction.js'
+//import { useGetRecipeQuery } from '../services/apiSlice'
 import InstructionsSection from '../components/InstructionsSection'
 
 const RecipeViewPage = () => {
@@ -460,12 +461,19 @@ const InfoGrid = ({ recipe, isScreenSmall, setShowRecipeGrid }) => {
   }
 
   const convertToFraction = (value) => {
+    // Check if the value is an integer
+    if (Number.isInteger(value)) {
+      // If it's an integer, return it as a string
+      return value.toString()
+    }
+
     const fraction = new Fraction(value)
+    console.log(fraction)
     return fraction.toFraction(true)
   }
 
   const handleMultiply = (value) => {
-    return ((value/recipe?.yield) * multiplier)
+    return ((value) * multiplier)
   }
 
   const roundValue = (value) => {
@@ -554,9 +562,9 @@ const InfoGrid = ({ recipe, isScreenSmall, setShowRecipeGrid }) => {
               variant="body1"
               sx={{ marginBottom: '8px' }}
             >
-              {`${convertToFraction(
+              {ingredient.quantity ? `${convertToFraction(
                 handleMultiply(ingredient.quantity)
-              )} ${ingredient.text.replace(pattern, '')}`}
+              )} ` : ''}{ingredient.text.replace(pattern, '')}
             </Typography>
           ))}
           {recipe.totalWeight && (<Typography
@@ -567,7 +575,7 @@ const InfoGrid = ({ recipe, isScreenSmall, setShowRecipeGrid }) => {
               fontWeight: 'bold', // Make the "Total weight" text bold
             }}
           >
-            Total weight {roundValue(handleMultiply(recipe.totalWeight))} grams
+            Total weight: {roundValue(handleMultiply(recipe.totalWeight))} grams
           </Typography>)}
           <IconButton
             sx={{

@@ -17,6 +17,10 @@ const commentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  label: {
+    type: String,
+    default: 'No label'
+  },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,

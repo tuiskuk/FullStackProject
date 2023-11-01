@@ -430,7 +430,7 @@ const UserSearchPage = () => {
         <FormControl sx={{ m: 0.5, minWidth: 200 }}>
           <RangeInputComponent
             value={ingridientsNumber || ''}
-            nameUser={'Number of incridients'}
+            nameUser={'Number of ingredients'}
             unit={'pcs'}
             onChange={setIngridientsNumber}
             clear={clear}

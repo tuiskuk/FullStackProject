@@ -22,7 +22,7 @@ import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSl
 import { setUser } from '../services/loginSlice'
 
 import { useGetAllFollowingQuery, useGetAllFollowersQuery } from '../services/followSlice'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import RecipeCard from '../components/RecipeCard'
 import UserListItem from '../components/userListItem'
 import formatFinnishDate from '../helpers/formatFinnishDate'
@@ -384,25 +384,23 @@ const UserProfile = () => {
                 <Grid container spacing={2}>
                   <Grid item>
                     <Avatar
-                      src={user.profileImage || `https://eu.ui-avatars.com/api/?name=${user.username}&size=200`}
-                      alt={user.name}
+                      src={user?.profileImage || `https://eu.ui-avatars.com/api/?name=${user?.username}&size=200`}
+                      alt={user?.name}
                     />
                   </Grid>
                   <Grid item>
                     <Typography variant="body1" fontWeight="bold">
-                      {user.name}
+                      {user?.name}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      {formatFinnishDate(comment.createdAt)}
+                      {formatFinnishDate(comment?.createdAt)}
                     </Typography>
                     <Typography variant="body1">
-                      {comment.text}
+                      {comment?.text}
                     </Typography>
-                    <Link to={`/recipes/${comment.recipeId}`} style={{ textDecoration: 'none', color: 'gray' }}>
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        Check out this recipe
-                      </Typography>
-                    </Link>
+                    <Typography variant="body2" sx={{ mt: 1 }} color="textSecondary">
+                        Commented in {comment?.label}
+                    </Typography>
                   </Grid>
                 </Grid>
               </CardContent>

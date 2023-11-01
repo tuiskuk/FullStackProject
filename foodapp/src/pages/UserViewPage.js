@@ -9,7 +9,6 @@ import RecipeCard from '../components/RecipeCard'
 import UserListItem from '../components/userListItem'
 import WarningDialog from '../dialogs/WarningDialog'
 import formatFinnishDate from '../helpers/formatFinnishDate'
-import { Link } from 'react-router-dom'
 import { useGetAllSpecificUserCreatedRecipesQuery } from '../services/interactionSlice'
 
 const UserViewPage = () => {
@@ -288,11 +287,9 @@ const UserViewPage = () => {
                     <Typography variant="body1">
                       {comment.text}
                     </Typography>
-                    <Link to={`/recipes/${comment.recipeId}`} style={{ textDecoration: 'none', color: 'gray' }}>
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        Check out this recipe
-                      </Typography>
-                    </Link>
+                    <Typography variant="body2" sx={{ mt: 1 }} color="textSecondary">
+                        Commented in {comment?.label}
+                    </Typography>
                   </Grid>
                 </Grid>
               </CardContent>

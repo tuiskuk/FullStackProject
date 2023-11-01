@@ -74,10 +74,12 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
 
   //inside useEffect to make sure that dataFromApi and recipe are defined
   useEffect(() => {
+    console.log(recipe)
     try {
       //modify recipe only if it is not created by user
       //and does not contain api information
       if(!recipe?.creator && !recipe?.url){
+        console.log('no creator, no url')
         //we need to make sure that properties instruktions, totalTime
         //and so on will be set in sessionStorage and in recipeViewPages state
         recipe = dataFromApi?.recipe
@@ -108,6 +110,10 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
       console.log('Error saving recipe:', error)
     }
   }
+
+
+  console.log(recipe)
+  console.log(displayedRecipe)
 
   return (
     <div

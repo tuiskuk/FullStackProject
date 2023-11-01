@@ -70,3 +70,38 @@ export const imageDeleter = (user) => {
   }
   console.log('old profile picture deleted')
 }
+
+export const recipePictureDeleter = (images) => {
+  /*little manipulation to avoid harcoded path to images folder
+  in order to make it possible for everybody to use this*/
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = dirname(__filename)
+
+  //array of recipes to be deleted
+  const recipePicturesToDelete = images
+    .map(image => '../' + image.replace('http://localhost:3001/', ''))
+    .map(imagePathEnd => resolve(__dirname, imagePathEnd))
+
+  console.log(recipePicturesToDelete)
+
+  let picturesDeletedCount = 0
+  recipePicturesToDelete.forEach((recipePicturePath) => {
+    if(fs.existsSync(recipePicturePath)) {
+      fs.unlink(recipePicturePath, (err) => {
+        if (err) {
+          console.log('error deleting recipepicture')
+        } else {
+          picturesDeletedCount++
+          if (picturesDeletedCount === recipePicturesToDelete.length) {
+            console.log('All recipe pictures deleted')
+          }
+        }
+      })
+    }
+  })
+  console.log('loop for deleting recipe pictures executed')
+
+}
+
+
+

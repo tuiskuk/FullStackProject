@@ -1,6 +1,6 @@
 import { User } from '../models/user.js'
 import { Recipe } from '../models/recipe.js'
-import { imageDeleter } from '../utils/helperFunctions.js'
+import { imageDeleter, recipePictureDeleter } from '../utils/helperFunctions.js'
 
 
 const uploadProfilePicture = async (request, response, next) => {
@@ -54,6 +54,8 @@ const uploadRecipePicture = async (request, response, next) => {
       const filename = file.filename.split('/').pop()
       return 'http://localhost:3001/images/recipePictures/' + filename
     })
+
+    recipePictureDeleter(recipe.images)
 
     // Replace the existing images with the new unique images
     recipe.images = newImagePaths

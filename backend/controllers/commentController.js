@@ -16,6 +16,8 @@ const addComment = async (request, response, next) => {
       Recipe.findOne({ recipeId }),
     ])
 
+    console.log(recipe)
+
     if (!currentUser) {
       return response.status(404).json({ error: 'User not found' })
     }
@@ -28,7 +30,8 @@ const addComment = async (request, response, next) => {
     const newComment = new Comment({
       user: userIdObject,
       text,
-      recipeId
+      recipeId,
+      label: recipe?.label
     })
     await newComment.save()
 
@@ -184,6 +187,7 @@ const addReply = async (request, response, next) => {
       User.findById(userIdObject),
       Comment.findById(commentId),
     ])
+    console.log(parentComment)
 
     if (!parentComment) {
       return response.status(404).json({ error: 'Parent comment not found' })
@@ -198,6 +202,7 @@ const addReply = async (request, response, next) => {
       user: userId,
       recipeId,
       text,
+      label: parentComment?.label
     })
     await newReply.save()
 

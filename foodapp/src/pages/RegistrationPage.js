@@ -136,7 +136,7 @@ const RegistrationForm = () => {
           <form encType="multipart/form-data" onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Typography variant="h4" align="center">
+                <Typography variant="h4" align="center" sx={{ marginTop: '12px' }}>
               Register and experience all we can offer!
                 </Typography>
               </Grid>
@@ -277,7 +277,7 @@ const RegistrationForm = () => {
                 />
               </Grid>
               <Grid item xs={12} style={{ marginBottom: '24px' }}>
-                <Typography variant="h6">Profile Picture</Typography>
+                <Typography variant="h6" style={{ marginBottom: '12px' }}>Profile Picture</Typography>
                 <Input
                   type="file"
                   name="profilePicture"

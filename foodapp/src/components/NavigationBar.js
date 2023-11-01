@@ -4,7 +4,7 @@ import { Avatar ,Menu, IconButton, useMediaQuery, AppBar, Toolbar, Button, MenuI
 import { Link } from 'react-router-dom'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useState } from 'react'
-import LogOutDialog from './LogOutDialog'
+import LogOutDialog from '../dialogs/LogOutDialog'
 import { useSendLogoutMutation } from '../services/loginApiSlice'
 
 const NavigationBar = () => {
@@ -48,12 +48,12 @@ const NavigationBar = () => {
             Discover users
           </MenuItem>
           <MenuItem component={Link} to="/userRecipesearch">
-            Recipes by other users
+            Recipes by users
           </MenuItem>
           <MenuItem component={Link} to="/profile">
             My Profile
           </MenuItem>
-          <MenuItem component={Link} to="/createRecipe">
+          <MenuItem component={Link} to="/CreateRecipe">
             Create recipe
           </MenuItem>
           {!user ? <MenuItem component={Link} to="/login">
@@ -86,7 +86,7 @@ const NavigationBar = () => {
             to="/userRecipesearch"
             sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
           >
-            <Typography variant="subtitle2">Recipes by Other Users</Typography>
+            <Typography variant="subtitle2">Recipes by Users</Typography>
           </Button>
           <Button
             color="inherit"
@@ -100,10 +100,20 @@ const NavigationBar = () => {
             <Button
               color="inherit"
               component={Link}
-              to="/createRecipe"
+              to="/CreateRecipe"
               sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
             >
               <Typography variant="subtitle2">Create Recipe</Typography>
+            </Button>
+          )}
+          {user && (
+            <Button
+              color="inherit"
+              component={Link}
+              to="/profile"
+              sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
+            >
+              <Typography variant="subtitle2">My Profile</Typography>
             </Button>
           )}
           <Grid style={{ marginLeft: 'auto' }}>
@@ -146,7 +156,7 @@ const LoginNavigationBarItem = ({ user }) => {
             My Profile
           </MenuItem>
           <MenuItem onClick={() => setShowLogOutDialog(true)} >
-            log out
+            Log out
           </MenuItem>
         </Menu>
         <LogOutDialog open={showLogOutDialog} onClose={() => setShowLogOutDialog(false)}/>

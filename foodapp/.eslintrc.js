@@ -24,8 +24,8 @@ module.exports = {
           2  
       ],
       "linebreak-style": [
-        "error", "windows"
-        ],
+        "error", (process.platform === "win32" ? "windows" : "unix")
+      ], // https://stackoverflow.com/q/39114446/2771889 otherwise did't get throught in pipeline
       "quotes": [
           "error",
           "single"

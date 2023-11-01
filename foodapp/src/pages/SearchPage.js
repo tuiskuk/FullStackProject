@@ -495,7 +495,7 @@ const SearchPage = () => {
                 </li>
               )}
               renderInput={(params) => (
-                <TextField {...params} placeholder="Filter spesific nutrient" />
+                <TextField {...params} placeholder="Filter specific nutrient" />
               )}
             />
           </Toolbar>
@@ -528,7 +528,7 @@ const SearchPage = () => {
         <FormControl sx={{ m: 0.5, minWidth: 200 }}>
           <RangeInputComponent
             value={ingridientsNumber || ''}
-            nameUser={'Number of incridients'}
+            nameUser={'Number of ingredients'}
             unit={'pcs'}
             onChange={setIngridientsNumber}
             clear={clear}

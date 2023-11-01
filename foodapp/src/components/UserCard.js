@@ -58,7 +58,6 @@ const UserCard = ({ user }) => {
   const currentUserIsTarget = currentUserId === targetUserId ? true : false
   const { data: targetUser, refetch: refetchTarget, isSuccess: targetUserSuccess } = useGetUserQuery(targetUserId)
   const isFollowing = Boolean(currentUser?.following.includes(targetUserId))
-  console.log(isFollowing)
   const [follow, { isLoading: isFollowMutateLoading, isFetching: isFollowMutateFetching }] = useFollowMutation({
     onSuccess: (response) => {
       dispatch(setUser({ user: response }))
@@ -87,7 +86,6 @@ const UserCard = ({ user }) => {
       console.log(currentUser)
     }
   }
-  console.log(isFollowing)
 
   const handleFollow = async (event) => {
     event.preventDefault()
