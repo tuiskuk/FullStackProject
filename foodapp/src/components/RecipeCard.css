@@ -1,0 +1,76 @@
+.recipe-label {
+  position: relative;
+  display: inline-block; /* Ensures the wrapper only takes the width of the text */
+}
+
+.recipe-label::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(139, 69, 19, 0.7); /* Rustic underline color */
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s;
+}
+
+.recipe-label:hover::before {
+  transform: scaleX(1);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.tag {
+  background-color: #FFA726; /* Customize the background color */
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+  color: #000000; /* Customize the text color */
+}
+
+.card-wrapper {
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2); /* Adjust the opacity and color as needed */
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Allow clicks to reach the card content */
+}
+
+.likes-comments {
+  /* Style for likes and comments count */
+  margin-bottom: 8px;
+  margin: 8px;
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+.likes-comments .likes,
+.likes-comments .comments {
+  margin: 0 8px; /* Adjust the margin as needed */
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.likes-comments svg {
+  margin-right: 4px;
+  font-size: 25px; /* Adjust the icon size */
+}
