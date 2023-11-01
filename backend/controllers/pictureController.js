@@ -7,7 +7,7 @@ const uploadProfilePicture = async (request, response, next) => {
 
 
   const { userId } = request.params
-  const imagePath =  'https://dishcovery-api.onrender.com/images/profilePictures/' + request?.file?.filename
+  const imagePath =  'https://dishcovery-api-tzpe.onrender.com/images/profilePictures/' + request?.file?.filename
 
 
   try {
@@ -52,7 +52,7 @@ const uploadRecipePicture = async (request, response, next) => {
 
     const newImagePaths = uniqueUploadedFiles.map(file => {
       const filename = file.filename.split('/').pop()
-      return 'https://dishcovery-api.onrender.com/images/recipePictures/' + filename
+      return 'https://dishcovery-api-tzpe.onrender.com/images/recipePictures/' + filename
     })
 
     recipePictureDeleter(recipe.images)

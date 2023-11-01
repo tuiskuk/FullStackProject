@@ -11,7 +11,7 @@ export const sendUserConfirmationEmail = (email, user) => {
   const emailToken = jwt.sign( { id: user._id,
   } , config.EMAIL_SECRET , { expiresIn: '1d' } )
 
-  const url = `https://dishcovery-api.onrender.com/api/register/${emailToken}`
+  const url = `https://dishcovery-api-tzpe.onrender.com/api/register/${emailToken}`
 
 
   const transporter = nodemailer.createTransport({
@@ -54,7 +54,7 @@ export const imageDeleter = (user) => {
   const __filename = fileURLToPath(import.meta.url)
   const __dirname = dirname(__filename)
 
-  const oldProfilePicturePathEnd = '../' + user.profileImage.replace('https://dishcovery-api.onrender.com/', '')
+  const oldProfilePicturePathEnd = '../' + user.profileImage.replace('https://dishcovery-api-tzpe.onrender.com/', '')
   const oldProfilePicturePath = resolve(__dirname, oldProfilePicturePathEnd)
 
   if(fs.existsSync(oldProfilePicturePath)) {
@@ -75,7 +75,7 @@ export const recipePictureDeleter = (images) => {
 
   //array of recipes to be deleted
   const recipePicturesToDelete = images
-    .map(image => '../' + image.replace('https://dishcovery-api.onrender.com/', ''))
+    .map(image => '../' + image.replace('https://dishcovery-api-tzpe.onrender.com/', ''))
     .map(imagePathEnd => resolve(__dirname, imagePathEnd))
 
 

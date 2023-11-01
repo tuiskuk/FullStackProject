@@ -4,7 +4,7 @@ import jwtDecode from 'jwt-decode'
 
 const fetchUser = async (userId) => {
   try {
-    const response = await fetch(`https://dishcovery-api.onrender.com/api/users/${userId}`)
+    const response = await fetch(`https://dishcovery-api-tzpe.onrender.com/api/users/${userId}`)
     if (!response.ok) {
       throw new Error('Failed to fetch user data')
     }
