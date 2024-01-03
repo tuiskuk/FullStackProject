@@ -21,6 +21,10 @@ Link to the production version: [https://dishcovery-nimz.onrender.com/](https://
 
 The production version might take some time (5-10 minutes) to run due to the free backend and frontend hosting in Render: [https://render.com/](https://render.com/).
 
+### Hours
+documented project hours: [https://github.com/tuiskuk/FullStackProject/blob/main/hours.md]
+
+
 ### Instructions
 - Open the app in your browser using the provided URL.
 - Upon reaching the app's homepage, take a moment to familiarize yourself with the layout and design.
@@ -50,7 +54,3 @@ Check the readme files in the frontend and backend folders for more information 
 
 ### Navigation diagram with functionalities
 ![image](https://github.com/tuiskuk/FullStackProject/assets/124632924/f5d54fc1-d87b-4990-8c39-de06283b69b9)
-
-
-### Hours can be found at
-https://github.com/tuiskuk/FullStackProject/blob/main/hours.md
