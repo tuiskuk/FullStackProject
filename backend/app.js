@@ -7,7 +7,6 @@ import confirmEmailRouter from './routes/confirmEmailRouter.js'
 import interactionRouter from './routes/interactionRouter.js'
 import commentRouter from './routes/commentRouter.js'
 import pictureRouter from './routes/pictureRouter.js'
-import resetDataBaseRouter from './routes/resetDataBaseRouter.js'
 import config from './utils/config.js'
 import middleware from './utils/middleware.js'
 import mongoose from 'mongoose'
@@ -60,7 +59,6 @@ app.use('/api/login', loginRouter)
 app.use('/api/interactions', interactionRouter)
 app.use('/api/comments', commentRouter)
 app.use('/api',pictureRouter)
-app.use('/api/reset',resetDataBaseRouter)
 
 
 app.use(middleware.unknownEndpoint)

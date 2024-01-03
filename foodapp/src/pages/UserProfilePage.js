@@ -68,16 +68,12 @@ const UserProfile = () => {
     userId, // Pass the actual value here
   })
   const postCount = userCreatedRecipes?.length
-  //TODO: dislikesData, LikesData, favoritesData, commentsData
 
   const dispatch = useDispatch()
   const followingCount = following?.length
   const followersCount = followers?.length
 
-  //const [recipeId, setRecipeId] = useState('')
 
-  //const { data: recipe } = useGetRecipeQuery(recipeId)
-  //setRecipeId('')
 
   useEffect(() => {
     setProfileDescription(user?.profileText)

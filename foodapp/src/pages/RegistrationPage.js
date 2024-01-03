@@ -15,9 +15,7 @@ import {
 import { useCreateUserMutation } from '../services/userApiSlice'
 import { useUploadProfilePictureMutation } from '../services/pictureHandlerApiSlice'
 import React from 'react'
-/*import { useConfirmEmailQuery } from '../services/apiSlice'
-import { selectCurrentAccessToken } from '../services/loginSlice'
-import { useSelector } from 'react-redux'*/
+
 
 const RegistrationForm = () => {
   const {
