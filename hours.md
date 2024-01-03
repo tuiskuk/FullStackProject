@@ -25,11 +25,11 @@
 - 5.8.2023 8h improved searchPage ui
 - 6.8.2023 5h improved seacrhPage ui
 - 7.8.2023 9h improved searchPage ui, adding new filters from api, footer
-- 25.8.2023 6h added instructions, updated navigation diagram, fixed frontend bugs.
+- 25.8.2023 6h added instructions, updated navigation diagram, fixed frontend bugs
 - 26.8.2023 6h refactored code, implemented users search page and database filtering to backend
 - 27.8.2023 3h finished database filtering and fixed frontend in search pages
-
-### Overall: 176h updated 27.8
+- 3.1.2024 4h improving README files and making the project ready to be returned
+### Overall: 180h updated 3.1.2024
 
 ## Otso Tikkanen
 - 30.6.2023 3h planning project with group and choosing API
