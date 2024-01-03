@@ -25,7 +25,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const corsOptions = {
-  origin: 'https://dishcovery-nimz.onrender.com',
+  origin: config.ORIGIN,
   credentials: true,
 }
 
@@ -60,10 +60,16 @@ app.use('/api/interactions', interactionRouter)
 app.use('/api/comments', commentRouter)
 app.use('/api',pictureRouter)
 
+// Serve static files from the React app
+app.use(express.static(join(__dirname, 'client/build')))
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
-
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(join(__dirname, 'client/build', 'index.html'))
+})
 
 export default app

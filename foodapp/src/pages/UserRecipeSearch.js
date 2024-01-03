@@ -46,10 +46,10 @@ const UserSearchPage = () => {
     const start = batchCounter * recipeBatch
     const end = start + recipeBatch
 
-    if (end >= allRecipesData?.length) {
+    if (end >= allRecipesData?.length || !allRecipesData?.length) {
       setShowLoadMore(false)
     }
-    const nextBatch = allRecipesData.slice(start, end)
+    const nextBatch = allRecipesData?.slice(start, end) || []
 
     setRecipesShown(prevRecipes => [...prevRecipes, ...nextBatch])
     setBatchCounter(batchCounter + 1)
@@ -455,7 +455,7 @@ const UserSearchPage = () => {
         </Typography>
         {isLoading || isFetching ? (
           <CircularProgress /> // Render the loading spinner when loading is true
-        ) : allRecipesData.length !== 0 ? (
+        ) : allRecipesData?.length > 0 ? (
           <Grid container spacing={2} marginTop={1} justifyContent="space-around" >
             {recipesShown.map((recipe, index) => (
               <Grid item key={index}  >
@@ -464,11 +464,13 @@ const UserSearchPage = () => {
             ))}
           </Grid>
         ) : (
-          <h3>No recipes found</h3>
+          <Grid container spacing={2} marginTop={1} justifyContent="space-around" >
+            <h3>No recipes found</h3>
+          </Grid>
         )}
       </Grid>
       <Grid item xs={12} sx={{ textAlign: 'center' }} >
-        {showLoadMore && (
+        {(showLoadMore && allRecipesData?.lenght > 0) && (
           <Button variant="contained" onClick={showMoreRecipes} sx={{ m: 0.5, width: 200 }}>
             Load more
           </Button>

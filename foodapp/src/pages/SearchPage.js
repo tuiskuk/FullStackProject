@@ -12,7 +12,6 @@ import RangeInputComponent from '../components/RangeInputComponent'
 import NutrientDialog from '../dialogs/NutrientDialog'
 
 const SearchPage = () => {
-  localStorage.clear()
   const [recipes, setRecipes] = useState([])
   const [nextPageLink, setNextPageLink] = useState('')
 
@@ -580,7 +579,9 @@ const SearchPage = () => {
             ))}
           </Grid>
         ) : (
-          <h3>No recipes found</h3>
+          <Grid container spacing={2} marginTop={1} justifyContent="space-around" >
+            <h3>No recipes found</h3>
+          </Grid>
         )}
       </Grid>
       <Grid item xs={12} sx={{ textAlign: 'center' }} >

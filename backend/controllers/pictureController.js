@@ -1,13 +1,13 @@
 import { User } from '../models/user.js'
 import { Recipe } from '../models/recipe.js'
 import { imageDeleter, recipePictureDeleter } from '../utils/helperFunctions.js'
-
+import config from '../utils/config.js'
 
 const uploadProfilePicture = async (request, response, next) => {
 
 
   const { userId } = request.params
-  const imagePath =  'https://dishcovery-api-tzpe.onrender.com/images/profilePictures/' + request?.file?.filename
+  const imagePath =  config.ORIGIN + '/images/profilePictures/' + request?.file?.filename
 
 
   try {
@@ -52,7 +52,7 @@ const uploadRecipePicture = async (request, response, next) => {
 
     const newImagePaths = uniqueUploadedFiles.map(file => {
       const filename = file.filename.split('/').pop()
-      return 'https://dishcovery-api-tzpe.onrender.com/images/recipePictures/' + filename
+      return config.ORIGIN + '/images/recipePictures/' + filename
     })
 
     recipePictureDeleter(recipe.images)
