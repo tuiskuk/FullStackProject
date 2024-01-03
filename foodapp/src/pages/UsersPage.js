@@ -24,12 +24,13 @@ const UsersPage = () => {
   }
 
   if (isError) {
+    console.log(error)
     return (
       <Container maxWidth="lg" >
         <Typography variant="h4" >
           All Users
         </Typography>
-        <p>Error: {error.message}</p>
+        <h3>No users found</h3>
       </Container>
     )
   }

@@ -10,6 +10,7 @@ const MY_GMAIL_PASSWORD = process.env.MY_GMAIL_PASSWORD
 const MY_GMAIL = process.env.MY_GMAIL
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
 const SECRET = process.env.SECRET
+const ORIGIN = process.env.ORIGIN
 
 export default {
   SECRET,
@@ -21,4 +22,5 @@ export default {
   EMAIL_SECRET,
   MY_GMAIL_PASSWORD,
   MY_GMAIL,
+  ORIGIN
 }

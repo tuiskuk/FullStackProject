@@ -20,4 +20,3 @@ https://developer.edamam.com/edamam-recipe-api
 2. Run `npm install` to install the project dependencies.
 2. To run the backend in the development mode run `npm run dev` and it is running on [http://localhost:3001](http://localhost:3000). The page will reload when you make changes.
 3. To use the backend, run it with the frontend.
-4. Run `npm run build` to create a production build of your application.
