@@ -61,15 +61,15 @@ app.use('/api/comments', commentRouter)
 app.use('/api',pictureRouter)
 
 // Serve static files from the React app
-app.use(express.static(join(__dirname, 'client/build')))
+app.use(express.static(join(__dirname, 'build')))
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, 'client/build', 'index.html'))
+app.get('/*', (req, res) => {
+  res.sendFile(join(__dirname, 'build', 'index.html'))
 })
 
 export default app
