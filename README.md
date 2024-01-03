@@ -1,6 +1,7 @@
 # FullStackProject
 Santeri, Otso, Tuisku fullstack project
 
+
 Description of the project
 
 Dishcovery is a powerful and interactive web application designed to simplify the process of discovering recipes that suit users' needs.
@@ -25,9 +26,13 @@ Instructions
    - Interact with recipes by liking and commenting on them.
    - Begin following other users. Likewise, other users can now follow your profile, explore your profile, view your recipes, and more.
 
+### app is Runnin at 
+https://dishcovery-nimz.onrender.com/
+
 Example user
 email: test.test@gmail.com
 password: 12345678
+
 
 Warning
 The page may sometimes lack information about recipes due to the limitation of api calls (10 calls/min in the free version)
@@ -38,3 +43,7 @@ https://developer.edamam.com/edamam-recipe-api
 
 Navigation diagram with functionalities
 ![image](https://github.com/tuiskuk/FullStackProject/assets/124632924/f5d54fc1-d87b-4990-8c39-de06283b69b9)
+
+
+### Hours can be found at
+https://github.com/tuiskuk/FullStackProject/blob/main/hours.md
