@@ -19,10 +19,8 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
   const userId = user?.id
   const navigate = useNavigate()
 
-
   const { data: dataFromApi } = useGetRecipeQuery(recipe.id)
   const [ deleteSpecificUserCreatedRecipe ] = useDeleteSpecificUserCreatedRecipeMutation()
-
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   // Handle opening the delete confirmation dialog
@@ -74,7 +72,6 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
 
   //inside useEffect to make sure that dataFromApi and recipe are defined
   useEffect(() => {
-
     try {
       //modify recipe only if it is not created by user
       //and does not contain api information
@@ -83,34 +80,23 @@ const RecipeCard = ({ recipe, deleteRecipe, edit }) => {
         //we need to make sure that properties instruktions, totalTime
         //and so on will be set in sessionStorage and in recipeViewPages state
         recipe = dataFromApi?.recipe
-        //console.log(recipe)
       }
-
       setDisplayedRecipe(recipe)
 
     } catch (e) {recipe
       favoriteRecipe = dataFromApi?.recipe
       setDisplayedRecipe(favoriteRecipe)
-
     }
-
-    //console.log(displayedRecipe)
   }, [recipe ,dataFromApi])
-
-
 
   const handleRecipeClick = () => {
     try {
-
       // Save the recipe to sessionStorage
       sessionStorage.setItem('recipe', JSON.stringify(displayedRecipe))
     } catch (error) {
       console.log('Error saving recipe:', error)
     }
   }
-
-
-
 
   return (
     <div

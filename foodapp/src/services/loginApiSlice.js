@@ -16,19 +16,14 @@ const fetchUser = async (userId) => {
 }
 
 const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
-
   try {
-
     const response = await queryFulfilled
-
     const { accessToken } = response.data
 
     dispatch(setAccessToken({ accessToken }))
 
     const { id, exp } = jwtDecode(accessToken)
-
     const user = await fetchUser(id)
-
 
     if (!user) {
       console.log('User not found in the database.')
@@ -38,9 +33,11 @@ const onQueryStarted = async (arg, { dispatch, queryFulfilled }) => {
       dispatch(setUser({ user }))
       dispatch(setExpTime({ exp }))
     }
-
   } catch (e) {
-    console.log(e)
+    //Do not show unauthorized errors
+    if(e?.error?.status !== 401){
+      console.log(e)
+    }
   }
 }
 
