@@ -3,7 +3,7 @@ import { setAccessToken } from './loginSlice'
 
 
 const baseQueryWithAccessToken = fetchBaseQuery({
-  baseUrl: 'http://dishcovery-api-tzpe.onrender.com/api',
+  baseUrl: 'https://dishcovery-api-tzpe.onrender.com/api',
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
 

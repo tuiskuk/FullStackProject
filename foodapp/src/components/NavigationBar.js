@@ -134,8 +134,6 @@ const LoginNavigationBarItem = ({ user }) => {
   const fisrstname = user?.name?.split(' ')[0]
   const secondName = user?.name?.split(' ')[1]
 
-  console.log(user, fisrstname, secondName)
-
   const [anchorEl, setAnchorEl] = useState(null)
   const [showLogOutDialog, setShowLogOutDialog] = useState(false)
 
