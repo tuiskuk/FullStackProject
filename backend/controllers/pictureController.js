@@ -7,7 +7,7 @@ const uploadProfilePicture = async (request, response, next) => {
 
 
   const { userId } = request.params
-  const imagePath =  config.ORIGIN + '/images/profilePictures/' + request?.file?.filename
+  const imagePath =  config.ORIGIN_IMAGES + '/images/profilePictures/' + request?.file?.filename
 
 
   try {
@@ -52,7 +52,7 @@ const uploadRecipePicture = async (request, response, next) => {
 
     const newImagePaths = uniqueUploadedFiles.map(file => {
       const filename = file.filename.split('/').pop()
-      return config.ORIGIN + '/images/recipePictures/' + filename
+      return config.ORIGIN_IMAGES + '/images/recipePictures/' + filename
     })
 
     recipePictureDeleter(recipe.images)

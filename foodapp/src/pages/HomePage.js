@@ -49,7 +49,6 @@ const HomePage = () => {
   const handleBannerClick = (link) => {
     navigate(link)
   }
-  console.log(recipesData)
   return (
     <Grid container spacing={2} paddingTop={1}>
 

@@ -13,7 +13,8 @@ import {
   Box,
   Popover,
   Card,
-  CardContent
+  CardContent,
+  CircularProgress
 } from '@mui/material'
 import { selectCurrentUser } from '../services/loginSlice'
 import { useSelector, useDispatch } from 'react-redux'
@@ -46,6 +47,7 @@ const UserProfile = () => {
   const user = useSelector(selectCurrentUser)
   const [ updateUser ] = useUpdateUserMutation()
   const [uploadProfilePicture] = useUploadProfilePictureMutation()
+  const [uploading, setUploading] = useState(false)
 
 
   const fileInputRef = useRef(null)
@@ -139,6 +141,7 @@ const UserProfile = () => {
     setNewProfilPicture(file)
     if (file) {
       try {
+        setUploading(true)
         // Upload the profile picture and get the response
         const response = await uploadProfilePicture({ file: file, id: user?.id })
         const updatedProfilePicture = response.data.profileImage
@@ -154,7 +157,9 @@ const UserProfile = () => {
 
         // Update the user in the application state
         dispatch(setUser({ user: updatedUser }))
+        setUploading(false)
       } catch (error) {
+        setUploading(false)
         // Handle any errors that occurred during the upload/update process
         console.error('Error uploading profile picture:', error)
       }
@@ -167,12 +172,16 @@ const UserProfile = () => {
     <Container maxWidth="sm">
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>
-          <Avatar
-            alt="Profile Image"
-            src={user?.profileImage}
-            sx={{ width: 150, height: 150, marginBottom: 2, cursor: 'pointer' }}
-            onClick={handleAvatarClick}
-          />
+          {uploading ? (
+            <CircularProgress size={50} /> // Show a loading spinner while uploading
+          ) : (
+            <Avatar
+              alt="Profile Image"
+              src={newProfilPicture ? URL.createObjectURL(newProfilPicture) : user?.profileImage}
+              sx={{ width: 150, height: 150, marginBottom: 2, cursor: 'pointer' }}
+              onClick={handleAvatarClick}
+            />
+          )}
           <input
             type="file"
             accept="image/*"

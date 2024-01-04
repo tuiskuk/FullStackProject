@@ -29,7 +29,7 @@ const NavigationBar = () => {
 
     return (
       <>
-        <IconButton onClick={handleMenuOpen} sx={{ position: 'fixed', top: 10, left: 10, color: '#FFA726' }}>
+        <IconButton onClick={handleMenuOpen} sx={{ position: 'fixed', top: 10, left: 15, color: '#FFA726', zIndex: 9999 }}>
           <MenuIcon sx={{ fontSize: '44px' }} />
         </IconButton>
         <Menu
@@ -50,12 +50,17 @@ const NavigationBar = () => {
           <MenuItem component={Link} to="/userRecipesearch">
             Recipes by users
           </MenuItem>
-          <MenuItem component={Link} to="/profile">
+
+          {user && (
+            <MenuItem component={Link} to="/profile">
             My Profile
-          </MenuItem>
-          <MenuItem component={Link} to="/CreateRecipe">
+            </MenuItem>
+          )}
+          {user && (
+            <MenuItem component={Link} to="/CreateRecipe">
             Create recipe
-          </MenuItem>
+            </MenuItem>
+          )}
           {!user ? <MenuItem component={Link} to="/login">
             Login
           </MenuItem> :
@@ -126,8 +131,10 @@ const NavigationBar = () => {
 
 const LoginNavigationBarItem = ({ user }) => {
 
-  const fisrstname = user?.user?.name?.split(' ')[0]
-  const secondName = user?.user?.name?.split(' ')[1]
+  const fisrstname = user?.name?.split(' ')[0]
+  const secondName = user?.name?.split(' ')[1]
+
+  console.log(user, fisrstname, secondName)
 
   const [anchorEl, setAnchorEl] = useState(null)
   const [showLogOutDialog, setShowLogOutDialog] = useState(false)
