@@ -60,7 +60,9 @@ const LoginPage = ({ action, closeDialog }) => {
       if (!action){
         navigate('/')
       }
-      closeDialog()
+      if(closeDialog){
+        closeDialog()
+      }
     } catch (error) {
       console.log(error)
     }

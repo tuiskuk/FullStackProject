@@ -114,9 +114,14 @@ const getRecipe = async (request, response, next) => {
     const { id } = request.query
     const foundRecipe = await Recipe.findById(id)
 
+    if (!id) {
+      return response.status(201).json({ message: 'No id' })
+    }
 
-    if (!foundRecipe || foundRecipe.creator !== null) {
+    if (!foundRecipe) {
       return response.status(404).json({ error: 'API Recipe not found' })
+    } else if (foundRecipe.creator) {
+      return response.status(200).json(foundRecipe)
     }
 
     const recipeId = foundRecipe.recipeId
