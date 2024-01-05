@@ -52,12 +52,12 @@ documented project hours: [https://github.com/tuiskuk/FullStackProject/blob/main
    - Begin following other users. Likewise, other users can now follow your profile, explore your profile, view your recipes, and more.
 
 
-Example user
-email: test.test@gmail.com
-password: 12345678
+**Example user** \
+**email:** test.test@gmail.com \
+**password:** 12345678
 
 
-Warning
+**Warning** \
 The page may sometimes lack information about recipes due to the limitation of api calls (10 calls/min in the free version)
 
 ### Usage and information about the project
