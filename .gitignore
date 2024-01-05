@@ -1,7 +1,10 @@
 /node_modules
 /.pnp
 .pnp.js
-backend/images
+backend/images/profilePictures
+backend/images/recipePictures
+
+
 
 # production
 /build
