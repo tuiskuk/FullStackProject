@@ -10,7 +10,6 @@ on:
     types:
       - synchronize
 
-
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-20.04
@@ -25,15 +24,11 @@ jobs:
           node-version: '16'
 
       - name: Install Backend Dependencies
-        run: |
-          cd backend
-          npm install
+        run: npm install
         working-directory: ./backend
 
       - name: Run Backend Lint
-        run: |
-          cd backend
-          npm run lint
+        run: npm run lint
         working-directory: ./backend
 
       - name: Set Up Node.js (Frontend)
@@ -42,17 +37,9 @@ jobs:
           node-version: '16'
 
       - name: Install Frontend Dependencies
-        run: |
-          cd frontend
-          npm install
+        run: npm install
         working-directory: ./frontend
 
       - name: Run Frontend Lint
-        run: |
-          cd frontend
-          npm run lint
+        run: npm run lint
         working-directory: ./frontend
-
-
-
-
