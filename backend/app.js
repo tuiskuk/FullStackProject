@@ -15,9 +15,7 @@ import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 mongoose.set('strictQuery', false)
 
-
 const app = express()
-
 
 //little manipulation to avoid harcoded path to images folder
 //in order to make it possible for everybody to use this
@@ -29,14 +27,10 @@ const corsOptions = {
   credentials: true,
 }
 
-
 app.use(cors(corsOptions))
-
 
 //allow requests under images folder to return picctures
 app.use('/images', express.static(join(__dirname, 'images')))
-
-
 
 const url = config.MONGODB_URI
 
@@ -47,7 +41,6 @@ mongoose.connect(url)
   .catch((error) => {
     console.log('error connecting to MongoDB:', error.message)
   })
-
 
 app.use(express.json())
 app.use(cookieParser())
@@ -60,16 +53,7 @@ app.use('/api/interactions', interactionRouter)
 app.use('/api/comments', commentRouter)
 app.use('/api',pictureRouter)
 
-// Serve static files from the React app
-app.use(express.static(join(__dirname, 'build')))
-
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('/*', (req, res) => {
-  res.sendFile(join(__dirname, 'build', 'index.html'))
-})
 
 export default app
