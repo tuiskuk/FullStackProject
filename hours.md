@@ -29,7 +29,8 @@
 - 26.8.2023 6h refactored code, implemented users search page and database filtering to backend
 - 27.8.2023 3h finished database filtering and fixed frontend in search pages
 - 3.1.2024 4h improving README files and making the project ready to be returned
-### Overall: 180h updated 3.1.2024
+- 4.1.2024 5h improving error handling and cleaning console logs
+### Overall: 185h updated 4.1.2024
 
 ## Otso Tikkanen
 - 30.6.2023 3h planning project with group and choosing API
@@ -52,10 +53,6 @@
 - 30.9.2023 (175) 12h making pipeline that compiles and redeploys our app. switching it to my two seperate (frontend and backend)branches that we decided against later 
 
 ### Overall: 175h updated 30.9
-
-
-
-
 
 ## Tuisku Kaikuvuo
 
