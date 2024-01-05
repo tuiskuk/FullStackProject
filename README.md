@@ -21,6 +21,8 @@ Link to the production version: [https://dishcovery-nimz.onrender.com/](https://
 
 The production version might take some time (5-10 minutes) to run due to the free backend and frontend hosting in Render: [https://render.com/](https://render.com/).
 
+Known issue (only in production): Because of limitations of Render's free version and non-persistent disk, after uploading images succesfully, they won't be saved after refreshing or after new deployments etc. Persistent images work in local versions and have the correct logic but bear this limitation in mind when using the application.
+
 ### Hours
 documented project hours: [https://github.com/tuiskuk/FullStackProject/blob/main/hours.md]
 
