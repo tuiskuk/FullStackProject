@@ -59,44 +59,44 @@
 
 ## Tuisku Kaikuvuo
 
-30.6.2023 3h planning project with group and choosing API
-2.7.2023 (8h) 5h planning project, defining and rating importance of functionalities, made navigation diagram, choosing and making database and diagram
-3.7.2023 4h researching how to implement redux and rtk query properly
-4.7.2023 8h adding temporary recipeviewpage, changed api calls to work with redux and rtk query and setup store and slice infrastructure and changed backend to ES6 modules and split controller and router logic
-5.6.2023 4h adding content to RecipeViewPage and a way to fetch the recipe to display it
-6.6.2023 8h added registration for users to frontend, added components and apiSlice for users, added mui theme logic
-10.6.2023 2h changed logic in frontend to be more redux focused
-11.6.2023 4h added profile page
-12.6.2023 6h added cookies and jsonwebtoken functionality
-13.6.2023 4.5h added errors for login and profile page and fixed bugs
-14.6.2023 6h restricted some routes for only logged in users, implemented further logic related to users
-15.6.2023 6h added logic for login refresh with jwt token, improved auth headers
-16.6.2023 5h added following, followers and follow/unfollow functionality, improved profile page with following, followers info and follow and unfollow capabilities
-17.7.2023 4h changed all instances of token to accessToken to avoid confusion, worked on fixing persisted login to work on all pages
-18.7.2023 3.5h fixed jwt becoming too large on requests (too much info being saved into jwt token)
-19.7.2023 6h changed way to dispatch user on refresh, fixed user not being up to date in redux state after follow/unfollow
-20.7.2023 3h updated users page with new functionality
-22.7.2023 4h updated profile page with new information being shown for the user
-24.7.2023 6h added lists of followers and following users when hovering in a user's profile or on my profile page, fixed favorite recipes to show with new logic of objectIds
-25.7.2023 4h improved recipe comment section and adjusted backend accordingly
-26.7.2023 6h added deletion of accessToken after expiration, automatic logout and changed design of login page
-27.7.2023 4h fixed issues with showing recipe cards on different pages because they have different access to information on different pages
-29.7.2023 2h bug fixing with recipe cards
-9.8.2023 5h improved user cards and recipe cards and fixed following users on home page
-18.8.2023 5h visual changes on most of the card components and the profiles
-20.8.2023 2h worked on profiles being able to display user created recipes
-22.8.2023 2h	-||-
-23.8.2023 4h implemented profiles being able to display user created recipes and worked on going to user created recipes
-24.8.2023 6h implemented going to user created recipes from favorites, likes, dislikes and my recipes list and also some other changes
-25.8.2023 4.5h added overlay on recipeCards on hover and added profileTexts to user profiles
-27.8.2023 1h fixed error with kebab case
-28.8.2023 10h fixed error with axios and added editing and deleting for user created recipes
-29.8.2023 7h updating for user recipes and improved logic for picture upload handling for updates and creation of recipes
-25.10.2023 1h deleted unnecessary control logs to prepare for production
-26.10.2023 3h slightly improved visual appeal on a few pages
-27.10.2023 7h worked on deployment, changed urls, changed mongo uri, deployed on Render and tested, a few small bugs remainn at this point
-3.1.2024 1h meetup on Discord to finish the project
-4.1.2024 6h fixed the menu icon on mobile not being on top of every element always, fixed profile image placeholder and worked on image uploading bug and with problems on Render
+- 30.6.2023 3h planning project with group and choosing API
+- 2.7.2023 (8h) 5h planning project, defining and rating importance of functionalities, made navigation diagram, choosing and making database and diagram
+- 3.7.2023 4h researching how to implement redux and rtk query properly
+- 4.7.2023 8h adding temporary recipeviewpage, changed api calls to work with redux and rtk query and setup store and slice infrastructure and changed backend to ES6 modules and split controller and router logic
+- 5.6.2023 4h adding content to RecipeViewPage and a way to fetch the recipe to display it
+- 6.6.2023 8h added registration for users to frontend, added components and apiSlice for users, added mui theme logic
+- 10.6.2023 2h changed logic in frontend to be more redux focused
+- 11.6.2023 4h added profile page
+- 12.6.2023 6h added cookies and jsonwebtoken functionality
+- 13.6.2023 4.5h added errors for login and profile page and fixed bugs
+- 14.6.2023 6h restricted some routes for only logged in users, implemented further logic related to users
+- 15.6.2023 6h added logic for login refresh with jwt token, improved auth headers
+- 16.6.2023 5h added following, followers and follow/unfollow functionality, improved profile page with following, followers info and follow and unfollow capabilities
+- 17.7.2023 4h changed all instances of token to accessToken to avoid confusion, worked on fixing persisted login to work on all pages
+- 18.7.2023 3.5h fixed jwt becoming too large on requests (too much info being saved into jwt token)
+- 19.7.2023 6h changed way to dispatch user on refresh, fixed user not being up to date in redux state after follow/unfollow
+- 20.7.2023 3h updated users page with new functionality
+- 22.7.2023 4h updated profile page with new information being shown for the user
+- 24.7.2023 6h added lists of followers and following users when hovering in a user's profile or on my profile page, fixed favorite recipes to show with new logic of objectIds
+- 25.7.2023 4h improved recipe comment section and adjusted backend accordingly
+- 26.7.2023 6h added deletion of accessToken after expiration, automatic logout and changed design of login page
+- 27.7.2023 4h fixed issues with showing recipe cards on different pages because they have different access to information on different pages
+- 29.7.2023 2h bug fixing with recipe cards
+- 9.8.2023 5h improved user cards and recipe cards and fixed following users on home page
+- 18.8.2023 5h visual changes on most of the card components and the profiles
+- 20.8.2023 2h worked on profiles being able to display user created recipes
+- 22.8.2023 2h	-||-
+- 23.8.2023 4h implemented profiles being able to display user created recipes and worked on going to user created recipes
+- 24.8.2023 6h implemented going to user created recipes from favorites, likes, dislikes and my recipes list and also some other changes
+- 25.8.2023 4.5h added overlay on recipeCards on hover and added profileTexts to user profiles
+- 27.8.2023 1h fixed error with kebab case
+- 28.8.2023 10h fixed error with axios and added editing and deleting for user created recipes
+- 29.8.2023 7h updating for user recipes and improved logic for picture upload handling for updates and creation of recipes
+- 25.10.2023 1h deleted unnecessary control logs to prepare for production
+- 26.10.2023 3h slightly improved visual appeal on a few pages
+- 27.10.2023 7h worked on deployment, changed urls, changed mongo uri, deployed on Render and tested, a few small bugs remainn at this point
+- 3.1.2024 1h meetup on Discord to finish the project
+- 4.1.2024 6h fixed the menu icon on mobile not being on top of every element always, fixed profile image placeholder and worked on image uploading bug and with problems on Render
 
 ### Overall: 175.5h updated 5.1.2024
 
