@@ -38,8 +38,8 @@ jobs:
 
       - name: Install Frontend Dependencies
         run: npm install
-        working-directory: ./frontend
+        working-directory: ./foodapp
 
       - name: Run Frontend Lint
         run: npm run lint
-        working-directory: ./frontend
+        working-directory: ./foodapp
