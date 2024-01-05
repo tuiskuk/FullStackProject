@@ -1,7 +1,7 @@
-# FullStackProject
+# FullStackProject - **Dishcovery**
 
 
-**Santeri, Otso, Tuisku fullstack project**
+**Santeri Ora, Otso Tikkanen and Tuisku Kaikuvuo**
 
 ## Description of the project
 
@@ -23,8 +23,21 @@ The production version might take some time (5-10 minutes) to run due to the fre
 
 Known issue (only in production): Because of limitations of Render's free version and non-persistent disk, after uploading images succesfully, they won't be saved after refreshing or after new deployments etc. Persistent images work in local versions and have the correct logic but bear this limitation in mind when using the application.
 
+
+### Individual Work Areas
+Overall, we didn't have typical designated working areas in the project, such as backend or frontend assignments. Instead, we viewed the project as an opportunity to delve deeper into full-stack development, exploring various technologies and showcasing our skills in this domain. Our group dynamics were excellent; we extensively discussed the project on Discord and consistently assisted each other in resolving various challenges. Below, we've outlined the primary work areas for each team member:
+
+- **Santeri Ora** \
+Santeri primarily focused on working with the recipe API, developing recipe search pages for both API and user-generated recipes. He handled backend tasks related to the recipe API and managed the recipe database. Additionally, he was responsible for various dialogs, UI components, and their associated logics.
+
+- **Otso Tikkanen** \
+Otso's primary area of work revolved around backend functionalities concerning user management. He also managed the create recipe page and the frontend display of recipes. He oversaw the integration of user-generated recipes with the API in the backend and database. Furthermore, Otso took care of saving and displaying images of users and their recipes. He also worked with the responsiveness of the app.
+
+- **Tuisku Kaikuvuo** \
+Tuisku worked on setting up Redux and RTK query at the start and then mainly on functionalities relating to users and users' profiles. Examples are jwt logic and logging in, following, seeing other users' profiles and people following them et cetera.
+
 ### Hours
-documented project hours: [https://github.com/tuiskuk/FullStackProject/blob/main/hours.md]
+documented project hours: [https://github.com/tuiskuk/FullStackProject/blob/main/hours.md](https://github.com/tuiskuk/FullStackProject/blob/main/hours.md)
 
 
 ### Instructions

@@ -11,7 +11,7 @@ export const sendUserConfirmationEmail = (email, user) => {
   const emailToken = jwt.sign( { id: user._id,
   } , config.EMAIL_SECRET , { expiresIn: '1d' } )
 
-  const url = config.ORIGIN + `/api/register/${emailToken}`
+  const url = config.ORIGIN_IMAGES + `/api/register/${emailToken}`
 
 
   const transporter = nodemailer.createTransport({
