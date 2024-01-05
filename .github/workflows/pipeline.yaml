@@ -11,16 +11,6 @@ on:
       - synchronize
 
 
-on:
-  push:
-    branches:
-      - '*'
-  pull_request:
-    branches:
-      - '*'
-    types:
-      - synchronize
-
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-20.04
@@ -65,34 +55,4 @@ jobs:
 
 
 
-  # tag_release:
-  #   needs: simple_deployment_pipeline
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #   - uses: actions/checkout@v3
-  #   - name: Bump version and push tag
-  #     env:
-  #       COMMIT_MESSAGE: ${{ toJson(github.event.commits[0].message) }}
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       DEFAULT_BUMP: patch 
-  #     if: ${{ github.event_name == 'push' && !contains(env.COMMIT_MESSAGE, '#skip') }}
-  #     uses: anothrNick/github-tag-action@1.67.0
 
-
-  # deployment:
-  #   needs: simple_deployment_pipeline
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Trigger deployment
-  #       if: ${{ github.event_name == 'push' }}
-  #       uses: johnbeynon/render-deploy-action@v0.0.8
-  #       with:
-  #         service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
-  #         api-key: ${{ secrets.MY_RENDER_API_KEY }}
-  #     - name: Deploy Success
-  #       uses: rjstone/discord-webhook-notify@v1.0.4
-  #       if: success() && github.event_name == 'push'
-  #       with:
-  #           severity: info
-  #           details: Deploy of pokeapp was Success!
-  #           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
